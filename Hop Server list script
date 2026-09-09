@@ -8,7 +8,7 @@ local PlayerGui = Player:WaitForChild("PlayerGui")
 
 --// SETTINGS
 local KEY = "key999"
-local DISCORD = "https://discord.gg/YOURINVITE"
+local DISCORD = "https://discord.gg/FJK6QzNnf7"
 
 local MAX_PAGES = 50
 local MAX_RETRIES = 3
