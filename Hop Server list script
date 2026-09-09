@@ -62,13 +62,10 @@ local function Button(parent, text, position, size, color)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.TextSize = 14
     button.Font = Enum.Font.GothamBold
-
     button.BackgroundColor3 = color
     button.BorderSizePixel = 0
-
     button.Position = position
     button.Size = size
-
     button.AutoButtonColor = false
     button.Parent = parent
 
@@ -96,10 +93,8 @@ local Main = Instance.new("Frame")
 Main.Name = "Main"
 Main.Size = UDim2.fromOffset(340, 410)
 Main.Position = UDim2.new(0.5, -170, 0.5, -205)
-
 Main.BackgroundColor3 = Color3.fromRGB(12, 15, 24)
 Main.BorderSizePixel = 0
-
 Main.Parent = ScreenGui
 
 Corner(Main, 16)
@@ -109,10 +104,8 @@ Stroke(Main, Color3.fromRGB(55, 75, 120), 0.35)
 
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 72)
-
 Header.BackgroundColor3 = Color3.fromRGB(17, 21, 34)
 Header.BorderSizePixel = 0
-
 Header.Parent = Main
 
 Corner(Header, 16)
@@ -120,10 +113,8 @@ Corner(Header, 16)
 local HeaderLine = Instance.new("Frame")
 HeaderLine.Size = UDim2.new(1, -32, 0, 2)
 HeaderLine.Position = UDim2.new(0, 16, 1, -2)
-
 HeaderLine.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
 HeaderLine.BorderSizePixel = 0
-
 HeaderLine.Parent = Header
 
 local Title = Label(
@@ -150,17 +141,13 @@ Subtitle.TextXAlignment = Enum.TextXAlignment.Left
 --// CLOSE BUTTON
 
 local Close = Instance.new("TextButton")
-
 Close.Size = UDim2.fromOffset(34, 34)
 Close.Position = UDim2.new(1, -48, 0, 18)
-
 Close.Text = "×"
 Close.TextSize = 24
 Close.Font = Enum.Font.Gotham
-
 Close.TextColor3 = Color3.fromRGB(180, 190, 210)
 Close.BackgroundColor3 = Color3.fromRGB(27, 31, 45)
-
 Close.BorderSizePixel = 0
 Close.Parent = Header
 
@@ -208,7 +195,6 @@ UIS.InputChanged:Connect(function(input)
         Main.Position = UDim2.new(
             startPosition.X.Scale,
             startPosition.X.Offset + delta.X,
-
             startPosition.Y.Scale,
             startPosition.Y.Offset + delta.Y
         )
@@ -220,16 +206,11 @@ end)
 --// CONTENT
 
 local Content = Instance.new("Frame")
-
 Content.Name = "Content"
-
 Content.Position = UDim2.new(0, 0, 0, 72)
 Content.Size = UDim2.new(1, 0, 1, -72)
-
 Content.BackgroundTransparency = 1
 Content.Parent = Main
-
---// SERVER FINDER FORWARD DECLARATION
 
 local ShowServerFinder
 
@@ -238,8 +219,6 @@ local ShowServerFinder
 local function ShowKeyScreen()
 
     Content:ClearAllChildren()
-
-    -- ICON
 
     local Icon = Label(
         Content,
@@ -251,52 +230,45 @@ local function ShowKeyScreen()
 
     Icon.Size = UDim2.new(1, 0, 0, 50)
 
-    -- TITLE
-
     local KeyTitle = Label(
         Content,
-        "KEY SYSTEM",
+        "DAILY KEY SYSTEM",
         21,
         UDim2.new(0, 0, 0, 66),
         Enum.Font.GothamBold
     )
 
-    -- DESCRIPTION
-
     local Description = Label(
         Content,
-        "Unlock the small server finder",
+        "🔄 Key changes every day\nJoin our Discord server to get the key",
         12,
         UDim2.new(0, 0, 0, 94),
         Enum.Font.Gotham,
         Color3.fromRGB(145, 155, 180)
     )
 
-    -- KEY BOX
+    Description.Size = UDim2.new(1, -30, 0, 42)
+    Description.TextWrapped = true
+
+    --// KEY BOX
 
     local KeyBox = Instance.new("TextBox")
-
     KeyBox.Size = UDim2.new(1, -40, 0, 48)
     KeyBox.Position = UDim2.new(0, 20, 0, 135)
-
     KeyBox.BackgroundColor3 = Color3.fromRGB(22, 27, 42)
     KeyBox.BorderSizePixel = 0
-
-    KeyBox.PlaceholderText = "Enter your key..."
+    KeyBox.PlaceholderText = "Enter key..."
     KeyBox.PlaceholderColor3 = Color3.fromRGB(100, 110, 135)
-
     KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     KeyBox.TextSize = 14
     KeyBox.Font = Enum.Font.Gotham
-
     KeyBox.ClearTextOnFocus = false
-
     KeyBox.Parent = Content
 
     Corner(KeyBox, 10)
     Stroke(KeyBox, Color3.fromRGB(55, 75, 120), 0.35)
 
-    -- ENTER BUTTON
+    --// ENTER BUTTON
 
     local EnterButton = Button(
         Content,
@@ -306,7 +278,7 @@ local function ShowKeyScreen()
         Color3.fromRGB(55, 105, 235)
     )
 
-    -- DISCORD BUTTON
+    --// DISCORD BUTTON
 
     local DiscordButton = Button(
         Content,
@@ -316,24 +288,21 @@ local function ShowKeyScreen()
         Color3.fromRGB(105, 70, 190)
     )
 
-    -- STATUS BOX
+    --// STATUS BOX
 
     local StatusBox = Instance.new("Frame")
-
     StatusBox.Size = UDim2.new(1, -40, 0, 48)
     StatusBox.Position = UDim2.new(0, 20, 0, 305)
-
     StatusBox.BackgroundColor3 = Color3.fromRGB(20, 24, 36)
     StatusBox.BorderSizePixel = 0
-
     StatusBox.Parent = Content
 
     Corner(StatusBox, 10)
 
     local Status = Label(
         StatusBox,
-        "●  Waiting for key",
-        12,
+        "●  Join our Discord server to get the key",
+        11,
         UDim2.new(0, 12, 0, 9),
         Enum.Font.GothamMedium,
         Color3.fromRGB(150, 160, 185)
@@ -341,8 +310,9 @@ local function ShowKeyScreen()
 
     Status.TextXAlignment = Enum.TextXAlignment.Left
     Status.Size = UDim2.new(1, -24, 1, -18)
+    Status.TextWrapped = true
 
-    -- ENTER KEY
+    --// ENTER KEY
 
     EnterButton.MouseButton1Click:Connect(function()
 
@@ -364,7 +334,7 @@ local function ShowKeyScreen()
 
     end)
 
-    -- DISCORD
+    --// JOIN DISCORD
 
     DiscordButton.MouseButton1Click:Connect(function()
 
@@ -377,7 +347,7 @@ local function ShowKeyScreen()
 
         else
 
-            Status.Text = DISCORD
+            Status.Text = "●  " .. DISCORD
             Status.TextColor3 = Color3.fromRGB(100, 180, 255)
 
         end
@@ -386,13 +356,11 @@ local function ShowKeyScreen()
 
 end
 
---// SERVER FINDER
+--// SMALL SERVER LIST
 
 ShowServerFinder = function()
 
     Content:ClearAllChildren()
-
-    --// TITLE
 
     local FinderTitle = Label(
         Content,
@@ -403,8 +371,6 @@ ShowServerFinder = function()
     )
 
     FinderTitle.Size = UDim2.new(1, 0, 0, 30)
-
-    --// SUBTITLE
 
     local FinderSubtitle = Label(
         Content,
@@ -417,7 +383,7 @@ ShowServerFinder = function()
 
     FinderSubtitle.Size = UDim2.new(1, 0, 0, 22)
 
-    --// REFRESH BUTTON
+    --// REFRESH
 
     local RefreshButton = Button(
         Content,
@@ -445,7 +411,6 @@ ShowServerFinder = function()
     local ServerList = Instance.new("ScrollingFrame")
 
     ServerList.Name = "ServerList"
-
     ServerList.Position = UDim2.new(0, 20, 0, 145)
     ServerList.Size = UDim2.new(1, -40, 1, -157)
 
@@ -465,19 +430,15 @@ ShowServerFinder = function()
     --// LIST LAYOUT
 
     local Layout = Instance.new("UIListLayout")
-
     Layout.Padding = UDim.new(0, 8)
     Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
     Layout.Parent = ServerList
 
     local Padding = Instance.new("UIPadding")
-
     Padding.PaddingTop = UDim.new(0, 8)
     Padding.PaddingBottom = UDim.new(0, 8)
     Padding.PaddingLeft = UDim.new(0, 8)
     Padding.PaddingRight = UDim.new(0, 8)
-
     Padding.Parent = ServerList
 
     Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -490,8 +451,6 @@ ShowServerFinder = function()
         )
 
     end)
-
-    --// SEARCH LOCK
 
     local Searching = false
 
@@ -512,8 +471,7 @@ ShowServerFinder = function()
 
         Searching = true
 
-        -- CLEAR OLD RESULTS
-
+        -- Clear previous server cards
         for _, child in ipairs(ServerList:GetChildren()) do
 
             if child:IsA("Frame") then
@@ -609,12 +567,10 @@ ShowServerFinder = function()
 
         end
 
-        --// SORT SERVERS
+        --// SORT
 
         table.sort(FoundServers, function(a, b)
-
             return a.playing < b.playing
-
         end)
 
         --// REMOVE DUPLICATES
@@ -640,7 +596,6 @@ ShowServerFinder = function()
             local Card = Instance.new("Frame")
 
             Card.Name = "Server_" .. Index
-
             Card.Size = UDim2.new(1, -16, 0, 65)
 
             Card.BackgroundColor3 = Color3.fromRGB(24, 29, 45)
@@ -649,42 +604,30 @@ ShowServerFinder = function()
             Card.Parent = ServerList
 
             Corner(Card, 10)
+            Stroke(Card, Color3.fromRGB(55, 75, 120), 0.5)
 
-            Stroke(
-                Card,
-                Color3.fromRGB(55, 75, 120),
-                0.5
-            )
-
-            --// SERVER NUMBER
+            -- SERVER NUMBER
 
             local ServerName = Instance.new("TextLabel")
 
             ServerName.BackgroundTransparency = 1
-
             ServerName.Position = UDim2.new(0, 12, 0, 8)
             ServerName.Size = UDim2.new(1, -115, 0, 23)
 
-            ServerName.Text =
-                "Server #" .. Index
-
-            ServerName.TextColor3 =
-                Color3.fromRGB(255, 255, 255)
+            ServerName.Text = "Server #" .. Index
+            ServerName.TextColor3 = Color3.fromRGB(255, 255, 255)
 
             ServerName.TextSize = 14
             ServerName.Font = Enum.Font.GothamBold
-
-            ServerName.TextXAlignment =
-                Enum.TextXAlignment.Left
+            ServerName.TextXAlignment = Enum.TextXAlignment.Left
 
             ServerName.Parent = Card
 
-            --// PLAYER COUNT
+            -- PLAYER COUNT
 
             local PlayerCount = Instance.new("TextLabel")
 
             PlayerCount.BackgroundTransparency = 1
-
             PlayerCount.Position = UDim2.new(0, 12, 0, 34)
             PlayerCount.Size = UDim2.new(1, -115, 0, 20)
 
@@ -700,26 +643,19 @@ ShowServerFinder = function()
 
             PlayerCount.TextSize = 11
             PlayerCount.Font = Enum.Font.Gotham
-
-            PlayerCount.TextXAlignment =
-                Enum.TextXAlignment.Left
+            PlayerCount.TextXAlignment = Enum.TextXAlignment.Left
 
             PlayerCount.Parent = Card
 
-            --// JOIN BUTTON
+            -- JOIN BUTTON
 
             local JoinButton = Instance.new("TextButton")
 
-            JoinButton.Size =
-                UDim2.fromOffset(82, 38)
-
-            JoinButton.Position =
-                UDim2.new(1, -92, 0.5, -19)
+            JoinButton.Size = UDim2.fromOffset(82, 38)
+            JoinButton.Position = UDim2.new(1, -92, 0.5, -19)
 
             JoinButton.Text = "JOIN"
-
-            JoinButton.TextColor3 =
-                Color3.fromRGB(255, 255, 255)
+            JoinButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 
             JoinButton.TextSize = 12
             JoinButton.Font = Enum.Font.GothamBold
@@ -728,18 +664,12 @@ ShowServerFinder = function()
                 Color3.fromRGB(55, 175, 105)
 
             JoinButton.BorderSizePixel = 0
-
             JoinButton.AutoButtonColor = false
 
             JoinButton.Parent = Card
 
             Corner(JoinButton, 9)
-
-            Stroke(
-                JoinButton,
-                Color3.fromRGB(255, 255, 255),
-                0.88
-            )
+            Stroke(JoinButton, Color3.fromRGB(255, 255, 255), 0.88)
 
             JoinButton.MouseEnter:Connect(function()
 
@@ -763,9 +693,7 @@ ShowServerFinder = function()
 
                 JoinButton.Text = "JOINING..."
 
-                Status.Text =
-                    "●  Joining server..."
-
+                Status.Text = "●  Joining server..."
                 Status.TextColor3 =
                     Color3.fromRGB(100, 180, 255)
 
@@ -783,9 +711,7 @@ ShowServerFinder = function()
 
                     JoinButton.Text = "JOIN"
 
-                    Status.Text =
-                        "●  Teleport failed"
-
+                    Status.Text = "●  Teleport failed"
                     Status.TextColor3 =
                         Color3.fromRGB(255, 90, 90)
 
@@ -797,7 +723,7 @@ ShowServerFinder = function()
 
         end
 
-        --// SEARCH RESULT
+        --// RESULT
 
         if #UniqueServers == 0 then
 
@@ -826,12 +752,10 @@ ShowServerFinder = function()
 
     end
 
-    --// REFRESH
+    --// REFRESH BUTTON
 
     RefreshButton.MouseButton1Click:Connect(function()
-
         SearchServers()
-
     end)
 
     --// AUTO SEARCH
