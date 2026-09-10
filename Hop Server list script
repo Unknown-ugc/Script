@@ -47,12 +47,15 @@ local function tween(obj,time,props)
 		),
 		props
 	)
+
 	t:Play()
 	return t
 end
 
 local function label(parent,text,pos,size,textSize,color)
+
 	local l=Instance.new("TextLabel")
+
 	l.Position=pos
 	l.Size=size
 	l.BackgroundTransparency=1
@@ -61,12 +64,16 @@ local function label(parent,text,pos,size,textSize,color)
 	l.Font=Enum.Font.Gotham
 	l.TextColor3=color
 	l.TextXAlignment=Enum.TextXAlignment.Left
+
 	l.Parent=parent
+
 	return l
 end
 
 local function button(parent,text,pos,size,color)
+
 	local b=Instance.new("TextButton")
+
 	b.Position=pos
 	b.Size=size
 	b.BackgroundColor3=color
@@ -76,30 +83,36 @@ local function button(parent,text,pos,size,color)
 	b.TextColor3=Color3.new(1,1,1)
 	b.AutoButtonColor=false
 	b.BorderSizePixel=0
+
 	b.Parent=parent
 
 	corner(b,10)
 
 	b.MouseEnter:Connect(function()
-		tween(b,0.12,{
+
+		tween(b,.12,{
 			BackgroundColor3=Color3.fromRGB(
 				math.min(color.R*255+15,255),
 				math.min(color.G*255+15,255),
 				math.min(color.B*255+15,255)
 			)
 		})
+
 	end)
 
 	b.MouseLeave:Connect(function()
-		tween(b,0.12,{
+
+		tween(b,.12,{
 			BackgroundColor3=color
 		})
+
 	end)
 
 	return b
 end
 
 local function drag(frame,handle)
+
 	local dragging=false
 	local dragStart
 	local startPos
@@ -114,7 +127,9 @@ local function drag(frame,handle)
 			dragging=true
 			dragStart=input.Position
 			startPos=frame.Position
+
 		end
+
 	end)
 
 	UIS.InputChanged:Connect(function(input)
@@ -134,7 +149,9 @@ local function drag(frame,handle)
 				startPos.Y.Scale,
 				startPos.Y.Offset+delta.Y
 			)
+
 		end
+
 	end)
 
 	UIS.InputEnded:Connect(function(input)
@@ -143,28 +160,52 @@ local function drag(frame,handle)
 		or input.UserInputType==Enum.UserInputType.Touch then
 
 			dragging=false
+
 			savedPosition=frame.Position
+
 		end
+
 	end)
 end
 
 local function getRequest()
-	return request or http_request or (syn and syn.request)
+
+	return request
+		or http_request
+		or (syn and syn.request)
+
 end
+
+--------------------------------------------------
+-- SMALL LOADING SCREEN
+--------------------------------------------------
 
 local function showLoading(callback)
 
 	local loading=Instance.new("Frame")
-	loading.Size=UDim2.fromScale(1,1)
+
+	loading.AnchorPoint=Vector2.new(.5,.5)
+	loading.Position=UDim2.fromScale(.5,.5)
+	loading.Size=UDim2.fromOffset(300,170)
+
 	loading.BackgroundColor3=Color3.fromRGB(7,21,47)
 	loading.BackgroundTransparency=1
+
 	loading.ZIndex=100
+
 	loading.Parent=gui
 
+	corner(loading,18)
+
+	stroke(
+		loading,
+		Color3.fromRGB(35,125,255),
+		1.5
+	)
+
 	local holder=Instance.new("Frame")
-	holder.AnchorPoint=Vector2.new(.5,.5)
-	holder.Position=UDim2.fromScale(.5,.5)
-	holder.Size=UDim2.fromOffset(320,190)
+
+	holder.Size=UDim2.fromScale(1,1)
 	holder.BackgroundTransparency=1
 	holder.ZIndex=101
 	holder.Parent=loading
@@ -172,9 +213,9 @@ local function showLoading(callback)
 	local title=label(
 		holder,
 		"SERVER HUB",
-		UDim2.fromOffset(0,10),
-		UDim2.new(1,0,0,40),
-		25,
+		UDim2.fromOffset(0,15),
+		UDim2.new(1,0,0,35),
+		22,
 		Color3.new(1,1,1)
 	)
 
@@ -185,9 +226,9 @@ local function showLoading(callback)
 	local subtitle=label(
 		holder,
 		"Preparing server browser",
-		UDim2.fromOffset(0,52),
-		UDim2.new(1,0,0,25),
-		13,
+		UDim2.fromOffset(0,48),
+		UDim2.new(1,0,0,22),
+		11,
 		Color3.fromRGB(150,190,235)
 	)
 
@@ -195,8 +236,10 @@ local function showLoading(callback)
 	subtitle.ZIndex=102
 
 	local barBack=Instance.new("Frame")
-	barBack.Position=UDim2.fromOffset(35,105)
-	barBack.Size=UDim2.new(1,-70,0,8)
+
+	barBack.Position=UDim2.fromOffset(30,85)
+	barBack.Size=UDim2.new(1,-60,0,7)
+
 	barBack.BackgroundColor3=Color3.fromRGB(18,43,78)
 	barBack.ZIndex=102
 	barBack.Parent=holder
@@ -204,7 +247,9 @@ local function showLoading(callback)
 	corner(barBack,5)
 
 	local bar=Instance.new("Frame")
+
 	bar.Size=UDim2.new(0,0,1,0)
+
 	bar.BackgroundColor3=Color3.fromRGB(22,119,255)
 	bar.ZIndex=103
 	bar.Parent=barBack
@@ -214,9 +259,9 @@ local function showLoading(callback)
 	local dots=label(
 		holder,
 		"Loading",
-		UDim2.fromOffset(0,125),
+		UDim2.fromOffset(0,105),
 		UDim2.new(1,0,0,25),
-		12,
+		11,
 		Color3.fromRGB(190,215,245)
 	)
 
@@ -246,7 +291,9 @@ local function showLoading(callback)
 			dots.Text="Loading"..string.rep(".",i)
 
 			task.wait(.35)
+
 		end
+
 	end)
 
 	task.delay(3,function()
@@ -266,15 +313,23 @@ local function showLoading(callback)
 		if callback then
 			callback()
 		end
+
 	end)
 end
+
+--------------------------------------------------
+-- KEY GUI
+--------------------------------------------------
 
 local function keyGui()
 
 	local frame=Instance.new("Frame")
+
 	frame.Size=UDim2.fromOffset(350,300)
 	frame.Position=UDim2.new(.5,-175,.5,-150)
+
 	frame.BackgroundColor3=Color3.fromRGB(245,247,252)
+
 	frame.Active=true
 	frame.Parent=gui
 
@@ -321,15 +376,21 @@ local function keyGui()
 	end)
 
 	local box=Instance.new("TextBox")
+
 	box.Position=UDim2.fromOffset(20,82)
 	box.Size=UDim2.new(1,-40,0,42)
+
 	box.PlaceholderText="Enter key..."
 	box.Text=""
+
 	box.TextSize=15
 	box.Font=Enum.Font.Gotham
+
 	box.TextColor3=Color3.fromRGB(20,25,35)
 	box.PlaceholderColor3=Color3.fromRGB(120,125,135)
+
 	box.BackgroundColor3=Color3.fromRGB(232,235,242)
+
 	box.ClearTextOnFocus=false
 	box.Parent=frame
 
@@ -354,14 +415,16 @@ local function keyGui()
 
 	status.TextXAlignment=Enum.TextXAlignment.Center
 
-	label(
+	local discordLabel=label(
 		frame,
 		"Join this Discord to get key",
 		UDim2.fromOffset(20,204),
 		UDim2.new(1,-40,0,20),
 		11,
 		Color3.fromRGB(90,100,115)
-	).TextXAlignment=Enum.TextXAlignment.Center
+	)
+
+	discordLabel.TextXAlignment=Enum.TextXAlignment.Center
 
 	local discord=button(
 		frame,
@@ -386,6 +449,7 @@ local function keyGui()
 			status.TextColor3=Color3.fromRGB(225,65,80)
 
 		end
+
 	end)
 
 	verify.MouseButton1Click:Connect(function()
@@ -419,15 +483,22 @@ local function keyGui()
 			tween(frame,.06,{
 				Position=original
 			})
+
 		end
+
 	end)
 
 	drag(frame)
 end
 
+--------------------------------------------------
+-- MAIN GUI
+--------------------------------------------------
+
 function mainGui()
 
 	local frame=Instance.new("Frame")
+
 	frame.Size=UDim2.fromOffset(390,475)
 
 	if savedPosition then
@@ -437,8 +508,10 @@ function mainGui()
 	end
 
 	frame.BackgroundColor3=Color3.fromRGB(6,25,60)
+
 	frame.Active=true
 	frame.ClipsDescendants=true
+
 	frame.Parent=gui
 
 	corner(frame,22)
@@ -455,8 +528,14 @@ function mainGui()
 	local collapsed=false
 	local slideTween=nil
 
+	--------------------------------------------------
+	-- HEADER
+	--------------------------------------------------
+
 	local header=Instance.new("Frame")
+
 	header.Size=UDim2.new(1,0,0,58)
+
 	header.BackgroundTransparency=1
 	header.Parent=frame
 
@@ -498,31 +577,47 @@ function mainGui()
 
 	close.TextSize=23
 
+	--------------------------------------------------
+	-- CONTENT
+	--------------------------------------------------
+
 	local content=Instance.new("Frame")
+
 	content.Position=UDim2.fromOffset(0,58)
 	content.Size=UDim2.new(1,0,1,-58)
+
 	content.BackgroundTransparency=1
 	content.Parent=frame
 
 	local filter=Instance.new("Frame")
+
 	filter.Position=UDim2.fromOffset(15,8)
 	filter.Size=UDim2.new(1,-30,0,55)
+
 	filter.BackgroundColor3=Color3.fromRGB(10,43,88)
+
 	filter.Parent=content
 
 	corner(filter,14)
 
 	local input=Instance.new("TextBox")
+
 	input.Position=UDim2.fromOffset(10,8)
 	input.Size=UDim2.fromOffset(125,39)
+
 	input.PlaceholderText="Players 1-7"
 	input.Text=""
+
 	input.TextSize=14
 	input.Font=Enum.Font.GothamBold
+
 	input.TextColor3=Color3.new(1,1,1)
 	input.PlaceholderColor3=Color3.fromRGB(130,165,210)
+
 	input.BackgroundColor3=Color3.fromRGB(7,31,68)
+
 	input.ClearTextOnFocus=false
+
 	input.Parent=filter
 
 	corner(input,10)
@@ -556,29 +651,50 @@ function mainGui()
 	status.TextXAlignment=Enum.TextXAlignment.Right
 	status.Font=Enum.Font.GothamBold
 
+	--------------------------------------------------
+	-- SERVER LIST
+	--------------------------------------------------
+
 	local list=Instance.new("ScrollingFrame")
+
 	list.Position=UDim2.fromOffset(15,97)
 	list.Size=UDim2.new(1,-30,1,-155)
+
 	list.BackgroundTransparency=1
 	list.BorderSizePixel=0
+
 	list.ScrollBarThickness=4
+
 	list.CanvasSize=UDim2.new(0,0,0,0)
+
 	list.AutomaticCanvasSize=Enum.AutomaticSize.Y
+
 	list.Parent=content
 
 	local layout=Instance.new("UIListLayout")
+
 	layout.Padding=UDim.new(0,7)
 	layout.SortOrder=Enum.SortOrder.LayoutOrder
+
 	layout.Parent=list
 
 	local padding=Instance.new("UIPadding")
+
 	padding.PaddingBottom=UDim.new(0,8)
+
 	padding.Parent=list
 
+	--------------------------------------------------
+	-- BOTTOM BUTTONS
+	--------------------------------------------------
+
 	local bottom=Instance.new("Frame")
+
 	bottom.Position=UDim2.new(0,15,1,-52)
 	bottom.Size=UDim2.new(1,-30,0,38)
+
 	bottom.BackgroundTransparency=1
+
 	bottom.Parent=content
 
 	local topButton=button(
@@ -608,6 +724,10 @@ function mainGui()
 
 	credit.TextXAlignment=Enum.TextXAlignment.Center
 
+	--------------------------------------------------
+	-- CLEAR LIST
+	--------------------------------------------------
+
 	local function clearList()
 
 		for _,child in ipairs(list:GetChildren()) do
@@ -615,8 +735,14 @@ function mainGui()
 			if child:IsA("Frame") then
 				child:Destroy()
 			end
+
 		end
+
 	end
+
+	--------------------------------------------------
+	-- ADD SERVER
+	--------------------------------------------------
 
 	local function addServer(server,index)
 
@@ -624,17 +750,21 @@ function mainGui()
 		local maxPlayers=tonumber(server.maxPlayers) or 7
 
 		local full=playing>=maxPlayers
+
 		local favorite=favorites[server.id]==true
 		local selected=selectedServer==server.id
 
 		local card=Instance.new("Frame")
+
 		card.Size=UDim2.new(1,-5,0,72)
+
 		card.BackgroundColor3=
 			selected
 			and Color3.fromRGB(17,65,120)
 			or Color3.fromRGB(10,45,90)
 
 		card.LayoutOrder=index
+
 		card.Parent=list
 
 		corner(card,14)
@@ -685,7 +815,9 @@ function mainGui()
 
 				status.Text="ID COPIED"
 				status.TextColor3=Color3.fromRGB(70,220,255)
+
 			end
+
 		end)
 
 		local fav=button(
@@ -706,6 +838,7 @@ function mainGui()
 				favorites[server.id]
 				and "★"
 				or "☆"
+
 		end)
 
 		local join=button(
@@ -713,6 +846,7 @@ function mainGui()
 			full and "FULL" or "JOIN",
 			UDim2.new(1,-100,0,11),
 			UDim2.fromOffset(88,30),
+
 			full
 			and Color3.fromRGB(65,70,85)
 			or Color3.fromRGB(20,125,240)
@@ -731,6 +865,7 @@ function mainGui()
 				selectedServer=server.id
 
 				status.Text="JOINING"
+
 				status.TextColor3=Color3.fromRGB(255,220,80)
 
 				pcall(function()
@@ -742,7 +877,9 @@ function mainGui()
 					)
 
 				end)
+
 			end)
+
 		end
 
 		card.InputBegan:Connect(function(inputObj)
@@ -751,10 +888,18 @@ function mainGui()
 			or inputObj.UserInputType==Enum.UserInputType.Touch then
 
 				selectedServer=server.id
+
 				card.BackgroundColor3=Color3.fromRGB(17,65,120)
+
 			end
+
 		end)
+
 	end
+
+	--------------------------------------------------
+	-- FETCH SERVERS
+	--------------------------------------------------
 
 	local function fetchServers()
 
@@ -788,6 +933,7 @@ function mainGui()
 				Url=url,
 				Method="GET"
 			})
+
 		end)
 
 		if not ok or not res or res.StatusCode~=200 then
@@ -803,6 +949,7 @@ function mainGui()
 		local good,data=pcall(function()
 
 			return HttpService:JSONDecode(res.Body)
+
 		end)
 
 		if not good or not data then
@@ -816,6 +963,7 @@ function mainGui()
 		end
 
 		local servers={}
+
 		local wanted=tonumber(input.Text)
 
 		for _,server in ipairs(data.data or {}) do
@@ -827,9 +975,13 @@ function mainGui()
 			and maxPlayers==7 then
 
 				if not wanted or playing==wanted then
+
 					table.insert(servers,server)
+
 				end
+
 			end
+
 		end
 
 		table.sort(servers,function(a,b)
@@ -845,6 +997,7 @@ function mainGui()
 			local bp=tonumber(b.playing) or 0
 
 			return ap<bp
+
 		end)
 
 		for i,server in ipairs(servers) do
@@ -855,14 +1008,20 @@ function mainGui()
 
 		status.Text="UPDATED"
 		status.TextColor3=Color3.fromRGB(70,255,175)
+
 	end
 
-	-- FIXED SLIDE SYSTEM
+	--------------------------------------------------
+	-- FIXED SLIDE BUTTON
+	--------------------------------------------------
+
 	slide.MouseButton1Click:Connect(function()
 
 		if slideTween then
+
 			slideTween:Cancel()
 			slideTween=nil
+
 		end
 
 		collapsed=not collapsed
@@ -873,9 +1032,13 @@ function mainGui()
 			subtitle.Visible=false
 			slide.Text="▼"
 
-			slideTween=tween(frame,.35,{
-				Size=collapsedSize
-			})
+			slideTween=tween(
+				frame,
+				.35,
+				{
+					Size=collapsedSize
+				}
+			)
 
 		else
 
@@ -883,51 +1046,82 @@ function mainGui()
 			subtitle.Visible=true
 			slide.Text="▲"
 
-			slideTween=tween(frame,.35,{
-				Size=expandedSize
-			})
+			slideTween=tween(
+				frame,
+				.35,
+				{
+					Size=expandedSize
+				}
+			)
+
+			local currentTween=slideTween
 
 			task.spawn(function()
 
-				local currentTween=slideTween
-
 				currentTween.Completed:Wait()
 
-				if not collapsed
-				and frame.Parent then
+				if not collapsed and frame.Parent then
 
 					frame.Size=expandedSize
+
 				end
+
 			end)
+
 		end
+
 	end)
+
+	--------------------------------------------------
+	-- CLOSE
+	--------------------------------------------------
 
 	close.MouseButton1Click:Connect(function()
 
 		autoRefresh=false
 
 		if refreshThread then
+
 			task.cancel(refreshThread)
 			refreshThread=nil
+
 		end
 
 		savedPosition=frame.Position
 
 		frame:Destroy()
+
 	end)
 
+	--------------------------------------------------
+	-- REFRESH
+	--------------------------------------------------
+
 	refresh.MouseButton1Click:Connect(function()
+
 		fetchServers()
+
 	end)
 
 	input.FocusLost:Connect(function()
+
 		fetchServers()
+
 	end)
+
+	--------------------------------------------------
+	-- TOP BUTTON
+	--------------------------------------------------
 
 	topButton.MouseButton1Click:Connect(function()
 
 		list.CanvasPosition=Vector2.new(0,0)
+
 	end)
+
+	--------------------------------------------------
+	-- AUTO REFRESH
+	--------------------------------------------------
 
 	autoButton.MouseButton1Click:Connect(function()
 
@@ -936,10 +1130,14 @@ function mainGui()
 		if autoRefresh then
 
 			autoButton.Text="AUTO ON"
-			autoButton.BackgroundColor3=Color3.fromRGB(20,125,90)
+
+			autoButton.BackgroundColor3=
+				Color3.fromRGB(20,125,90)
 
 			if refreshThread then
+
 				task.cancel(refreshThread)
+
 			end
 
 			refreshThread=task.spawn(function()
@@ -949,28 +1147,46 @@ function mainGui()
 					task.wait(15)
 
 					if autoRefresh and frame.Parent then
+
 						fetchServers()
+
 					end
+
 				end
+
 			end)
 
 		else
 
 			autoButton.Text="AUTO OFF"
-			autoButton.BackgroundColor3=Color3.fromRGB(15,65,130)
+
+			autoButton.BackgroundColor3=
+				Color3.fromRGB(15,65,130)
 
 			if refreshThread then
+
 				task.cancel(refreshThread)
 				refreshThread=nil
+
 			end
+
 		end
+
 	end)
 
-	-- DRAG ONLY FROM TITLE
+	--------------------------------------------------
+	-- DRAG ONLY TITLE
+	--------------------------------------------------
+
 	drag(frame,title)
 
 	fetchServers()
+
 end
+
+--------------------------------------------------
+-- START
+--------------------------------------------------
 
 if KEY_SYSTEM then
 
@@ -979,7 +1195,7 @@ if KEY_SYSTEM then
 else
 
 	showLoading(function()
-		mainGui()
-	end)
 
-end
+		mainGui()
+
+	end
