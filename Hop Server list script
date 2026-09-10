@@ -61,7 +61,6 @@ local function drag(frame)
 	frame.InputBegan:Connect(function(input)
 		if input.UserInputType==Enum.UserInputType.MouseButton1
 		or input.UserInputType==Enum.UserInputType.Touch then
-
 			dragging=true
 			dragStart=input.Position
 			startPos=frame.Position
@@ -92,10 +91,6 @@ local function drag(frame)
 		end
 	end)
 end
-
---------------------------------------------------
--- KEY GUI
---------------------------------------------------
 
 local function keyGui()
 
@@ -187,20 +182,14 @@ local function keyGui()
 	end)
 
 	verify.MouseButton1Click:Connect(function()
-
 		if box.Text==KEY then
 			frame:Destroy()
 			mainGui()
 		else
 			status.Text="Invalid key"
 		end
-
 	end)
 end
-
---------------------------------------------------
--- SERVER BROWSER
---------------------------------------------------
 
 function mainGui()
 
@@ -247,8 +236,6 @@ function mainGui()
 		frame:Destroy()
 	end)
 
-	-- FILTER
-
 	local filter=Instance.new("Frame",frame)
 	filter.Position=UDim2.fromOffset(15,76)
 	filter.Size=UDim2.new(1,-30,0,55)
@@ -277,8 +264,6 @@ function mainGui()
 		Color3.fromRGB(20,115,225)
 	)
 
-	-- STATUS
-
 	local status=label(
 		frame,
 		"● READY",
@@ -289,8 +274,6 @@ function mainGui()
 	)
 
 	status.Font=Enum.Font.GothamBold
-
-	-- SCROLL LIST
 
 	local list=Instance.new("ScrollingFrame",frame)
 	list.Position=UDim2.fromOffset(15,165)
@@ -466,10 +449,6 @@ function mainGui()
 
 	fetchServers()
 end
-
---------------------------------------------------
--- START
---------------------------------------------------
 
 if KEY_SYSTEM then
 	keyGui()
