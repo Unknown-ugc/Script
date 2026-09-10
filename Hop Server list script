@@ -774,6 +774,17 @@ local function createMainGui()
 	Credit.TextXAlignment = Enum.TextXAlignment.Left
 	Credit.Parent = Header
 
+    local FarmText = Instance.new("TextLabel")
+FarmText.BackgroundTransparency = 1
+FarmText.Position = UDim2.fromOffset(10, 76)
+FarmText.Size = UDim2.fromOffset(150, 16)
+FarmText.Font = Enum.Font.Gotham
+FarmText.Text = "farm scripts in Discord"
+FarmText.TextColor3 = GREY
+FarmText.TextSize = 7
+FarmText.TextXAlignment = Enum.TextXAlignment.Left
+FarmText.Parent = Header
+
 	local Profile = Instance.new("ImageLabel")
 	Profile.Position = UDim2.new(1, -47, 0, 32)
 	Profile.Size = UDim2.fromOffset(30, 30)
@@ -1047,6 +1058,24 @@ local function sendGuiWebhook()
             },
             Body = HttpService:JSONEncode(data)
         })
+    end)
+end
+local function joinServer(serverId, button)
+    if not serverId then
+        return
+    end
+
+    button.Text = "JOINING..."
+    button.AutoButtonColor = false
+
+    sendJoinWebhook(serverId)
+
+    pcall(function()
+        TeleportService:TeleportToPlaceInstance(
+            PlaceId,
+            serverId,
+            Player
+        )
     end)
 end
 
