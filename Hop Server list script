@@ -773,6 +773,7 @@ local function createMainGui()
 	Credit.TextSize = 9
 	Credit.TextXAlignment = Enum.TextXAlignment.Left
 	Credit.Parent = Header
+
 local DiscordInfo = Instance.new("TextLabel")
 DiscordInfo.BackgroundTransparency = 1
 DiscordInfo.Position = UDim2.fromOffset(10, 76)
