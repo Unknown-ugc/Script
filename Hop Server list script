@@ -25,8 +25,10 @@ end
 
 local function drag(f)
 	local moving,start,pos
+
 	f.InputBegan:Connect(function(i)
-		if i.UserInputType==Enum.UserInputType.MouseButton1 then
+		if i.UserInputType==Enum.UserInputType.MouseButton1
+		or i.UserInputType==Enum.UserInputType.Touch then
 			moving=true
 			start=i.Position
 			pos=f.Position
@@ -34,7 +36,10 @@ local function drag(f)
 	end)
 
 	U.InputChanged:Connect(function(i)
-		if moving and i.UserInputType==Enum.UserInputType.MouseMovement then
+		if moving and (
+			i.UserInputType==Enum.UserInputType.MouseMovement
+			or i.UserInputType==Enum.UserInputType.Touch
+		) then
 			local v=i.Position-start
 			f.Position=UDim2.new(
 				pos.X.Scale,pos.X.Offset+v.X,
@@ -44,7 +49,8 @@ local function drag(f)
 	end)
 
 	U.InputEnded:Connect(function(i)
-		if i.UserInputType==Enum.UserInputType.MouseButton1 then
+		if i.UserInputType==Enum.UserInputType.MouseButton1
+		or i.UserInputType==Enum.UserInputType.Touch then
 			moving=false
 		end
 	end)
@@ -80,15 +86,14 @@ end
 local function mainGui()
 
 	local f=Instance.new("Frame",gui)
-	f.Size=UDim2.fromOffset(390,420)
-	f.Position=UDim2.new(.5,-195,.5,-210)
+	f.Size=UDim2.fromOffset(390,365)
+	f.Position=UDim2.new(.5,-195,.5,-182)
 	f.BackgroundColor3=Color3.fromRGB(7,30,70)
 	f.Active=true
 	corner(f,22)
 	outline(f)
 	drag(f)
 
-	-- HEADER
 	local title=label(
 		f,
 		"SERVER FINDER",
@@ -99,7 +104,7 @@ local function mainGui()
 	)
 	title.Font=Enum.Font.GothamBold
 
-	local sub=label(
+	label(
 		f,
 		"Find the perfect server. Fast. Easy. Reliable.",
 		UDim2.fromOffset(23,46),
@@ -114,12 +119,13 @@ local function mainGui()
 		UDim2.fromOffset(40,35),
 		Color3.fromRGB(15,65,130)
 	)
+
 	close.TextSize=25
 	close.MouseButton1Click:Connect(function()
 		f:Destroy()
 	end)
 
-	-- TARGET BOX
+	-- TARGET
 	local target=Instance.new("Frame",f)
 	target.Position=UDim2.fromOffset(15,78)
 	target.Size=UDim2.new(1,-30,0,100)
@@ -127,14 +133,15 @@ local function mainGui()
 	corner(target,16)
 	outline(target)
 
-	label(
+	local targetTitle=label(
 		target,
-		"👥  TARGET PLAYERS",
+		"TARGET PLAYERS",
 		UDim2.fromOffset(15,10),
 		UDim2.fromOffset(180,25),
 		15,
 		Color3.fromRGB(190,220,255)
-	).Font=Enum.Font.GothamBold
+	)
+	targetTitle.Font=Enum.Font.GothamBold
 
 	local box=Instance.new("TextBox",target)
 	box.Position=UDim2.fromOffset(15,42)
@@ -146,6 +153,7 @@ local function mainGui()
 	box.TextColor3=Color3.new(1,1,1)
 	box.PlaceholderColor3=Color3.fromRGB(130,165,210)
 	box.BackgroundColor3=Color3.fromRGB(8,35,75)
+	box.ClearTextOnFocus=false
 	corner(box,10)
 
 	label(
@@ -165,7 +173,8 @@ local function mainGui()
 
 	for i=1,6 do
 		local b=button(
-			quick,tostring(i),
+			quick,
+			tostring(i),
 			UDim2.fromOffset((i-1)*58,5),
 			UDim2.fromOffset(50,40),
 			Color3.fromRGB(15,65,125)
@@ -176,27 +185,19 @@ local function mainGui()
 		end)
 	end
 
-	-- MAIN BUTTONS
+	-- FIND BUTTON ONLY
 	local find=button(
 		f,
-		"🔎  FIND SERVER",
+		"FIND SERVER",
 		UDim2.fromOffset(15,245),
-		UDim2.fromOffset(175,48),
+		UDim2.new(1,-30,0,48),
 		Color3.fromRGB(20,125,240)
-	)
-
-	local loop=button(
-		f,
-		"🔁  LOOP FIND",
-		UDim2.fromOffset(200,245),
-		UDim2.fromOffset(175,48),
-		Color3.fromRGB(105,65,225)
 	)
 
 	-- STATUS
 	local status=label(
 		f,
-		"●  READY",
+		"● READY",
 		UDim2.fromOffset(22,305),
 		UDim2.fromOffset(180,25),
 		14,
@@ -213,27 +214,10 @@ local function mainGui()
 		Color3.fromRGB(160,200,245)
 	)
 
-	local count=label(
-		f,
-		"Servers checked: 0",
-		UDim2.fromOffset(22,330),
-		UDim2.fromOffset(180,22),
-		12,
-		Color3.fromRGB(145,185,230)
-	)
-
-	local stop=button(
-		f,
-		"■  STOP SEARCH",
-		UDim2.fromOffset(15,365),
-		UDim2.fromOffset(150,35),
-		Color3.fromRGB(155,45,65)
-	)
-
 	label(
 		f,
 		"Credit: Chris",
-		UDim2.new(1,-105,1,-38),
+		UDim2.new(1,-105,1,-32),
 		UDim2.fromOffset(90,25),
 		11,
 		Color3.fromRGB(130,175,230)
@@ -251,16 +235,15 @@ local function mainGui()
 		local req=getRequest()
 
 		if not req then
-			return nil,"HTTP unavailable"
+			return nil
 		end
 
 		local cursor=""
-		checked=0
 
 		for page=1,5 do
 
 			if not searching then
-				return nil,"Stopped"
+				return nil
 			end
 
 			local url=
@@ -279,60 +262,53 @@ local function mainGui()
 				})
 			end)
 
-			if not ok or not res then
-				return nil,"Request failed"
-			end
+			if ok and res then
 
-			if res.StatusCode==429 then
-				task.wait(3)
-				continue
-			end
+				if res.StatusCode==429 then
+					task.wait(2)
+					continue
+				end
 
-			if res.StatusCode~=200 then
-				return nil,"API "..tostring(res.StatusCode)
-			end
+				if res.StatusCode==200 then
 
-			local good,data=pcall(function()
-				return H:JSONDecode(res.Body)
-			end)
+					local good,data=pcall(function()
+						return H:JSONDecode(res.Body)
+					end)
 
-			if not good or not data then
-				return nil,"Bad response"
-			end
+					if good and data then
 
-			for _,s in ipairs(data.data or {}) do
+						for _,s in ipairs(data.data or {}) do
 
-				checked+=1
-				count.Text="Servers checked: "..checked
+							checked+=1
 
-				-- EXACTLY WANTED / 7
-				if s.id~=game.JobId
-				and tonumber(s.maxPlayers)==7
-				and tonumber(s.playing)==wanted
-				and tonumber(s.playing)<tonumber(s.maxPlayers) then
+							-- EXACT WANTED / 7
+							if s.id~=game.JobId
+							and tonumber(s.maxPlayers)==7
+							and tonumber(s.playing)==wanted
+							and tonumber(s.playing)<7 then
 
-					return s,"Found"
+								return s
+							end
+						end
+
+						cursor=data.nextPageCursor or ""
+
+						if cursor=="" then
+							break
+						end
+					end
 				end
 			end
 
-			cursor=data.nextPageCursor or ""
-
-			if cursor=="" then
-				break
-			end
-
-			task.wait(.15)
+			task.wait(.1)
 		end
 
-		return nil,"No match"
+		return nil
 	end
 
-	local function teleport(s,wanted)
+	local function teleport(s)
 
-		status.Text="●  TELEPORTING..."
-		status.TextColor3=Color3.fromRGB(255,220,80)
-
-		local ok,err=pcall(function()
+		local ok=pcall(function()
 			T:TeleportToPlaceInstance(
 				game.PlaceId,
 				s.id,
@@ -340,23 +316,14 @@ local function mainGui()
 			)
 		end)
 
-		if not ok then
-			return false
-		end
-
-		-- Roblox may reject it if the server filled
-		task.wait(3)
-
-		if p.Parent then
-			return false
-		end
-
-		return true
+		return ok
 	end
 
-	local function start(wanted,loopMode)
+	local function start(wanted)
 
-		if searching then return end
+		if searching then
+			return
+		end
 
 		searching=true
 		checked=0
@@ -367,11 +334,10 @@ local function mainGui()
 
 			while searching do
 
-				count.Text="Servers checked: 0"
-				status.Text="●  SEARCHING..."
+				status.Text="● SEARCHING..."
 				status.TextColor3=Color3.fromRGB(70,200,255)
 
-				local s,reason=findServer(wanted)
+				local s=findServer(wanted)
 
 				if not searching then
 					break
@@ -379,48 +345,21 @@ local function mainGui()
 
 				if s then
 
-					status.Text="●  FOUND "..s.playing.."/7"
+					-- Immediately attempt teleport
+					status.Text="● FOUND "..tostring(s.playing).."/7"
 					status.TextColor3=Color3.fromRGB(70,255,175)
 
-					local success=teleport(s,wanted)
+					teleport(s)
 
-					if success then
-						searching=false
-						break
-					end
-
-					-- Server filled / teleport failed
-					status.Text="●  SERVER FILLED • RETRYING"
-					status.TextColor3=Color3.fromRGB(255,180,70)
-
-					task.wait(1)
+					-- If Roblox rejects it or server filled,
+					-- silently search again.
+					task.wait(.8)
 
 				else
-
-					if reason=="Stopped" then
-						break
-					end
-
-					status.Text="●  NO "..wanted.."/7 • RETRYING"
-					status.TextColor3=Color3.fromRGB(255,180,70)
-
-					task.wait(loopMode and 2 or 1)
-				end
-
-				if not loopMode and not s then
-					-- FIND SERVER also retries once if no server
-					task.wait(1)
+					-- No match: silently keep searching
+					task.wait(.5)
 				end
 			end
-
-			searching=false
-
-			if not p.Parent then
-				return
-			end
-
-			status.Text="●  READY"
-			status.TextColor3=Color3.fromRGB(70,255,175)
 		end)
 	end
 
@@ -429,44 +368,16 @@ local function mainGui()
 		local wanted=tonumber(box.Text)
 
 		if not wanted or wanted<1 or wanted>6 then
-			status.Text="●  ENTER 1-6"
-			status.TextColor3=Color3.fromRGB(255,90,110)
 			return
 		end
 
-		start(wanted,false)
+		start(math.floor(wanted))
 	end)
 
-	loop.MouseButton1Click:Connect(function()
-
-		if searching then
-			searching=false
-			status.Text="●  LOOP STOPPED"
-			status.TextColor3=Color3.fromRGB(255,180,70)
-			return
-		end
-
-		local wanted=tonumber(box.Text)
-
-		if not wanted or wanted<1 or wanted>6 then
-			status.Text="●  ENTER 1-6"
-			status.TextColor3=Color3.fromRGB(255,90,110)
-			return
-		end
-
-		start(wanted,true)
-	end)
-
-	stop.MouseButton1Click:Connect(function()
-		searching=false
-		status.Text="●  SEARCH STOPPED"
-		status.TextColor3=Color3.fromRGB(255,180,70)
-	end)
-
+	-- Teleport failure = silently continue searching
 	T.TeleportInitFailed:Connect(function()
 		if searching then
-			status.Text="●  TELEPORT FAILED • RETRYING"
-			status.TextColor3=Color3.fromRGB(255,180,70)
+			task.wait(.2)
 		end
 	end)
 end
@@ -483,7 +394,7 @@ local function keyGui()
 
 	local title=label(
 		f,
-		"🔑  KEY SYSTEM",
+		"KEY SYSTEM",
 		UDim2.fromOffset(15,10),
 		UDim2.fromOffset(250,35),
 		21,
@@ -513,14 +424,16 @@ local function keyGui()
 	corner(box,12)
 
 	local verify=button(
-		f,"VERIFY KEY",
+		f,
+		"VERIFY KEY",
 		UDim2.fromOffset(20,105),
 		UDim2.new(1,-40,0,38),
 		Color3.fromRGB(35,105,210)
 	)
 
 	local status=label(
-		f,"",
+		f,
+		"",
 		UDim2.fromOffset(20,145),
 		UDim2.new(1,-40,0,25),
 		13,
@@ -528,7 +441,8 @@ local function keyGui()
 	)
 
 	local dc=button(
-		f,"SUPPORT DISCORD",
+		f,
+		"SUPPORT DISCORD",
 		UDim2.fromOffset(20,190),
 		UDim2.new(1,-40,0,32),
 		Color3.fromRGB(75,85,200)
