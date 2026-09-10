@@ -17,296 +17,462 @@ local function corner(x,r)
 	c.CornerRadius=UDim.new(0,r or 14)
 end
 
-local function stroke(x)
+local function outline(x)
 	local s=Instance.new("UIStroke",x)
-	s.Color=Color3.fromRGB(45,145,255)
+	s.Color=Color3.fromRGB(35,125,255)
 	s.Thickness=1.5
 end
 
 local function drag(f)
-	local d,sp,fp
+	local moving,start,pos
 	f.InputBegan:Connect(function(i)
 		if i.UserInputType==Enum.UserInputType.MouseButton1 then
-			d=true;sp=i.Position;fp=f.Position
+			moving=true
+			start=i.Position
+			pos=f.Position
 		end
 	end)
+
 	U.InputChanged:Connect(function(i)
-		if d and i.UserInputType==Enum.UserInputType.MouseMovement then
-			local v=i.Position-sp
-			f.Position=UDim2.new(fp.X.Scale,fp.X.Offset+v.X,
-				fp.Y.Scale,fp.Y.Offset+v.Y)
+		if moving and i.UserInputType==Enum.UserInputType.MouseMovement then
+			local v=i.Position-start
+			f.Position=UDim2.new(
+				pos.X.Scale,pos.X.Offset+v.X,
+				pos.Y.Scale,pos.Y.Offset+v.Y
+			)
 		end
 	end)
+
 	U.InputEnded:Connect(function(i)
-		if i.UserInputType==Enum.UserInputType.MouseButton1 then d=false end
+		if i.UserInputType==Enum.UserInputType.MouseButton1 then
+			moving=false
+		end
 	end)
 end
 
 local function button(par,text,pos,size,color)
 	local b=Instance.new("TextButton",par)
-	b.Text=text
 	b.Position=pos
 	b.Size=size
-	b.BackgroundColor3=color
-	b.TextColor3=Color3.new(1,1,1)
+	b.Text=text
 	b.TextSize=14
 	b.Font=Enum.Font.GothamBold
+	b.TextColor3=Color3.new(1,1,1)
+	b.BackgroundColor3=color
+	b.AutoButtonColor=true
 	corner(b,12)
 	return b
 end
 
+local function label(par,text,pos,size,ts,color)
+	local l=Instance.new("TextLabel",par)
+	l.Position=pos
+	l.Size=size
+	l.Text=text
+	l.TextSize=ts
+	l.Font=Enum.Font.Gotham
+	l.TextColor3=color
+	l.BackgroundTransparency=1
+	l.TextXAlignment=Enum.TextXAlignment.Left
+	return l
+end
+
 local function mainGui()
+
 	local f=Instance.new("Frame",gui)
-	f.Size=UDim2.fromOffset(380,330)
-	f.Position=UDim2.new(.5,-190,.5,-165)
-	f.BackgroundColor3=Color3.fromRGB(8,35,80)
+	f.Size=UDim2.fromOffset(390,420)
+	f.Position=UDim2.new(.5,-195,.5,-210)
+	f.BackgroundColor3=Color3.fromRGB(7,30,70)
 	f.Active=true
-	corner(f,20)
-	stroke(f)
+	corner(f,22)
+	outline(f)
 	drag(f)
 
-	local title=Instance.new("TextLabel",f)
-	title.Position=UDim2.fromOffset(20,12)
-	title.Size=UDim2.new(1,-80,0,38)
-	title.Text="SERVER FINDER"
-	title.TextSize=23
+	-- HEADER
+	local title=label(
+		f,
+		"SERVER FINDER",
+		UDim2.fromOffset(22,14),
+		UDim2.fromOffset(280,35),
+		24,
+		Color3.new(1,1,1)
+	)
 	title.Font=Enum.Font.GothamBold
-	title.TextColor3=Color3.new(1,1,1)
-	title.BackgroundTransparency=1
-	title.TextXAlignment=Enum.TextXAlignment.Left
 
-	local sub=Instance.new("TextLabel",f)
-	sub.Position=UDim2.fromOffset(22,45)
-	sub.Size=UDim2.new(1,-45,0,25)
-	sub.Text="Find an exact player count • Max 7"
-	sub.TextSize=12
-	sub.TextColor3=Color3.fromRGB(150,190,240)
-	sub.BackgroundTransparency=1
-	sub.TextXAlignment=Enum.TextXAlignment.Left
+	local sub=label(
+		f,
+		"Find the perfect server. Fast. Easy. Reliable.",
+		UDim2.fromOffset(23,46),
+		UDim2.fromOffset(330,22),
+		12,
+		Color3.fromRGB(150,195,255)
+	)
 
-	local close=button(f,"×",UDim2.new(1,-52,0,12),
-		UDim2.fromOffset(38,32),Color3.fromRGB(190,45,65))
-	close.TextSize=22
+	local close=button(
+		f,"×",
+		UDim2.new(1,-55,0,12),
+		UDim2.fromOffset(40,35),
+		Color3.fromRGB(15,65,130)
+	)
+	close.TextSize=25
 	close.MouseButton1Click:Connect(function()
 		f:Destroy()
 	end)
 
-	local box=Instance.new("TextBox",f)
-	box.Position=UDim2.fromOffset(20,78)
-	box.Size=UDim2.new(1,-40,0,42)
-	box.PlaceholderText="👥  Players wanted (1-6)"
+	-- TARGET BOX
+	local target=Instance.new("Frame",f)
+	target.Position=UDim2.fromOffset(15,78)
+	target.Size=UDim2.new(1,-30,0,100)
+	target.BackgroundColor3=Color3.fromRGB(10,45,90)
+	corner(target,16)
+	outline(target)
+
+	label(
+		target,
+		"👥  TARGET PLAYERS",
+		UDim2.fromOffset(15,10),
+		UDim2.fromOffset(180,25),
+		15,
+		Color3.fromRGB(190,220,255)
+	).Font=Enum.Font.GothamBold
+
+	local box=Instance.new("TextBox",target)
+	box.Position=UDim2.fromOffset(15,42)
+	box.Size=UDim2.fromOffset(145,40)
 	box.Text=""
-	box.TextSize=15
-	box.Font=Enum.Font.Gotham
-	box.BackgroundColor3=Color3.fromRGB(15,50,100)
+	box.PlaceholderText="1-6"
+	box.TextSize=18
+	box.Font=Enum.Font.GothamBold
 	box.TextColor3=Color3.new(1,1,1)
-	box.PlaceholderColor3=Color3.fromRGB(150,180,220)
-	corner(box,12)
+	box.PlaceholderColor3=Color3.fromRGB(130,165,210)
+	box.BackgroundColor3=Color3.fromRGB(8,35,75)
+	corner(box,10)
 
-	local find=button(f,"🔎 FIND SERVER",
-		UDim2.fromOffset(20,130),
-		UDim2.fromOffset(165,45),
-		Color3.fromRGB(20,125,240))
+	label(
+		target,
+		"Exact current players • Max 7",
+		UDim2.fromOffset(175,48),
+		UDim2.fromOffset(175,25),
+		12,
+		Color3.fromRGB(145,185,235)
+	)
 
-	local loop=button(f,"🔁 LOOP FIND",
-		UDim2.fromOffset(195,130),
-		UDim2.fromOffset(165,45),
-		Color3.fromRGB(105,70,230))
+	-- QUICK SELECT
+	local quick=Instance.new("Frame",f)
+	quick.Position=UDim2.fromOffset(15,185)
+	quick.Size=UDim2.new(1,-30,0,52)
+	quick.BackgroundTransparency=1
 
-	local status=Instance.new("TextLabel",f)
-	status.Position=UDim2.fromOffset(20,185)
-	status.Size=UDim2.new(1,-40,0,42)
-	status.Text="●  Ready"
-	status.TextSize=14
+	for i=1,6 do
+		local b=button(
+			quick,tostring(i),
+			UDim2.fromOffset((i-1)*58,5),
+			UDim2.fromOffset(50,40),
+			Color3.fromRGB(15,65,125)
+		)
+
+		b.MouseButton1Click:Connect(function()
+			box.Text=tostring(i)
+		end)
+	end
+
+	-- MAIN BUTTONS
+	local find=button(
+		f,
+		"🔎  FIND SERVER",
+		UDim2.fromOffset(15,245),
+		UDim2.fromOffset(175,48),
+		Color3.fromRGB(20,125,240)
+	)
+
+	local loop=button(
+		f,
+		"🔁  LOOP FIND",
+		UDim2.fromOffset(200,245),
+		UDim2.fromOffset(175,48),
+		Color3.fromRGB(105,65,225)
+	)
+
+	-- STATUS
+	local status=label(
+		f,
+		"●  READY",
+		UDim2.fromOffset(22,305),
+		UDim2.fromOffset(180,25),
+		14,
+		Color3.fromRGB(70,255,175)
+	)
 	status.Font=Enum.Font.GothamBold
-	status.TextColor3=Color3.fromRGB(80,255,180)
-	status.BackgroundColor3=Color3.fromRGB(12,45,90)
-	corner(status,10)
 
-	local info=Instance.new("TextLabel",f)
-	info.Position=UDim2.fromOffset(20,237)
-	info.Size=UDim2.new(1,-40,0,35)
-	info.Text="Example: 1 → searches for exactly 1/7"
-	info.TextSize=12
-	info.TextColor3=Color3.fromRGB(170,205,245)
-	info.BackgroundTransparency=1
+	local targetStatus=label(
+		f,
+		"Searching for: —",
+		UDim2.fromOffset(205,305),
+		UDim2.fromOffset(160,25),
+		12,
+		Color3.fromRGB(160,200,245)
+	)
 
-	local stop=button(f,"■ STOP SEARCH",
-		UDim2.fromOffset(20,275),
-		UDim2.fromOffset(145,35),
-		Color3.fromRGB(170,45,65))
+	local count=label(
+		f,
+		"Servers checked: 0",
+		UDim2.fromOffset(22,330),
+		UDim2.fromOffset(180,22),
+		12,
+		Color3.fromRGB(145,185,230)
+	)
 
-	local credit=Instance.new("TextLabel",f)
-	credit.Position=UDim2.new(1,-105,1,-38)
-	credit.Size=UDim2.fromOffset(95,25)
-	credit.Text="Credit: Chris"
-	credit.TextSize=11
-	credit.TextColor3=Color3.fromRGB(150,190,240)
-	credit.BackgroundTransparency=1
+	local stop=button(
+		f,
+		"■  STOP SEARCH",
+		UDim2.fromOffset(15,365),
+		UDim2.fromOffset(150,35),
+		Color3.fromRGB(155,45,65)
+	)
+
+	label(
+		f,
+		"Credit: Chris",
+		UDim2.new(1,-105,1,-38),
+		UDim2.fromOffset(90,25),
+		11,
+		Color3.fromRGB(130,175,230)
+	)
 
 	local searching=false
+	local checked=0
 
-	local function getServer(wanted)
-		local req=request or http_request or (syn and syn.request)
-		if not req then return nil,"HTTP unavailable" end
+	local function getRequest()
+		return request or http_request or (syn and syn.request)
+	end
+
+	local function findServer(wanted)
+
+		local req=getRequest()
+
+		if not req then
+			return nil,"HTTP unavailable"
+		end
 
 		local cursor=""
-		local checked=0
+		checked=0
 
 		for page=1,5 do
-			if not searching then return nil,"Stopped" end
 
-			local url="https://games.roblox.com/v1/games/"
-				..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+			if not searching then
+				return nil,"Stopped"
+			end
+
+			local url=
+				"https://games.roblox.com/v1/games/"
+				..game.PlaceId
+				.."/servers/Public?sortOrder=Asc&limit=100"
 
 			if cursor~="" then
 				url=url.."&cursor="..H:UrlEncode(cursor)
 			end
 
-			local ok,r=pcall(function()
-				return req({Url=url,Method="GET"})
+			local ok,res=pcall(function()
+				return req({
+					Url=url,
+					Method="GET"
+				})
 			end)
 
-			if not ok or not r or r.StatusCode~=200 then
-				return nil,"API unavailable"
+			if not ok or not res then
+				return nil,"Request failed"
 			end
 
-			local ok2,data=pcall(function()
-				return H:JSONDecode(r.Body)
+			if res.StatusCode==429 then
+				task.wait(3)
+				continue
+			end
+
+			if res.StatusCode~=200 then
+				return nil,"API "..tostring(res.StatusCode)
+			end
+
+			local good,data=pcall(function()
+				return H:JSONDecode(res.Body)
 			end)
 
-			if not ok2 then return nil,"Invalid response" end
+			if not good or not data then
+				return nil,"Bad response"
+			end
 
 			for _,s in ipairs(data.data or {}) do
-				checked+=1
 
-				-- EXACT COUNT + MAX 7 + NOT FULL + NOT CURRENT
+				checked+=1
+				count.Text="Servers checked: "..checked
+
+				-- EXACTLY WANTED / 7
 				if s.id~=game.JobId
-				and s.maxPlayers==7
-				and s.playing==wanted
-				and s.playing<s.maxPlayers then
-					return s,checked
+				and tonumber(s.maxPlayers)==7
+				and tonumber(s.playing)==wanted
+				and tonumber(s.playing)<tonumber(s.maxPlayers) then
+
+					return s,"Found"
 				end
 			end
 
 			cursor=data.nextPageCursor or ""
-			if cursor=="" then break end
+
+			if cursor=="" then
+				break
+			end
+
+			task.wait(.15)
 		end
 
-		return nil,checked
+		return nil,"No match"
 	end
 
-	local function teleportServer(s)
-		status.Text="● Teleporting "..s.playing.."/7..."
+	local function teleport(s,wanted)
+
+		status.Text="●  TELEPORTING..."
 		status.TextColor3=Color3.fromRGB(255,220,80)
 
-		local ok=pcall(function()
-			T:TeleportToPlaceInstance(game.PlaceId,s.id,p)
+		local ok,err=pcall(function()
+			T:TeleportToPlaceInstance(
+				game.PlaceId,
+				s.id,
+				p
+			)
 		end)
 
 		if not ok then
 			return false
 		end
 
+		-- Roblox may reject it if the server filled
+		task.wait(3)
+
+		if p.Parent then
+			return false
+		end
+
 		return true
 	end
 
-	local function search(wanted,loopMode)
+	local function start(wanted,loopMode)
+
 		if searching then return end
+
 		searching=true
+		checked=0
+
+		targetStatus.Text="Searching for: "..wanted.."/7"
 
 		task.spawn(function()
+
 			while searching do
-				status.Text="● Searching for "..wanted.."/7..."
-				status.TextColor3=Color3.fromRGB(80,200,255)
 
-				local s,checked=getServer(wanted)
+				count.Text="Servers checked: 0"
+				status.Text="●  SEARCHING..."
+				status.TextColor3=Color3.fromRGB(70,200,255)
 
-				if not searching then break end
+				local s,reason=findServer(wanted)
+
+				if not searching then
+					break
+				end
 
 				if s then
-					status.Text="● Found "..s.playing.."/7 • Teleporting"
-					status.TextColor3=Color3.fromRGB(80,255,180)
 
-					local ok=teleportServer(s)
+					status.Text="●  FOUND "..s.playing.."/7"
+					status.TextColor3=Color3.fromRGB(70,255,175)
 
-					if ok then
-						-- Give Roblox time to begin teleport.
-						-- If teleport fails, TeleportInitFailed below
-						-- will allow another search.
-						task.wait(5)
+					local success=teleport(s,wanted)
 
-						if loopMode and searching then
-							status.Text="● Still here • Searching again..."
-						elseif searching then
-							searching=false
-						end
-					else
-						status.Text="● Server filled • Retrying..."
-						task.wait(1)
+					if success then
+						searching=false
+						break
 					end
+
+					-- Server filled / teleport failed
+					status.Text="●  SERVER FILLED • RETRYING"
+					status.TextColor3=Color3.fromRGB(255,180,70)
+
+					task.wait(1)
+
 				else
-					status.Text="● No "..wanted.."/7 • Retrying..."
+
+					if reason=="Stopped" then
+						break
+					end
+
+					status.Text="●  NO "..wanted.."/7 • RETRYING"
+					status.TextColor3=Color3.fromRGB(255,180,70)
+
 					task.wait(loopMode and 2 or 1)
 				end
 
-				if not loopMode and s then
-					break
+				if not loopMode and not s then
+					-- FIND SERVER also retries once if no server
+					task.wait(1)
 				end
 			end
 
 			searching=false
+
+			if not p.Parent then
+				return
+			end
+
+			status.Text="●  READY"
+			status.TextColor3=Color3.fromRGB(70,255,175)
 		end)
 	end
 
 	find.MouseButton1Click:Connect(function()
-		local n=tonumber(box.Text)
 
-		if not n or n<1 or n>6 then
-			status.Text="● Enter a number from 1-6"
-			status.TextColor3=Color3.fromRGB(255,100,110)
+		local wanted=tonumber(box.Text)
+
+		if not wanted or wanted<1 or wanted>6 then
+			status.Text="●  ENTER 1-6"
+			status.TextColor3=Color3.fromRGB(255,90,110)
 			return
 		end
 
-		search(n,false)
+		start(wanted,false)
 	end)
 
 	loop.MouseButton1Click:Connect(function()
+
 		if searching then
 			searching=false
-			status.Text="● Loop stopped"
-			status.TextColor3=Color3.fromRGB(255,180,80)
+			status.Text="●  LOOP STOPPED"
+			status.TextColor3=Color3.fromRGB(255,180,70)
 			return
 		end
 
-		local n=tonumber(box.Text)
+		local wanted=tonumber(box.Text)
 
-		if not n or n<1 or n>6 then
-			status.Text="● Enter a number from 1-6"
-			status.TextColor3=Color3.fromRGB(255,100,110)
+		if not wanted or wanted<1 or wanted>6 then
+			status.Text="●  ENTER 1-6"
+			status.TextColor3=Color3.fromRGB(255,90,110)
 			return
 		end
 
-		search(n,true)
+		start(wanted,true)
 	end)
 
 	stop.MouseButton1Click:Connect(function()
 		searching=false
-		status.Text="● Search stopped"
-		status.TextColor3=Color3.fromRGB(255,180,80)
+		status.Text="●  SEARCH STOPPED"
+		status.TextColor3=Color3.fromRGB(255,180,70)
 	end)
 
-	-- Retry when Roblox rejects the teleport, including
-	-- cases where the server became full.
 	T.TeleportInitFailed:Connect(function()
 		if searching then
-			status.Text="● Teleport failed • Finding another..."
-			status.TextColor3=Color3.fromRGB(255,180,80)
+			status.Text="●  TELEPORT FAILED • RETRYING"
+			status.TextColor3=Color3.fromRGB(255,180,70)
 		end
 	end)
 end
 
 local function keyGui()
+
 	local f=Instance.new("Frame",gui)
 	f.Size=UDim2.fromOffset(340,235)
 	f.Position=UDim2.new(.5,-170,.5,-117)
@@ -315,17 +481,22 @@ local function keyGui()
 	corner(f,18)
 	drag(f)
 
-	local title=Instance.new("TextLabel",f)
-	title.Size=UDim2.new(1,-55,0,45)
-	title.Position=UDim2.fromOffset(15,5)
-	title.Text="🔑 KEY SYSTEM"
-	title.TextSize=21
+	local title=label(
+		f,
+		"🔑  KEY SYSTEM",
+		UDim2.fromOffset(15,10),
+		UDim2.fromOffset(250,35),
+		21,
+		Color3.fromRGB(25,25,30)
+	)
 	title.Font=Enum.Font.GothamBold
-	title.TextColor3=Color3.fromRGB(25,25,30)
-	title.BackgroundTransparency=1
 
-	local close=button(f,"X",UDim2.new(1,-45,0,8),
-		UDim2.fromOffset(35,30),Color3.fromRGB(220,60,70))
+	local close=button(
+		f,"X",
+		UDim2.new(1,-45,0,8),
+		UDim2.fromOffset(35,30),
+		Color3.fromRGB(220,60,70)
+	)
 
 	close.MouseButton1Click:Connect(function()
 		f:Destroy()
@@ -341,23 +512,27 @@ local function keyGui()
 	box.TextColor3=Color3.fromRGB(20,20,25)
 	corner(box,12)
 
-	local verify=button(f,"VERIFY KEY",
+	local verify=button(
+		f,"VERIFY KEY",
 		UDim2.fromOffset(20,105),
 		UDim2.new(1,-40,0,38),
-		Color3.fromRGB(35,105,210))
+		Color3.fromRGB(35,105,210)
+	)
 
-	local status=Instance.new("TextLabel",f)
-	status.Position=UDim2.fromOffset(20,145)
-	status.Size=UDim2.new(1,-40,0,25)
-	status.Text=""
-	status.TextSize=13
-	status.TextColor3=Color3.fromRGB(220,60,70)
-	status.BackgroundTransparency=1
+	local status=label(
+		f,"",
+		UDim2.fromOffset(20,145),
+		UDim2.new(1,-40,0,25),
+		13,
+		Color3.fromRGB(220,60,70)
+	)
 
-	local dc=button(f,"SUPPORT DISCORD",
+	local dc=button(
+		f,"SUPPORT DISCORD",
 		UDim2.fromOffset(20,190),
 		UDim2.new(1,-40,0,32),
-		Color3.fromRGB(75,85,200))
+		Color3.fromRGB(75,85,200)
+	)
 
 	dc.MouseButton1Click:Connect(function()
 		if setclipboard then
