@@ -1060,6 +1060,7 @@ local function sendGuiWebhook()
         })
     end)
 end
+
 local function joinServer(serverId, button)
     if not serverId then
         return
