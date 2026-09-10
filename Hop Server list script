@@ -107,6 +107,7 @@ local function drag(frame,handle)
 	handle=handle or frame
 
 	handle.InputBegan:Connect(function(input)
+
 		if input.UserInputType==Enum.UserInputType.MouseButton1
 		or input.UserInputType==Enum.UserInputType.Touch then
 
@@ -117,6 +118,7 @@ local function drag(frame,handle)
 	end)
 
 	UIS.InputChanged:Connect(function(input)
+
 		if not dragging then
 			return
 		end
@@ -136,6 +138,7 @@ local function drag(frame,handle)
 	end)
 
 	UIS.InputEnded:Connect(function(input)
+
 		if input.UserInputType==Enum.UserInputType.MouseButton1
 		or input.UserInputType==Enum.UserInputType.Touch then
 
@@ -197,6 +200,7 @@ local function showLoading(callback)
 	barBack.BackgroundColor3=Color3.fromRGB(18,43,78)
 	barBack.ZIndex=102
 	barBack.Parent=holder
+
 	corner(barBack,5)
 
 	local bar=Instance.new("Frame")
@@ -204,6 +208,7 @@ local function showLoading(callback)
 	bar.BackgroundColor3=Color3.fromRGB(22,119,255)
 	bar.ZIndex=103
 	bar.Parent=barBack
+
 	corner(bar,5)
 
 	local dots=label(
@@ -227,9 +232,11 @@ local function showLoading(callback)
 	})
 
 	task.spawn(function()
+
 		local i=0
 
 		while loading.Parent do
+
 			i=i+1
 
 			if i>3 then
@@ -272,6 +279,7 @@ local function keyGui()
 	frame.Parent=gui
 
 	corner(frame,20)
+
 	stroke(
 		frame,
 		Color3.fromRGB(210,220,235),
@@ -366,13 +374,17 @@ local function keyGui()
 	discord.MouseButton1Click:Connect(function()
 
 		if setclipboard then
+
 			setclipboard(DISCORD)
 
 			status.Text="Discord link copied"
 			status.TextColor3=Color3.fromRGB(50,160,90)
+
 		else
+
 			status.Text="Copy unavailable"
 			status.TextColor3=Color3.fromRGB(225,65,80)
+
 		end
 	end)
 
@@ -441,6 +453,7 @@ function mainGui()
 	local collapsedSize=UDim2.fromOffset(390,58)
 
 	local collapsed=false
+	local slideTween=nil
 
 	local header=Instance.new("Frame")
 	header.Size=UDim2.new(1,0,0,58)
@@ -598,6 +611,7 @@ function mainGui()
 	local function clearList()
 
 		for _,child in ipairs(list:GetChildren()) do
+
 			if child:IsA("Frame") then
 				child:Destroy()
 			end
@@ -666,6 +680,7 @@ function mainGui()
 		idButton.MouseButton1Click:Connect(function()
 
 			if setclipboard then
+
 				setclipboard(server.id)
 
 				status.Text="ID COPIED"
@@ -773,7 +788,6 @@ function mainGui()
 				Url=url,
 				Method="GET"
 			})
-
 		end)
 
 		if not ok or not res or res.StatusCode~=200 then
@@ -789,7 +803,6 @@ function mainGui()
 		local good,data=pcall(function()
 
 			return HttpService:JSONDecode(res.Body)
-
 		end)
 
 		if not good or not data then
@@ -844,7 +857,13 @@ function mainGui()
 		status.TextColor3=Color3.fromRGB(70,255,175)
 	end
 
+	-- FIXED SLIDE SYSTEM
 	slide.MouseButton1Click:Connect(function()
+
+		if slideTween then
+			slideTween:Cancel()
+			slideTween=nil
+		end
 
 		collapsed=not collapsed
 
@@ -854,7 +873,7 @@ function mainGui()
 			subtitle.Visible=false
 			slide.Text="▼"
 
-			tween(frame,.35,{
+			slideTween=tween(frame,.35,{
 				Size=collapsedSize
 			})
 
@@ -864,9 +883,22 @@ function mainGui()
 			subtitle.Visible=true
 			slide.Text="▲"
 
-			tween(frame,.35,{
+			slideTween=tween(frame,.35,{
 				Size=expandedSize
 			})
+
+			task.spawn(function()
+
+				local currentTween=slideTween
+
+				currentTween.Completed:Wait()
+
+				if not collapsed
+				and frame.Parent then
+
+					frame.Size=expandedSize
+				end
+			end)
 		end
 	end)
 
@@ -934,7 +966,8 @@ function mainGui()
 		end
 	end)
 
-	drag(frame,header)
+	-- DRAG ONLY FROM TITLE
+	drag(frame,title)
 
 	fetchServers()
 end
