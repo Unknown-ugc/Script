@@ -11,7 +11,7 @@ local Player = Players.LocalPlayer
 local PlaceId = game.PlaceId
 
 --// SETTINGS
-local KEY_SYSTEM = true
+local KEY_SYSTEM = false
 local KEY = "key555"
 local DISCORD = "https://discord.gg/FJK6QzNnf7"
 
