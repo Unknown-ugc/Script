@@ -8,9 +8,10 @@ local H=game:GetService("HttpService")
 local U=game:GetService("UserInputService")
 local p=P.LocalPlayer
 
-local gui=Instance.new("ScreenGui",p:WaitForChild("PlayerGui"))
+local gui=Instance.new("ScreenGui")
 gui.Name="ChrisServerFinder"
 gui.ResetOnSpawn=false
+gui.Parent=p:WaitForChild("PlayerGui")
 
 local function corner(x,r)
 	local c=Instance.new("UICorner",x)
@@ -24,7 +25,9 @@ local function outline(x)
 end
 
 local function drag(f)
-	local moving,start,pos
+	local moving=false
+	local start
+	local pos
 
 	f.InputBegan:Connect(function(i)
 		if i.UserInputType==Enum.UserInputType.MouseButton1
@@ -36,14 +39,18 @@ local function drag(f)
 	end)
 
 	U.InputChanged:Connect(function(i)
-		if moving and (
-			i.UserInputType==Enum.UserInputType.MouseMovement
-			or i.UserInputType==Enum.UserInputType.Touch
-		) then
+		if not moving then return end
+
+		if i.UserInputType==Enum.UserInputType.MouseMovement
+		or i.UserInputType==Enum.UserInputType.Touch then
+
 			local v=i.Position-start
+
 			f.Position=UDim2.new(
-				pos.X.Scale,pos.X.Offset+v.X,
-				pos.Y.Scale,pos.Y.Offset+v.Y
+				pos.X.Scale,
+				pos.X.Offset+v.X,
+				pos.Y.Scale,
+				pos.Y.Offset+v.Y
 			)
 		end
 	end)
@@ -90,6 +97,7 @@ local function mainGui()
 	f.Position=UDim2.new(.5,-195,.5,-182)
 	f.BackgroundColor3=Color3.fromRGB(7,30,70)
 	f.Active=true
+
 	corner(f,22)
 	outline(f)
 	drag(f)
@@ -106,7 +114,7 @@ local function mainGui()
 
 	label(
 		f,
-		"Find the perfect server. Fast. Easy. Reliable.",
+		"Fast server search • Automatic teleport",
 		UDim2.fromOffset(23,46),
 		UDim2.fromOffset(330,22),
 		12,
@@ -114,22 +122,26 @@ local function mainGui()
 	)
 
 	local close=button(
-		f,"×",
+		f,
+		"×",
 		UDim2.new(1,-55,0,12),
 		UDim2.fromOffset(40,35),
 		Color3.fromRGB(15,65,130)
 	)
 
 	close.TextSize=25
+
 	close.MouseButton1Click:Connect(function()
 		f:Destroy()
 	end)
 
-	-- TARGET
+	-- TARGET BOX
+
 	local target=Instance.new("Frame",f)
 	target.Position=UDim2.fromOffset(15,78)
 	target.Size=UDim2.new(1,-30,0,100)
 	target.BackgroundColor3=Color3.fromRGB(10,45,90)
+
 	corner(target,16)
 	outline(target)
 
@@ -141,6 +153,7 @@ local function mainGui()
 		15,
 		Color3.fromRGB(190,220,255)
 	)
+
 	targetTitle.Font=Enum.Font.GothamBold
 
 	local box=Instance.new("TextBox",target)
@@ -154,6 +167,7 @@ local function mainGui()
 	box.PlaceholderColor3=Color3.fromRGB(130,165,210)
 	box.BackgroundColor3=Color3.fromRGB(8,35,75)
 	box.ClearTextOnFocus=false
+
 	corner(box,10)
 
 	label(
@@ -166,12 +180,14 @@ local function mainGui()
 	)
 
 	-- QUICK SELECT
+
 	local quick=Instance.new("Frame",f)
 	quick.Position=UDim2.fromOffset(15,185)
 	quick.Size=UDim2.new(1,-30,0,52)
 	quick.BackgroundTransparency=1
 
 	for i=1,6 do
+
 		local b=button(
 			quick,
 			tostring(i),
@@ -185,7 +201,8 @@ local function mainGui()
 		end)
 	end
 
-	-- FIND BUTTON ONLY
+	-- FIND
+
 	local find=button(
 		f,
 		"FIND SERVER",
@@ -195,6 +212,7 @@ local function mainGui()
 	)
 
 	-- STATUS
+
 	local status=label(
 		f,
 		"● READY",
@@ -203,6 +221,7 @@ local function mainGui()
 		14,
 		Color3.fromRGB(70,255,175)
 	)
+
 	status.Font=Enum.Font.GothamBold
 
 	local targetStatus=label(
@@ -214,7 +233,7 @@ local function mainGui()
 		Color3.fromRGB(160,200,245)
 	)
 
-	label(
+	local credit=label(
 		f,
 		"Credit: Chris",
 		UDim2.new(1,-105,1,-32),
@@ -224,12 +243,12 @@ local function mainGui()
 	)
 
 	local searching=false
-	local checked=0
 
 	local function getRequest()
 		return request or http_request or (syn and syn.request)
 	end
 
+	-- FAST SERVER SEARCH
 	local function findServer(wanted)
 
 		local req=getRequest()
@@ -238,87 +257,80 @@ local function mainGui()
 			return nil
 		end
 
-		local cursor=""
+		local url=
+			"https://games.roblox.com/v1/games/"
+			..game.PlaceId
+			.."/servers/Public?sortOrder=Asc&limit=100"
 
-		for page=1,5 do
+		local ok,res=pcall(function()
+
+			return req({
+				Url=url,
+				Method="GET"
+			})
+
+		end)
+
+		if not ok or not res then
+			return nil
+		end
+
+		if res.StatusCode==429 then
+			return nil
+		end
+
+		if res.StatusCode~=200 then
+			return nil
+		end
+
+		local good,data=pcall(function()
+			return H:JSONDecode(res.Body)
+		end)
+
+		if not good or not data then
+			return nil
+		end
+
+		for _,s in ipairs(data.data or {}) do
 
 			if not searching then
 				return nil
 			end
 
-			local url=
-				"https://games.roblox.com/v1/games/"
-				..game.PlaceId
-				.."/servers/Public?sortOrder=Asc&limit=100"
+			local playing=tonumber(s.playing)
+			local maxPlayers=tonumber(s.maxPlayers)
 
-			if cursor~="" then
-				url=url.."&cursor="..H:UrlEncode(cursor)
+			if s.id~=game.JobId
+			and maxPlayers==7
+			and playing==wanted
+			and playing<maxPlayers then
+
+				return s
 			end
-
-			local ok,res=pcall(function()
-				return req({
-					Url=url,
-					Method="GET"
-				})
-			end)
-
-			if ok and res then
-
-				if res.StatusCode==429 then
-					task.wait(2)
-					continue
-				end
-
-				if res.StatusCode==200 then
-
-					local good,data=pcall(function()
-						return H:JSONDecode(res.Body)
-					end)
-
-					if good and data then
-
-						for _,s in ipairs(data.data or {}) do
-
-							checked+=1
-
-							-- EXACT WANTED / 7
-							if s.id~=game.JobId
-							and tonumber(s.maxPlayers)==7
-							and tonumber(s.playing)==wanted
-							and tonumber(s.playing)<7 then
-
-								return s
-							end
-						end
-
-						cursor=data.nextPageCursor or ""
-
-						if cursor=="" then
-							break
-						end
-					end
-				end
-			end
-
-			task.wait(.1)
 		end
 
 		return nil
 	end
 
+	-- IMMEDIATE TELEPORT
 	local function teleport(s)
 
-		local ok=pcall(function()
+		if not s or not searching then
+			return
+		end
+
+		pcall(function()
+
 			T:TeleportToPlaceInstance(
 				game.PlaceId,
 				s.id,
 				p
 			)
-		end)
 
-		return ok
+		end)
 	end
 
+	-- CONTINUOUS FAST SEARCH
 	local function start(wanted)
 
 		if searching then
@@ -326,38 +338,38 @@ local function mainGui()
 		end
 
 		searching=true
-		checked=0
 
 		targetStatus.Text="Searching for: "..wanted.."/7"
+		status.Text="● SEARCHING..."
+		status.TextColor3=Color3.fromRGB(70,200,255)
 
 		task.spawn(function()
 
 			while searching do
 
-				status.Text="● SEARCHING..."
-				status.TextColor3=Color3.fromRGB(70,200,255)
-
-				local s=findServer(wanted)
+				local server=findServer(wanted)
 
 				if not searching then
 					break
 				end
 
-				if s then
+				if server then
 
-					-- Immediately attempt teleport
-					status.Text="● FOUND "..tostring(s.playing).."/7"
+					status.Text="● FOUND "..wanted.."/7"
 					status.TextColor3=Color3.fromRGB(70,255,175)
 
-					teleport(s)
+					-- NO EXTRA WAIT
+					teleport(server)
 
-					-- If Roblox rejects it or server filled,
-					-- silently search again.
-					task.wait(.8)
+					-- Give Roblox a moment to process.
+					-- If teleport doesn't happen, search again.
+					task.wait(.35)
 
 				else
-					-- No match: silently keep searching
-					task.wait(.5)
+
+					-- Very short retry delay
+					task.wait(.15)
+
 				end
 			end
 		end)
@@ -367,18 +379,36 @@ local function mainGui()
 
 		local wanted=tonumber(box.Text)
 
-		if not wanted or wanted<1 or wanted>6 then
+		if not wanted then
 			return
 		end
 
-		start(math.floor(wanted))
+		wanted=math.floor(wanted)
+
+		if wanted<1 or wanted>6 then
+			return
+		end
+
+		start(wanted)
 	end)
 
-	-- Teleport failure = silently continue searching
+	-- If Roblox rejects the teleport,
+	-- the main loop automatically continues.
 	T.TeleportInitFailed:Connect(function()
+
 		if searching then
-			task.wait(.2)
+
+			task.defer(function()
+
+				if searching then
+					status.Text="● SEARCHING..."
+					status.TextColor3=Color3.fromRGB(70,200,255)
+				end
+
+			end)
+
 		end
+
 	end)
 end
 
@@ -389,6 +419,7 @@ local function keyGui()
 	f.Position=UDim2.new(.5,-170,.5,-117)
 	f.BackgroundColor3=Color3.fromRGB(248,248,250)
 	f.Active=true
+
 	corner(f,18)
 	drag(f)
 
@@ -400,10 +431,12 @@ local function keyGui()
 		21,
 		Color3.fromRGB(25,25,30)
 	)
+
 	title.Font=Enum.Font.GothamBold
 
 	local close=button(
-		f,"X",
+		f,
+		"X",
 		UDim2.new(1,-45,0,8),
 		UDim2.fromOffset(35,30),
 		Color3.fromRGB(220,60,70)
@@ -421,6 +454,7 @@ local function keyGui()
 	box.TextSize=15
 	box.BackgroundColor3=Color3.fromRGB(235,235,240)
 	box.TextColor3=Color3.fromRGB(20,20,25)
+
 	corner(box,12)
 
 	local verify=button(
@@ -449,19 +483,23 @@ local function keyGui()
 	)
 
 	dc.MouseButton1Click:Connect(function()
+
 		if setclipboard then
 			setclipboard(DISCORD)
 			status.Text="Discord link copied!"
 		end
+
 	end)
 
 	verify.MouseButton1Click:Connect(function()
+
 		if box.Text==KEY then
 			f:Destroy()
 			mainGui()
 		else
 			status.Text="Invalid key"
 		end
+
 	end)
 end
 
