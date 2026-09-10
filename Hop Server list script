@@ -1,4 +1,4 @@
-local KEY_SYSTEM = false -- change to true when ready
+local KEY_SYSTEM = true -- change to true when ready
 local KEY = "key555"
 local DISCORD = "https://discord.gg/FJK6QzNnf7"
 
