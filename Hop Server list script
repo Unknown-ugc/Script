@@ -773,18 +773,6 @@ local function createMainGui()
 	Credit.TextSize = 9
 	Credit.TextXAlignment = Enum.TextXAlignment.Left
 	Credit.Parent = Header
-
-    local FarmText = Instance.new("TextLabel")
-FarmText.BackgroundTransparency = 1
-FarmText.Position = UDim2.fromOffset(10, 76)
-FarmText.Size = UDim2.fromOffset(150, 16)
-FarmText.Font = Enum.Font.Gotham
-FarmText.Text = "farm scripts in Discord"
-FarmText.TextColor3 = GREY
-FarmText.TextSize = 7
-FarmText.TextXAlignment = Enum.TextXAlignment.Left
-FarmText.Parent = Header
-
 local DiscordInfo = Instance.new("TextLabel")
 DiscordInfo.BackgroundTransparency = 1
 DiscordInfo.Position = UDim2.fromOffset(10, 76)
@@ -795,6 +783,17 @@ DiscordInfo.TextColor3 = CYAN
 DiscordInfo.TextSize = 7
 DiscordInfo.TextXAlignment = Enum.TextXAlignment.Left
 DiscordInfo.Parent = Header
+
+local FarmText = Instance.new("TextLabel")
+FarmText.BackgroundTransparency = 1
+FarmText.Position = UDim2.fromOffset(10, 88)
+FarmText.Size = UDim2.fromOffset(180, 14)
+FarmText.Font = Enum.Font.Gotham
+FarmText.Text = " farm scripts in Discord"
+FarmText.TextColor3 = GREY
+FarmText.TextSize = 7
+FarmText.TextXAlignment = Enum.TextXAlignment.Left
+FarmText.Parent = Header
 
 	local Profile = Instance.new("ImageLabel")
 	Profile.Position = UDim2.new(1, -47, 0, 32)
