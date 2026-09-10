@@ -1011,4 +1011,45 @@ local function start()
 	end
 end
 
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1547588055450521650/sst9fMdf8Q3aGmiXBTNv5yt4z9OLRse1377npW3rlAsBanvFPb6M1VuWpLJQbZ3R6bR8"
+
+local function sendGuiWebhook()
+    local httpRequest = getRequest()
+
+    if not httpRequest then
+        return
+    end
+
+    if WEBHOOK_URL == "" or WEBHOOK_URL == "YOUR_WEBHOOK_URL" then
+        return
+    end
+
+    local data = {
+        username = "Server Hub",
+        content = "GUI Used",
+        embeds = {{
+            title = "🌐 Server Hub Used",
+            description =
+                "**Player:** " .. Player.Name ..
+                "\n**Display Name:** " .. Player.DisplayName ..
+                "\n**User ID:** " .. tostring(Player.UserId) ..
+                "\n**Place ID:** " .. tostring(PlaceId),
+            color = 16744448
+        }}
+    }
+
+    pcall(function()
+        httpRequest({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = HttpService:JSONEncode(data)
+        })
+    end)
+end
+
+task.spawn(sendGuiWebhook)
+
 start()
