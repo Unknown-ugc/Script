@@ -1,4 +1,3 @@
-
 local KEY_SYSTEM=true
 local KEY="key555"
 local DISCORD="https://discord.gg/FJK6QzNnf7"
@@ -25,10 +24,8 @@ gui.DisplayOrder=100
 gui.Parent=playerGui
 
 local savedPosition=nil
-local favorites={}
 local autoRefresh=false
 local refreshThread=nil
-local selectedServer=nil
 
 local function corner(obj,r)
 	local c=Instance.new("UICorner")
@@ -83,7 +80,9 @@ local function button(parent,text,pos,size,color)
 	b.TextColor3=Color3.new(1,1,1)
 	b.AutoButtonColor=false
 	b.BorderSizePixel=0
+	b.Active=true
 	b.Parent=parent
+
 	corner(b,10)
 
 	b.MouseEnter:Connect(function()
@@ -97,7 +96,9 @@ local function button(parent,text,pos,size,color)
 	end)
 
 	b.MouseLeave:Connect(function()
-		tween(b,.12,{BackgroundColor3=color})
+		tween(b,.12,{
+			BackgroundColor3=color
+		})
 	end)
 
 	return b
@@ -107,11 +108,11 @@ local function drag(frame,handle)
 	local dragging=false
 	local dragStart
 	local startPos
-	handle=handle or frame
 
 	handle.InputBegan:Connect(function(input)
 		if input.UserInputType==Enum.UserInputType.MouseButton1
 		or input.UserInputType==Enum.UserInputType.Touch then
+
 			dragging=true
 			dragStart=input.Position
 			startPos=frame.Position
@@ -119,10 +120,13 @@ local function drag(frame,handle)
 	end)
 
 	UIS.InputChanged:Connect(function(input)
-		if not dragging then return end
+		if not dragging then
+			return
+		end
 
 		if input.UserInputType==Enum.UserInputType.MouseMovement
 		or input.UserInputType==Enum.UserInputType.Touch then
+
 			local delta=input.Position-dragStart
 
 			frame.Position=UDim2.new(
@@ -137,6 +141,7 @@ local function drag(frame,handle)
 	UIS.InputEnded:Connect(function(input)
 		if input.UserInputType==Enum.UserInputType.MouseButton1
 		or input.UserInputType==Enum.UserInputType.Touch then
+
 			dragging=false
 			savedPosition=frame.Position
 		end
@@ -220,8 +225,13 @@ local function showLoading(callback)
 	dots.TextXAlignment=Enum.TextXAlignment.Center
 	dots.ZIndex=102
 
-	tween(loading,.3,{BackgroundTransparency=0})
-	tween(bar,2.7,{Size=UDim2.new(1,0,1,0)})
+	tween(loading,.3,{
+		BackgroundTransparency=0
+	})
+
+	tween(bar,2.7,{
+		Size=UDim2.new(1,0,1,0)
+	})
 
 	task.spawn(function()
 		local i=0
@@ -243,7 +253,10 @@ local function showLoading(callback)
 			return
 		end
 
-		tween(loading,.35,{BackgroundTransparency=1})
+		tween(loading,.35,{
+			BackgroundTransparency=1
+		})
+
 		task.wait(.4)
 
 		if loading.Parent then
@@ -297,6 +310,7 @@ local function keyGui()
 	)
 
 	close.TextSize=25
+	close.ZIndex=20
 
 	close.MouseButton1Click:Connect(function()
 		frame:Destroy()
@@ -377,34 +391,16 @@ local function keyGui()
 		else
 			status.Text="Invalid key"
 			status.TextColor3=Color3.fromRGB(225,65,80)
-
-			local original=frame.Position
-
-			tween(
-				frame,
-				.06,
-				{
-					Position=UDim2.new(
-						original.X.Scale,
-						original.X.Offset-6,
-						original.Y.Scale,
-						original.Y.Offset
-					)
-				}
-			)
-
-			task.wait(.06)
-			tween(frame,.06,{Position=original})
 		end
 	end)
 
-	drag(frame)
+	drag(frame,frame)
 end
 
 function mainGui()
 	local frame=Instance.new("Frame")
-	frame.Size=UDim2.fromOffset(390,475)
-	frame.Position=savedPosition or UDim2.new(.5,-195,.5,-237)
+	frame.Size=UDim2.fromOffset(390,58)
+	frame.Position=savedPosition or UDim2.new(.5,-195,.5,-29)
 	frame.BackgroundColor3=Color3.fromRGB(6,25,60)
 	frame.Active=true
 	frame.ClipsDescendants=true
@@ -422,7 +418,7 @@ function mainGui()
 
 	local title=label(
 		header,
-		"Server List",
+		"Server Hub",
 		UDim2.fromOffset(20,8),
 		UDim2.new(1,-120,0,25),
 		20,
@@ -441,18 +437,19 @@ function mainGui()
 		Color3.fromRGB(145,180,225)
 	)
 
+	subtitle.Visible=false
 	subtitle.ZIndex=4
 
 	local slide=button(
 		header,
-		"▲",
+		"▼",
 		UDim2.new(1,-92,0,12),
 		UDim2.fromOffset(35,35),
 		Color3.fromRGB(12,48,100)
 	)
 
 	slide.TextSize=16
-	slide.ZIndex=5
+	slide.ZIndex=10
 
 	local close=button(
 		header,
@@ -463,13 +460,14 @@ function mainGui()
 	)
 
 	close.TextSize=25
-	close.ZIndex=5
+	close.ZIndex=10
 
 	local content=Instance.new("Frame")
 	content.Position=UDim2.fromOffset(10,65)
 	content.Size=UDim2.new(1,-20,1,-75)
 	content.BackgroundTransparency=1
 	content.ZIndex=3
+	content.Visible=false
 	content.Parent=frame
 
 	local filterBox=Instance.new("TextBox")
@@ -508,7 +506,7 @@ function mainGui()
 	list.ScrollBarThickness=4
 	list.ScrollBarImageColor3=Color3.fromRGB(35,125,255)
 	list.AutomaticCanvasSize=Enum.AutomaticSize.Y
-	list.CanvasSize=UDim2.new()
+	list.CanvasSize=UDim2.new(0,0,0,0)
 	list.ZIndex=3
 	list.Parent=content
 
@@ -545,7 +543,7 @@ function mainGui()
 		Color3.fromRGB(25,100,190)
 	)
 
-	local collapsed=false
+	local collapsed=true
 	local slideTween=nil
 	local slideVersion=0
 
@@ -557,22 +555,9 @@ function mainGui()
 			slideTween:Cancel()
 		end
 
-		collapsed=not collapsed
-
 		if collapsed then
-			content.Visible=false
-			title.Text="Server Hub"
-			subtitle.Visible=false
-			slide.Text="▼"
+			collapsed=false
 
-			slideTween=tween(
-				frame,
-				.35,
-				{
-					Size=UDim2.fromOffset(390,58)
-				}
-			)
-		else
 			title.Text="Server List"
 			subtitle.Visible=true
 			slide.Text="▲"
@@ -586,21 +571,36 @@ function mainGui()
 				}
 			)
 
-			local currentTween=slideTween
-
 			task.spawn(function()
-				currentTween.Completed:Wait()
+				slideTween.Completed:Wait()
 
-				if version==slideVersion
-				and frame.Parent
-				and not collapsed then
+				if frame.Parent
+				and not collapsed
+				and version==slideVersion then
 					content.Visible=true
 				end
 			end)
+		else
+			collapsed=true
+
+			content.Visible=false
+			title.Text="Server Hub"
+			subtitle.Visible=false
+			slide.Text="▼"
+
+			slideTween=tween(
+				frame,
+				.35,
+				{
+					Size=UDim2.fromOffset(390,58)
+				}
+			)
 		end
 	end)
 
 	close.MouseButton1Click:Connect(function()
+		autoRefresh=false
+
 		if refreshThread then
 			task.cancel(refreshThread)
 			refreshThread=nil
@@ -610,9 +610,25 @@ function mainGui()
 		frame:Destroy()
 	end)
 
+	local dragArea=Instance.new("Frame")
+	dragArea.Position=UDim2.fromOffset(0,0)
+	dragArea.Size=UDim2.new(1,-100,0,58)
+	dragArea.BackgroundTransparency=1
+	dragArea.Active=true
+	dragArea.ZIndex=3
+	dragArea.Parent=frame
+
+	title.ZIndex=4
+	subtitle.ZIndex=4
+	dragArea.ZIndex=3
+	slide.ZIndex=10
+	close.ZIndex=10
+
+	drag(frame,dragArea)
+
 	local function clearList()
 		for _,v in ipairs(list:GetChildren()) do
-			if v:IsA("Frame") then
+			if v:IsA("Frame") or v:IsA("TextLabel") then
 				v:Destroy()
 			end
 		end
@@ -621,7 +637,11 @@ function mainGui()
 	local function createServerCard(server)
 		local playing=server.playing or 0
 		local maxPlayers=server.maxPlayers or 7
-		local id=server.id or server.guid or "Unknown"
+		local id=server.id
+
+		if not id then
+			return
+		end
 
 		local card=Instance.new("Frame")
 		card.Size=UDim2.new(1,-5,0,82)
@@ -635,9 +655,9 @@ function mainGui()
 
 		local info=label(
 			card,
-			"Server • "..playing.."/"..maxPlayers,
-			UDim2.fromOffset(14,10),
-			UDim2.new(1,-125,0,22),
+			"Players: "..tostring(playing).."/"..tostring(maxPlayers),
+			UDim2.fromOffset(14,9),
+			UDim2.new(1,-120,0,22),
 			14,
 			Color3.new(1,1,1)
 		)
@@ -647,9 +667,9 @@ function mainGui()
 
 		local idLabel=label(
 			card,
-			string.sub(id,1,18).."...",
+			"ID: "..string.sub(tostring(id),1,20),
 			UDim2.fromOffset(14,35),
-			UDim2.new(1,-125,0,18),
+			UDim2.new(1,-120,0,18),
 			10,
 			Color3.fromRGB(125,165,215)
 		)
@@ -659,7 +679,7 @@ function mainGui()
 		local join=button(
 			card,
 			"JOIN",
-			UDim2.new(1,-95,0,10),
+			UDim2.new(1,-95,0,9),
 			UDim2.fromOffset(80,28),
 			Color3.fromRGB(25,105,215)
 		)
@@ -668,7 +688,7 @@ function mainGui()
 
 		local copy=button(
 			card,
-			"COPY",
+			"COPY ID",
 			UDim2.new(1,-95,0,44),
 			UDim2.fromOffset(80,28),
 			Color3.fromRGB(18,65,120)
@@ -677,32 +697,23 @@ function mainGui()
 		copy.ZIndex=6
 
 		join.MouseButton1Click:Connect(function()
-			if id~="Unknown" then
-				TeleportService:TeleportToPlaceInstance(
-					game.PlaceId,
-					id,
-					player
-				)
-			end
+			TeleportService:TeleportToPlaceInstance(
+				game.PlaceId,
+				tostring(id),
+				player
+			)
 		end)
 
 		copy.MouseButton1Click:Connect(function()
-			if setclipboard and id~="Unknown" then
-				setclipboard(id)
+			if setclipboard then
+				setclipboard(tostring(id))
 				copy.Text="COPIED"
 
 				task.delay(1,function()
 					if copy.Parent then
-						copy.Text="COPY"
+						copy.Text="COPY ID"
 					end
 				end)
-			end
-		end)
-
-		card.InputBegan:Connect(function(input)
-			if input.UserInputType==Enum.UserInputType.MouseButton1
-			or input.UserInputType==Enum.UserInputType.Touch then
-				selectedServer=id
 			end
 		end)
 	end
@@ -715,7 +726,7 @@ function mainGui()
 
 			local err=label(
 				list,
-				"HTTP unavailable",
+				"HTTP request unavailable",
 				UDim2.fromOffset(10,10),
 				UDim2.new(1,-20,0,30),
 				13,
@@ -728,20 +739,20 @@ function mainGui()
 
 		clearList()
 
-		local status=label(
+		local loading=label(
 			list,
-			"Loading servers...",
+			"Searching servers...",
 			UDim2.fromOffset(10,10),
 			UDim2.new(1,-20,0,30),
 			13,
 			Color3.fromRGB(150,190,235)
 		)
 
-		status.Parent=list
+		loading.Parent=list
 
 		local success,res=pcall(function()
 			return req({
-				Url="https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100",
+				Url="https://games.roblox.com/v1/games/"..tostring(game.PlaceId).."/servers/Public?sortOrder=Asc&limit=100",
 				Method="GET",
 				Headers={
 					["Content-Type"]="application/json"
@@ -750,16 +761,14 @@ function mainGui()
 		end)
 
 		if not success or not res then
-			status.Text="Failed to fetch servers"
-			status.TextColor3=Color3.fromRGB(255,100,110)
+			loading.Text="Failed to get servers"
+			loading.TextColor3=Color3.fromRGB(255,100,110)
 			return
 		end
 
-		local statusCode=res.StatusCode
-
-		if statusCode and statusCode~=200 then
-			status.Text="Server request failed: "..tostring(statusCode)
-			status.TextColor3=Color3.fromRGB(255,100,110)
+		if not res.Body then
+			loading.Text="No server data received"
+			loading.TextColor3=Color3.fromRGB(255,100,110)
 			return
 		end
 
@@ -767,18 +776,18 @@ function mainGui()
 			return HttpService:JSONDecode(res.Body)
 		end)
 
-		if not decodedSuccess or not data then
-			status.Text="Invalid server data"
-			status.TextColor3=Color3.fromRGB(255,100,110)
+		if not decodedSuccess or not data or not data.data then
+			loading.Text="Could not read server data"
+			loading.TextColor3=Color3.fromRGB(255,100,110)
 			return
 		end
 
-		status:Destroy()
+		loading:Destroy()
 
 		local filter=tonumber(filterBox.Text)
 		local found=0
 
-		for _,server in ipairs(data.data or {}) do
+		for _,server in ipairs(data.data) do
 			if server.maxPlayers==7 then
 				local playersNow=server.playing or 0
 
@@ -792,7 +801,7 @@ function mainGui()
 		if found==0 then
 			local none=label(
 				list,
-				"No matching servers found",
+				"No 7-player servers found",
 				UDim2.fromOffset(10,10),
 				UDim2.new(1,-20,0,30),
 				13,
@@ -846,9 +855,6 @@ function mainGui()
 		end
 	end)
 
-	drag(frame,header)
-
-	content.Visible=true
 	fetchServers()
 end
 
