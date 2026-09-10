@@ -27,7 +27,8 @@ local function drag(f)
 	U.InputChanged:Connect(function(i)
 		if d and i.UserInputType==Enum.UserInputType.MouseMovement then
 			local v=i.Position-s
-			f.Position=UDim2.new(pos.X.Scale,pos.X.Offset+v.X,pos.Y.Scale,pos.Y.Offset+v.Y)
+			f.Position=UDim2.new(pos.X.Scale,pos.X.Offset+v.X,
+				pos.Y.Scale,pos.Y.Offset+v.Y)
 		end
 	end)
 	U.InputEnded:Connect(function(i)
@@ -38,7 +39,8 @@ end
 local function btn(par,text,pos,size,color)
 	local b=Instance.new("TextButton",par)
 	b.Text=text;b.Position=pos;b.Size=size
-	b.BackgroundColor3=color;b.TextColor3=Color3.new(1,1,1)
+	b.BackgroundColor3=color
+	b.TextColor3=Color3.new(1,1,1)
 	b.TextSize=13
 	round(b)
 	return b
@@ -49,7 +51,9 @@ local function mainGui()
 	f.Size=UDim2.fromOffset(340,255)
 	f.Position=UDim2.new(.5,-170,.5,-127)
 	f.BackgroundColor3=Color3.fromRGB(15,70,150)
-	f.Active=true;round(f);drag(f)
+	f.Active=true
+	round(f)
+	drag(f)
 
 	local title=Instance.new("TextLabel",f)
 	title.Size=UDim2.new(1,-55,0,45)
@@ -60,14 +64,17 @@ local function mainGui()
 	title.TextColor3=Color3.new(1,1,1)
 	title.BackgroundTransparency=1
 
-	local close=btn(f,"X",UDim2.new(1,-45,0,8),UDim2.fromOffset(35,30),
-		Color3.fromRGB(190,45,55))
-	close.MouseButton1Click:Connect(function() f:Destroy() end)
+	local close=btn(f,"X",UDim2.new(1,-45,0,8),
+		UDim2.fromOffset(35,30),Color3.fromRGB(190,45,55))
+
+	close.MouseButton1Click:Connect(function()
+		f:Destroy()
+	end)
 
 	local box=Instance.new("TextBox",f)
 	box.Position=UDim2.fromOffset(20,55)
 	box.Size=UDim2.new(1,-40,0,42)
-	box.PlaceholderText="Players wanted..."
+	box.PlaceholderText="Players in server (1-6)"
 	box.Text=""
 	box.TextSize=15
 	box.BackgroundColor3=Color3.fromRGB(245,250,255)
@@ -92,6 +99,8 @@ local function mainGui()
 	status.TextColor3=Color3.new(1,1,1)
 	status.BackgroundTransparency=1
 
+	local searching=false
+
 	local function search(wanted)
 		local req=request or http_request or (syn and syn.request)
 		if not req then return nil,"HTTP unavailable" end
@@ -111,64 +120,69 @@ local function mainGui()
 			return H:JSONDecode(r.Body)
 		end)
 
-		if not ok2 then return nil,"Invalid API response" end
+		if not ok2 then return nil,"Invalid response" end
 
 		for _,s in ipairs(data.data or {}) do
-			if s.id~=game.JobId and s.playing==wanted then
+			if s.id~=game.JobId
+			and s.maxPlayers==7
+			and s.playing==wanted
+			and s.playing<7 then
 				return s
 			end
 		end
 
-		return nil,"No server"
+		return nil,"No match"
 	end
 
-	local searching=false
+	local function start(wanted,loopMode)
+		if searching then return end
+		searching=true
 
-	local function teleport(s)
-		searching=false
-		status.Text="Teleporting..."
+		task.spawn(function()
+			while searching do
+				status.Text="Searching "..wanted.."/7..."
 
-		local ok,err=pcall(function()
-			T:TeleportToPlaceInstance(game.PlaceId,s.id,p)
-		end)
+				local s,err=search(wanted)
 
-		if not ok then
-			status.Text="Teleport failed - retrying..."
-			return false
-		end
+				if s then
+					status.Text="Found "..s.playing.."/7 - Teleporting..."
 
-		task.delay(8,function()
-			if p.Parent then
-				status.Text="Teleport taking too long"
+					local ok=pcall(function()
+						T:TeleportToPlaceInstance(
+							game.PlaceId,s.id,p
+						)
+					end)
+
+					if not ok then
+						status.Text="Teleport failed - retrying..."
+						task.wait(2)
+					elseif not loopMode then
+						searching=false
+						break
+					else
+						task.wait(3)
+					end
+				else
+					status.Text="No "..wanted.."/7 found - retrying..."
+					if not loopMode then
+						searching=false
+						break
+					end
+					task.wait(2)
+				end
 			end
 		end)
-
-		return true
 	end
 
 	find.MouseButton1Click:Connect(function()
-		if searching then return end
+		local n=tonumber(box.Text)
 
-		local wanted=tonumber(box.Text)
-		if not wanted or wanted<0 then
-			status.Text="Enter a player number"
+		if not n or n<1 or n>6 then
+			status.Text="Enter 1-6"
 			return
 		end
 
-		searching=true
-		status.Text="Searching..."
-
-		local s,err=search(wanted)
-
-		if s then
-			status.Text="Found: "..s.playing.."/"..s.maxPlayers
-			teleport(s)
-		else
-			searching=false
-			status.Text=err=="No server"
-				and "No matching server found"
-				or err
-		end
+		start(n,false)
 	end)
 
 	loop.MouseButton1Click:Connect(function()
@@ -178,30 +192,14 @@ local function mainGui()
 			return
 		end
 
-		local wanted=tonumber(box.Text)
-		if not wanted or wanted<0 then
-			status.Text="Enter a player number"
+		local n=tonumber(box.Text)
+
+		if not n or n<1 or n>6 then
+			status.Text="Enter 1-6"
 			return
 		end
 
-		searching=true
-
-		task.spawn(function()
-			while searching do
-				status.Text="🔁 Searching..."
-
-				local s,err=search(wanted)
-
-				if s then
-					status.Text="Found: "..s.playing.."/"..s.maxPlayers
-					teleport(s)
-					break
-				end
-
-				status.Text="No match - retrying..."
-				task.wait(2)
-			end
-		end)
+		start(n,true)
 	end)
 
 	local credit=Instance.new("TextLabel",f)
@@ -218,7 +216,9 @@ local function keyGui()
 	f.Size=UDim2.fromOffset(340,235)
 	f.Position=UDim2.new(.5,-170,.5,-117)
 	f.BackgroundColor3=Color3.fromRGB(248,248,250)
-	f.Active=true;round(f);drag(f)
+	f.Active=true
+	round(f)
+	drag(f)
 
 	local title=Instance.new("TextLabel",f)
 	title.Size=UDim2.new(1,-55,0,45)
@@ -229,9 +229,12 @@ local function keyGui()
 	title.TextColor3=Color3.fromRGB(25,25,30)
 	title.BackgroundTransparency=1
 
-	local close=btn(f,"X",UDim2.new(1,-45,0,8),UDim2.fromOffset(35,30),
-		Color3.fromRGB(220,60,70))
-	close.MouseButton1Click:Connect(function() f:Destroy() end)
+	local close=btn(f,"X",UDim2.new(1,-45,0,8),
+		UDim2.fromOffset(35,30),Color3.fromRGB(220,60,70))
+
+	close.MouseButton1Click:Connect(function()
+		f:Destroy()
+	end)
 
 	local box=Instance.new("TextBox",f)
 	box.Position=UDim2.fromOffset(20,55)
@@ -243,8 +246,10 @@ local function keyGui()
 	box.TextColor3=Color3.fromRGB(20,20,25)
 	round(box)
 
-	local verify=btn(f,"VERIFY KEY",UDim2.fromOffset(20,105),
-		UDim2.new(1,-40,0,38),Color3.fromRGB(35,105,210))
+	local verify=btn(f,"VERIFY KEY",
+		UDim2.fromOffset(20,105),
+		UDim2.new(1,-40,0,38),
+		Color3.fromRGB(35,105,210))
 
 	local status=Instance.new("TextLabel",f)
 	status.Position=UDim2.fromOffset(20,145)
