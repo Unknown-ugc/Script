@@ -1,1199 +1,210 @@
-local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
-local TeleportService = game:GetService("TeleportService")
-
-local Player = Players.LocalPlayer
-local PlayerGui = Player:WaitForChild("PlayerGui")
-
---// SETTINGS
-local KEY = "key999"
+local KEY_SYSTEM = false
+local KEY = "key555"
 local DISCORD = "https://discord.gg/FJK6QzNnf7"
 
-local MAX_PAGES = 50
-local MAX_RETRIES = 3
+local P = game:GetService("Players")
+local T = game:GetService("TeleportService")
+local H = game:GetService("HttpService")
+local U = game:GetService("UserInputService")
+local p = P.LocalPlayer
 
---// ONE WHITELISTED PLAYER
-local WHITELISTED_USER_ID = 5139354165
+local gui = Instance.new("ScreenGui")
+gui.Name = "ServerFinder"
+gui.ResetOnSpawn = false
+gui.Parent = p:WaitForChild("PlayerGui")
 
-local function IsWhitelisted()
-    return Player.UserId == WHITELISTED_USER_ID
+local function corner(x)
+	local c = Instance.new("UICorner",x)
+	c.CornerRadius = UDim.new(0,12)
 end
 
---// REMOVE OLD GUI
-local OldGui = PlayerGui:FindFirstChild("ServerFinder")
-
-if OldGui then
-    OldGui:Destroy()
+local function button(parent,text,pos,size)
+	local b = Instance.new("TextButton",parent)
+	b.Text=text
+	b.Position=pos
+	b.Size=size
+	b.BackgroundColor3=Color3.fromRGB(45,45,60)
+	b.TextColor3=Color3.new(1,1,1)
+	b.TextSize=14
+	corner(b)
+	return b
 end
 
---// GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ServerFinder"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.Parent = PlayerGui
+-- KEY GUI
+local function keyGui()
+	local f=Instance.new("Frame",gui)
+	f.Size=UDim2.fromOffset(340,230)
+	f.Position=UDim2.new(.5,-170,.5,-115)
+	f.BackgroundColor3=Color3.fromRGB(18,18,25)
+	corner(f)
 
---// HELPERS
-local function Corner(Object, Radius)
-    local CornerObject = Instance.new("UICorner")
-    CornerObject.CornerRadius = UDim.new(0, Radius or 10)
-    CornerObject.Parent = Object
+	local t=Instance.new("TextLabel",f)
+	t.Size=UDim2.new(1,0,0,50)
+	t.Text="KEY SYSTEM"
+	t.TextSize=22
+	t.TextColor3=Color3.new(1,1,1)
+	t.BackgroundTransparency=1
 
-    return CornerObject
+	local box=Instance.new("TextBox",f)
+	box.Position=UDim2.fromOffset(20,65)
+	box.Size=UDim2.new(1,-40,0,42)
+	box.PlaceholderText="Enter key..."
+	box.Text=""
+	box.TextSize=15
+	box.BackgroundColor3=Color3.fromRGB(30,30,40)
+	box.TextColor3=Color3.new(1,1,1)
+	corner(box)
+
+	local verify=button(f,"VERIFY KEY",UDim2.fromOffset(20,120),UDim2.new(1,-40,0,38))
+
+	local dc=button(f,"SUPPORT DISCORD",UDim2.fromOffset(20,170),UDim2.new(1,-40,0,35))
+
+	local status=Instance.new("TextLabel",f)
+	status.Position=UDim2.fromOffset(20,205)
+	status.Size=UDim2.new(1,-40,0,25)
+	status.Text=""
+	status.TextColor3=Color3.new(1,1,1)
+	status.BackgroundTransparency=1
+
+	dc.MouseButton1Click:Connect(function()
+		if setclipboard then setclipboard(DISCORD) end
+		status.Text="Discord link copied!"
+	end)
+
+	verify.MouseButton1Click:Connect(function()
+		if box.Text==KEY then
+			f:Destroy()
+			task.wait(.1)
+			serverGui()
+		else
+			status.Text="Invalid key"
+		end
+	end)
 end
 
-local function Stroke(Object, Color, Transparency)
-    local StrokeObject = Instance.new("UIStroke")
+function serverGui()
+	local f=Instance.new("Frame",gui)
+	f.Size=UDim2.fromOffset(340,250)
+	f.Position=UDim2.new(.5,-170,.5,-125)
+	f.BackgroundColor3=Color3.fromRGB(18,18,25)
+	corner(f)
 
-    StrokeObject.Color = Color
-    StrokeObject.Transparency = Transparency or 0
-    StrokeObject.Thickness = 1
-    StrokeObject.Parent = Object
+	local t=Instance.new("TextLabel",f)
+	t.Size=UDim2.new(1,-50,0,50)
+	t.Text="SERVER FINDER"
+	t.TextSize=21
+	t.TextColor3=Color3.new(1,1,1)
+	t.BackgroundTransparency=1
 
-    return StrokeObject
+	local close=button(f,"X",UDim2.new(1,-45,0,10),UDim2.fromOffset(35,30))
+	close.MouseButton1Click:Connect(function() f:Destroy() end)
+
+	local box=Instance.new("TextBox",f)
+	box.Position=UDim2.fromOffset(20,60)
+	box.Size=UDim2.new(1,-40,0,42)
+	box.PlaceholderText="Players wanted..."
+	box.Text=""
+	box.TextSize=15
+	box.BackgroundColor3=Color3.fromRGB(30,30,40)
+	box.TextColor3=Color3.new(1,1,1)
+	corner(box)
+
+	local find=button(f,"FIND SERVER",UDim2.fromOffset(20,112),UDim2.new(1,-40,0,38))
+
+	local status=Instance.new("TextLabel",f)
+	status.Position=UDim2.fromOffset(20,155)
+	status.Size=UDim2.new(1,-40,0,30)
+	status.Text="Ready"
+	status.TextColor3=Color3.new(1,1,1)
+	status.BackgroundTransparency=1
+
+	local join
+	local serverId
+
+	find.MouseButton1Click:Connect(function()
+		local wanted=tonumber(box.Text)
+		if not wanted then status.Text="Enter a number"; return end
+
+		local req=request or http_request or (syn and syn.request)
+		if not req then status.Text="HTTP request unavailable"; return end
+
+		status.Text="Searching..."
+
+		local url="https://games.roblox.com/v1/games/"..game.PlaceId..
+			"/servers/Public?sortOrder=Asc&limit=100"
+
+		local ok,r=pcall(function()
+			return req({Url=url,Method="GET"})
+		end)
+
+		if not ok or not r or r.StatusCode~=200 then
+			status.Text="Server API unavailable"
+			return
+		end
+
+		local data=H:JSONDecode(r.Body)
+
+		for _,s in ipairs(data.data or {}) do
+			if s.id~=game.JobId and s.playing==wanted then
+				serverId=s.id
+				status.Text="Found: "..s.playing.."/"..s.maxPlayers
+
+				if join then join:Destroy() end
+
+				join=button(
+					f,
+					"JOIN SERVER",
+					UDim2.fromOffset(20,195),
+					UDim2.new(1,-40,0,38)
+				)
+
+				join.MouseButton1Click:Connect(function()
+					local opt=Instance.new("TeleportOptions")
+					opt.ServerInstanceId=serverId
+					T:TeleportAsync(game.PlaceId,{p},opt)
+				end)
+
+				return
+			end
+		end
+
+		status.Text="No matching server found"
+	end)
+
+	-- draggable
+	local dragging=false
+	local startPos
+	local framePos
+
+	f.InputBegan:Connect(function(v)
+		if v.UserInputType==Enum.UserInputType.MouseButton1 then
+			dragging=true
+			startPos=v.Position
+			framePos=f.Position
+		end
+	end)
+
+	U.InputChanged:Connect(function(v)
+		if dragging and v.UserInputType==Enum.UserInputType.MouseMovement then
+			local d=v.Position-startPos
+			f.Position=UDim2.new(
+				framePos.X.Scale,
+				framePos.X.Offset+d.X,
+				framePos.Y.Scale,
+				framePos.Y.Offset+d.Y
+			)
+		end
+	end)
+
+	U.InputEnded:Connect(function(v)
+		if v.UserInputType==Enum.UserInputType.MouseButton1 then
+			dragging=false
+		end
+	end)
 end
 
-local function Label(
-    Parent,
-    Text,
-    TextSize,
-    Position,
-    Font,
-    TextColor
-)
-    local NewLabel = Instance.new("TextLabel")
-
-    NewLabel.BackgroundTransparency = 1
-    NewLabel.Text = Text
-    NewLabel.TextColor3 =
-        TextColor or Color3.fromRGB(255, 255, 255)
-
-    NewLabel.TextSize = TextSize
-    NewLabel.Font = Font or Enum.Font.Gotham
-    NewLabel.Position = Position
-    NewLabel.Size = UDim2.new(1, 0, 0, 30)
-    NewLabel.Parent = Parent
-
-    return NewLabel
-end
-
-local function Button(
-    Parent,
-    Text,
-    Position,
-    Size,
-    Color
-)
-    local NewButton = Instance.new("TextButton")
-
-    NewButton.Text = Text
-    NewButton.TextColor3 =
-        Color3.fromRGB(255, 255, 255)
-
-    NewButton.TextSize = 14
-    NewButton.Font = Enum.Font.GothamBold
-
-    NewButton.BackgroundColor3 = Color
-    NewButton.BorderSizePixel = 0
-    NewButton.Position = Position
-    NewButton.Size = Size
-
-    NewButton.AutoButtonColor = false
-    NewButton.Parent = Parent
-
-    Corner(NewButton, 10)
-
-    Stroke(
-        NewButton,
-        Color3.fromRGB(255, 255, 255),
-        0.88
-    )
-
-    NewButton.MouseEnter:Connect(function()
-        NewButton.BackgroundColor3 = Color3.new(
-            math.min(Color.R + 0.06, 1),
-            math.min(Color.G + 0.06, 1),
-            math.min(Color.B + 0.06, 1)
-        )
-    end)
-
-    NewButton.MouseLeave:Connect(function()
-        NewButton.BackgroundColor3 = Color
-    end)
-
-    return NewButton
-end
-
---// MAIN WINDOW
-local Main = Instance.new("Frame")
-
-Main.Name = "Main"
-Main.Size = UDim2.fromOffset(340, 410)
-Main.Position = UDim2.new(0.5, -170, 0.5, -205)
-
-Main.BackgroundColor3 =
-    Color3.fromRGB(12, 15, 24)
-
-Main.BorderSizePixel = 0
-Main.Parent = ScreenGui
-
-Corner(Main, 16)
-
-Stroke(
-    Main,
-    Color3.fromRGB(55, 75, 120),
-    0.35
-)
-
---// HEADER
-local Header = Instance.new("Frame")
-
-Header.Size = UDim2.new(1, 0, 0, 72)
-Header.BackgroundColor3 =
-    Color3.fromRGB(17, 21, 34)
-
-Header.BorderSizePixel = 0
-Header.Parent = Main
-
-Corner(Header, 16)
-
-local HeaderLine = Instance.new("Frame")
-
-HeaderLine.Size =
-    UDim2.new(1, -32, 0, 2)
-
-HeaderLine.Position =
-    UDim2.new(0, 16, 1, -2)
-
-HeaderLine.BackgroundColor3 =
-    Color3.fromRGB(70, 120, 255)
-
-HeaderLine.BorderSizePixel = 0
-HeaderLine.Parent = Header
-
-local Title = Label(
-    Header,
-    "⚡ SERVER TOOLS",
-    20,
-    UDim2.new(0, 20, 0, 10),
-    Enum.Font.GothamBold
-)
-
-Title.TextXAlignment =
-    Enum.TextXAlignment.Left
-
-local Subtitle = Label(
-    Header,
-    "Small Server Finder",
-    11,
-    UDim2.new(0, 21, 0, 38),
-    Enum.Font.Gotham,
-    Color3.fromRGB(145, 155, 180)
-)
-
-Subtitle.TextXAlignment =
-    Enum.TextXAlignment.Left
-
---// CLOSE BUTTON
-local Close = Instance.new("TextButton")
-
-Close.Size = UDim2.fromOffset(34, 34)
-Close.Position = UDim2.new(1, -48, 0, 18)
-
-Close.Text = "×"
-Close.TextSize = 24
-Close.Font = Enum.Font.Gotham
-
-Close.TextColor3 =
-    Color3.fromRGB(180, 190, 210)
-
-Close.BackgroundColor3 =
-    Color3.fromRGB(27, 31, 45)
-
-Close.BorderSizePixel = 0
-Close.Parent = Header
-
-Corner(Close, 10)
-
-Close.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
---// DRAGGING
-local Dragging = false
-local DragStart
-local StartPosition
-
-Header.InputBegan:Connect(function(Input)
-    if Input.UserInputType == Enum.UserInputType.MouseButton1
-        or Input.UserInputType == Enum.UserInputType.Touch then
-
-        Dragging = true
-        DragStart = Input.Position
-        StartPosition = Main.Position
-
-        Input.Changed:Connect(function()
-            if Input.UserInputState ==
-                Enum.UserInputState.End then
-
-                Dragging = false
-            end
-        end)
-    end
-end)
-
-UIS.InputChanged:Connect(function(Input)
-    if not Dragging then
-        return
-    end
-
-    if Input.UserInputType ==
-        Enum.UserInputType.MouseMovement
-        or Input.UserInputType ==
-        Enum.UserInputType.Touch then
-
-        local Delta =
-            Input.Position - DragStart
-
-        Main.Position = UDim2.new(
-            StartPosition.X.Scale,
-            StartPosition.X.Offset + Delta.X,
-
-            StartPosition.Y.Scale,
-            StartPosition.Y.Offset + Delta.Y
-        )
-    end
-end)
-
---// CONTENT
-local Content = Instance.new("Frame")
-
-Content.Name = "Content"
-Content.Position =
-    UDim2.new(0, 0, 0, 72)
-
-Content.Size =
-    UDim2.new(1, 0, 1, -72)
-
-Content.BackgroundTransparency = 1
-Content.Parent = Main
-
-local ShowServerFinder
-
---// KEY SCREEN
-local function ShowKeyScreen()
-
-    Content:ClearAllChildren()
-
-    local Icon = Label(
-        Content,
-        "🔐",
-        42,
-        UDim2.new(0, 0, 0, 16),
-        Enum.Font.GothamBold
-    )
-
-    Icon.Size =
-        UDim2.new(1, 0, 0, 50)
-
-    local KeyTitle = Label(
-        Content,
-        "DAILY KEY SYSTEM",
-        21,
-        UDim2.new(0, 0, 0, 66),
-        Enum.Font.GothamBold
-    )
-
-    local Description = Label(
-        Content,
-        "🔄 Key changes every day\nJoin our Discord server to get the key",
-        12,
-        UDim2.new(0, 0, 0, 94),
-        Enum.Font.Gotham,
-        Color3.fromRGB(145, 155, 180)
-    )
-
-    Description.Size =
-        UDim2.new(1, -30, 0, 42)
-
-    Description.TextWrapped = true
-
-    --// KEY BOX
-    local KeyBox = Instance.new("TextBox")
-
-    KeyBox.Size =
-        UDim2.new(1, -40, 0, 48)
-
-    KeyBox.Position =
-        UDim2.new(0, 20, 0, 135)
-
-    KeyBox.BackgroundColor3 =
-        Color3.fromRGB(22, 27, 42)
-
-    KeyBox.BorderSizePixel = 0
-
-    KeyBox.PlaceholderText =
-        "Enter key..."
-
-    KeyBox.PlaceholderColor3 =
-        Color3.fromRGB(100, 110, 135)
-
-    KeyBox.TextColor3 =
-        Color3.fromRGB(255, 255, 255)
-
-    KeyBox.TextSize = 14
-    KeyBox.Font = Enum.Font.Gotham
-
-    KeyBox.ClearTextOnFocus = false
-    KeyBox.Parent = Content
-
-    Corner(KeyBox, 10)
-
-    Stroke(
-        KeyBox,
-        Color3.fromRGB(55, 75, 120),
-        0.35
-    )
-
-    --// ENTER KEY
-    local EnterButton = Button(
-        Content,
-        "🔓  ENTER KEY",
-        UDim2.new(0, 20, 0, 195),
-        UDim2.new(1, -40, 0, 45),
-        Color3.fromRGB(55, 105, 235)
-    )
-
-    --// DISCORD
-    local DiscordButton = Button(
-        Content,
-        "💬  JOIN DISCORD",
-        UDim2.new(0, 20, 0, 250),
-        UDim2.new(1, -40, 0, 45),
-        Color3.fromRGB(105, 70, 190)
-    )
-
-    --// STATUS
-    local StatusBox = Instance.new("Frame")
-
-    StatusBox.Size =
-        UDim2.new(1, -40, 0, 48)
-
-    StatusBox.Position =
-        UDim2.new(0, 20, 0, 305)
-
-    StatusBox.BackgroundColor3 =
-        Color3.fromRGB(20, 24, 36)
-
-    StatusBox.BorderSizePixel = 0
-    StatusBox.Parent = Content
-
-    Corner(StatusBox, 10)
-
-    local Status = Label(
-        StatusBox,
-        "● Join our Discord server to get the key",
-        11,
-        UDim2.new(0, 12, 0, 9),
-        Enum.Font.GothamMedium,
-        Color3.fromRGB(150, 160, 185)
-    )
-
-    Status.TextXAlignment =
-        Enum.TextXAlignment.Left
-
-    Status.Size =
-        UDim2.new(1, -24, 1, -18)
-
-    Status.TextWrapped = true
-
-    --// ENTER KEY
-    EnterButton.MouseButton1Click:Connect(function()
-
-        if KeyBox.Text == KEY then
-
-            Status.Text = "● Key accepted!"
-            Status.TextColor3 =
-                Color3.fromRGB(80, 220, 130)
-
-            task.wait(0.5)
-
-            if ScreenGui.Parent then
-                ShowServerFinder()
-            end
-
-        else
-
-            Status.Text = "● Invalid key"
-            Status.TextColor3 =
-                Color3.fromRGB(255, 90, 90)
-
-        end
-    end)
-
-    --// DISCORD BUTTON
-    DiscordButton.MouseButton1Click:Connect(function()
-
-        if setclipboard then
-
-            setclipboard(DISCORD)
-
-            Status.Text =
-                "● Discord invite copied!"
-
-            Status.TextColor3 =
-                Color3.fromRGB(100, 180, 255)
-
-        else
-
-            Status.Text =
-                "● " .. DISCORD
-
-            Status.TextColor3 =
-                Color3.fromRGB(100, 180, 255)
-
-        end
-    end)
-end
-
---// SERVER FINDER
-ShowServerFinder = function()
-
-    Content:ClearAllChildren()
-
-    local FinderTitle = Label(
-        Content,
-        "🔎  SMALL SERVER LIST",
-        19,
-        UDim2.new(0, 0, 0, 12),
-        Enum.Font.GothamBold
-    )
-
-    FinderTitle.Size =
-        UDim2.new(1, 0, 0, 30)
-
-    local FinderSubtitle = Label(
-        Content,
-        "Find servers with exactly 1 player",
-        11,
-        UDim2.new(0, 0, 0, 42),
-        Enum.Font.Gotham,
-        Color3.fromRGB(145, 155, 180)
-    )
-
-    FinderSubtitle.Size =
-        UDim2.new(1, 0, 0, 22)
-
-    --// REFRESH
-    local RefreshButton = Button(
-        Content,
-        "🔄  REFRESH SERVERS",
-        UDim2.new(0, 20, 0, 70),
-        UDim2.new(1, -40, 0, 42),
-        Color3.fromRGB(55, 105, 235)
-    )
-
-    --// STATUS
-    local Status = Label(
-        Content,
-        "● Ready",
-        11,
-        UDim2.new(0, 20, 0, 116),
-        Enum.Font.GothamMedium,
-        Color3.fromRGB(145, 155, 180)
-    )
-
-    Status.TextXAlignment =
-        Enum.TextXAlignment.Left
-
-    --// SERVER LIST
-    local ServerList = Instance.new("ScrollingFrame")
-
-    ServerList.Name = "ServerList"
-
-    ServerList.Position =
-        UDim2.new(0, 20, 0, 145)
-
-    ServerList.Size =
-        UDim2.new(1, -40, 1, -157)
-
-    ServerList.BackgroundColor3 =
-        Color3.fromRGB(17, 21, 34)
-
-    ServerList.BorderSizePixel = 0
-
-    ServerList.ScrollBarThickness = 4
-
-    ServerList.ScrollBarImageColor3 =
-        Color3.fromRGB(70, 120, 255)
-
-    ServerList.CanvasSize =
-        UDim2.new(0, 0, 0, 0)
-
-    ServerList.Parent = Content
-
-    Corner(ServerList, 10)
-
-    Stroke(
-        ServerList,
-        Color3.fromRGB(55, 75, 120),
-        0.45
-    )
-
-    --// LIST LAYOUT
-    local Layout = Instance.new("UIListLayout")
-
-    Layout.Padding =
-        UDim.new(0, 8)
-
-    Layout.HorizontalAlignment =
-        Enum.HorizontalAlignment.Center
-
-    Layout.Parent = ServerList
-
-    local Padding = Instance.new("UIPadding")
-
-    Padding.PaddingTop =
-        UDim.new(0, 8)
-
-    Padding.PaddingBottom =
-        UDim.new(0, 8)
-
-    Padding.PaddingLeft =
-        UDim.new(0, 8)
-
-    Padding.PaddingRight =
-        UDim.new(0, 8)
-
-    Padding.Parent = ServerList
-
-    Layout:GetPropertyChangedSignal(
-        "AbsoluteContentSize"
-    ):Connect(function()
-
-        ServerList.CanvasSize =
-            UDim2.new(
-                0,
-                0,
-                0,
-                Layout.AbsoluteContentSize.Y + 16
-            )
-
-    end)
-
-    --// REQUEST FUNCTION
-    local RequestFunction =
-        request
-        or http_request
-        or (syn and syn.request)
-
-    --// SEARCH CONTROL
-    local Searching = false
-    local SearchID = 0
-
-    local function ClearServerList()
-
-        for _, Child in ipairs(
-            ServerList:GetChildren()
-        ) do
-
-            if Child:IsA("Frame") then
-                Child:Destroy()
-            end
-
-        end
-
-        ServerList.CanvasPosition =
-            Vector2.new(0, 0)
-    end
-
-    --// API REQUEST WITH RETRIES
-    local function GetServerPage(URL)
-
-        for Attempt = 1, MAX_RETRIES do
-
-            local Success, Response = pcall(function()
-
-                return RequestFunction({
-                    Url = URL,
-                    Method = "GET"
-                })
-
-            end)
-
-            if Success and Response then
-
-                local StatusCode =
-                    tonumber(Response.StatusCode)
-
-                --// SUCCESS
-                if not StatusCode
-                    or (
-                        StatusCode >= 200
-                        and StatusCode < 300
-                    ) then
-
-                    local Body =
-                        Response.Body
-                        or Response.body
-
-                    if Body and Body ~= "" then
-
-                        local DecodeSuccess, Data =
-                            pcall(function()
-
-                                return HttpService:
-                                    JSONDecode(Body)
-
-                            end)
-
-                        if DecodeSuccess
-                            and Data then
-
-                            return true, Data
-
-                        end
-
-                        return false,
-                            "Invalid JSON response"
-                    end
-
-                    return false,
-                        "Empty API response"
-                end
-
-                --// RATE LIMIT
-                if StatusCode == 429 then
-
-                    Status.Text = string.format(
-                        "● Rate limited, retrying %d/%d...",
-                        Attempt,
-                        MAX_RETRIES
-                    )
-
-                    Status.TextColor3 =
-                        Color3.fromRGB(
-                            255,
-                            180,
-                            80
-                        )
-
-                    task.wait(2 * Attempt)
-
-                else
-
-                    return false,
-                        "HTTP error "
-                        .. tostring(StatusCode)
-
-                end
-
-            else
-
-                if Attempt < MAX_RETRIES then
-
-                    Status.Text = string.format(
-                        "● Request failed, retrying %d/%d...",
-                        Attempt,
-                        MAX_RETRIES
-                    )
-
-                    Status.TextColor3 =
-                        Color3.fromRGB(
-                            255,
-                            180,
-                            80
-                        )
-
-                    task.wait(Attempt)
-
-                else
-
-                    return false,
-                        "Request failed"
-
-                end
-            end
-        end
-
-        return false,
-            "Maximum retries reached"
-    end
-
-    --// SEARCH
-    local function SearchServers()
-
-        if Searching then
-            return
-        end
-
-        Searching = true
-
-        SearchID += 1
-
-        local MySearchID = SearchID
-
-        ClearServerList()
-
-        RefreshButton.Text =
-            "⏳ SEARCHING..."
-
-        Status.Text =
-            "● Starting server search..."
-
-        Status.TextColor3 =
-            Color3.fromRGB(
-                100,
-                180,
-                255
-            )
-
-        if not RequestFunction then
-
-            Status.Text =
-                "● HTTP request function unavailable"
-
-            Status.TextColor3 =
-                Color3.fromRGB(
-                    255,
-                    90,
-                    90
-                )
-
-            RefreshButton.Text =
-                "🔄 REFRESH SERVERS"
-
-            Searching = false
-
-            return
-        end
-
-        local FoundServers = {}
-        local Seen = {}
-        local Cursor = nil
-
-        local PagesScanned = 0
-        local SearchError = nil
-
-        --// PAGINATION
-        for Page = 1, MAX_PAGES do
-
-            if MySearchID ~= SearchID then
-                return
-            end
-
-            PagesScanned = Page
-
-            Status.Text = string.format(
-                "● Searching page %d/%d...",
-                Page,
-                MAX_PAGES
-            )
-
-            local URL =
-                "https://games.roblox.com/v1/games/"
-                .. tostring(game.PlaceId)
-                .. "/servers/Public?sortOrder=Asc&limit=100"
-
-            if Cursor and Cursor ~= "" then
-
-                URL =
-                    URL
-                    .. "&cursor="
-                    .. HttpService:UrlEncode(Cursor)
-
-            end
-
-            local Success, Result =
-                GetServerPage(URL)
-
-            if not Success then
-
-                SearchError = Result
-
-                break
-            end
-
-            local Data = Result
-
-            if type(Data.data) == "table" then
-
-                for _, Server in ipairs(Data.data) do
-
-                    if Server.id
-                        and Server.id ~= game.JobId
-                        and tonumber(Server.playing) == 1
-                        and not Seen[Server.id] then
-
-                        Seen[Server.id] = true
-
-                        table.insert(
-                            FoundServers,
-                            Server
-                        )
-
-                    end
-                end
-            end
-
-            Cursor =
-                Data.nextPageCursor
-
-            --// NO MORE PAGES
-            if not Cursor
-                or Cursor == "" then
-
-                break
-            end
-
-            task.wait(0.1)
-        end
-
-        --// SEARCH WAS REPLACED
-        if MySearchID ~= SearchID then
-            return
-        end
-
-        table.sort(
-            FoundServers,
-            function(A, B)
-
-                return tostring(A.id)
-                    < tostring(B.id)
-
-            end
-        )
-
-        --// CREATE SERVER CARDS
-        for Index, Server in ipairs(
-            FoundServers
-        ) do
-
-            local Card = Instance.new("Frame")
-
-            Card.Name =
-                "Server_" .. Index
-
-            Card.Size =
-                UDim2.new(1, -16, 0, 65)
-
-            Card.BackgroundColor3 =
-                Color3.fromRGB(
-                    24,
-                    29,
-                    45
-                )
-
-            Card.BorderSizePixel = 0
-            Card.Parent = ServerList
-
-            Corner(Card, 10)
-
-            Stroke(
-                Card,
-                Color3.fromRGB(
-                    55,
-                    75,
-                    120
-                ),
-                0.5
-            )
-
-            --// SERVER NAME
-            local ServerName =
-                Instance.new("TextLabel")
-
-            ServerName.BackgroundTransparency = 1
-
-            ServerName.Position =
-                UDim2.new(0, 12, 0, 8)
-
-            ServerName.Size =
-                UDim2.new(1, -115, 0, 23)
-
-            ServerName.Text =
-                "Server #" .. Index
-
-            ServerName.TextColor3 =
-                Color3.fromRGB(
-                    255,
-                    255,
-                    255
-                )
-
-            ServerName.TextSize = 14
-
-            ServerName.Font =
-                Enum.Font.GothamBold
-
-            ServerName.TextXAlignment =
-                Enum.TextXAlignment.Left
-
-            ServerName.Parent = Card
-
-            --// PLAYER COUNT
-            local PlayerCount =
-                Instance.new("TextLabel")
-
-            PlayerCount.BackgroundTransparency = 1
-
-            PlayerCount.Position =
-                UDim2.new(0, 12, 0, 34)
-
-            PlayerCount.Size =
-                UDim2.new(1, -115, 0, 20)
-
-            PlayerCount.Text =
-                "👤 "
-                .. tostring(Server.playing)
-                .. " / "
-                .. tostring(Server.maxPlayers)
-                .. " players"
-
-            PlayerCount.TextColor3 =
-                Color3.fromRGB(
-                    145,
-                    155,
-                    180
-                )
-
-            PlayerCount.TextSize = 11
-
-            PlayerCount.Font =
-                Enum.Font.Gotham
-
-            PlayerCount.TextXAlignment =
-                Enum.TextXAlignment.Left
-
-            PlayerCount.Parent = Card
-
-            --// JOIN BUTTON
-            local JoinButton =
-                Instance.new("TextButton")
-
-            JoinButton.Size =
-                UDim2.fromOffset(
-                    82,
-                    38
-                )
-
-            JoinButton.Position =
-                UDim2.new(
-                    1,
-                    -92,
-                    0.5,
-                    -19
-                )
-
-            JoinButton.Text = "JOIN"
-
-            JoinButton.TextColor3 =
-                Color3.fromRGB(
-                    255,
-                    255,
-                    255
-                )
-
-            JoinButton.TextSize = 12
-
-            JoinButton.Font =
-                Enum.Font.GothamBold
-
-            JoinButton.BackgroundColor3 =
-                Color3.fromRGB(
-                    55,
-                    175,
-                    105
-                )
-
-            JoinButton.BorderSizePixel = 0
-
-            JoinButton.AutoButtonColor =
-                false
-
-            JoinButton.Parent = Card
-
-            Corner(
-                JoinButton,
-                9
-            )
-
-            Stroke(
-                JoinButton,
-                Color3.fromRGB(
-                    255,
-                    255,
-                    255
-                ),
-                0.88
-            )
-
-            JoinButton.MouseEnter:Connect(
-                function()
-
-                    JoinButton.BackgroundColor3 =
-                        Color3.fromRGB(
-                            70,
-                            195,
-                            120
-                        )
-
-                end
-            )
-
-            JoinButton.MouseLeave:Connect(
-                function()
-
-                    JoinButton.BackgroundColor3 =
-                        Color3.fromRGB(
-                            55,
-                            175,
-                            105
-                        )
-
-                end
-            )
-
-            JoinButton.MouseButton1Click:Connect(
-                function()
-
-                    if Searching then
-                        return
-                    end
-
-                    JoinButton.Text =
-                        "JOINING..."
-
-                    Status.Text =
-                        "● Joining server..."
-
-                    Status.TextColor3 =
-                        Color3.fromRGB(
-                            100,
-                            180,
-                            255
-                        )
-
-                    local Success,
-                        ErrorMessage =
-                        pcall(function()
-
-                            TeleportService:
-                                TeleportToPlaceInstance(
-                                    game.PlaceId,
-                                    Server.id,
-                                    Player
-                                )
-
-                        end)
-
-                    if not Success then
-
-                        JoinButton.Text =
-                            "JOIN"
-
-                        Status.Text =
-                            "● Teleport failed"
-
-                        Status.TextColor3 =
-                            Color3.fromRGB(
-                                255,
-                                90,
-                                90
-                            )
-
-                        warn(
-                            ErrorMessage
-                        )
-                    end
-                end
-            )
-        end
-
-        --// RESULT
-        if SearchError then
-
-            Status.Text =
-                "● " .. tostring(SearchError)
-
-            Status.TextColor3 =
-                Color3.fromRGB(
-                    255,
-                    90,
-                    90
-                )
-
-        elseif #FoundServers == 0 then
-
-            Status.Text = string.format(
-                "● No 1-player servers found (%d pages scanned)",
-                PagesScanned
-            )
-
-            Status.TextColor3 =
-                Color3.fromRGB(
-                    255,
-                    180,
-                    80
-                )
-
-        else
-
-            Status.Text = string.format(
-                "● Found %d 1-player servers (%d pages scanned)",
-                #FoundServers,
-                PagesScanned
-            )
-
-            Status.TextColor3 =
-                Color3.fromRGB(
-                    80,
-                    220,
-                    130
-                )
-        end
-
-        RefreshButton.Text =
-            "🔄 REFRESH SERVERS"
-
-        Searching = false
-    end
-
-    --// REFRESH
-    RefreshButton.MouseButton1Click:Connect(
-        function()
-
-            if Searching then
-                return
-            end
-
-            task.spawn(
-                SearchServers
-            )
-
-        end
-    )
-
-    --// INITIAL SEARCH
-    task.delay(0.5, function()
-
-        if ScreenGui.Parent then
-            task.spawn(SearchServers)
-        end
-
-    end)
-end
-
---// START
-if IsWhitelisted() then
-
-    -- Whitelisted player skips key
-    ShowServerFinder()
-
+if KEY_SYSTEM then
+	keyGui()
 else
-
-    -- Everyone else needs the key
-    ShowKeyScreen()
-
+	serverGui()
 end
