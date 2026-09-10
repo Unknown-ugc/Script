@@ -20,7 +20,7 @@ gui.Parent=playerGui
 local savedPosition=nil
 local favorites={}
 local autoRefresh=false
-local refreshConnection=nil
+local refreshThread=nil
 local selectedServer=nil
 
 local function corner(obj,r)
@@ -40,7 +40,11 @@ end
 local function tween(obj,time,props)
 	local t=TweenService:Create(
 		obj,
-		TweenInfo.new(time,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),
+		TweenInfo.new(
+			time,
+			Enum.EasingStyle.Quint,
+			Enum.EasingDirection.Out
+		),
 		props
 	)
 	t:Play()
@@ -73,6 +77,7 @@ local function button(parent,text,pos,size,color)
 	b.AutoButtonColor=false
 	b.BorderSizePixel=0
 	b.Parent=parent
+
 	corner(b,10)
 
 	b.MouseEnter:Connect(function()
@@ -112,7 +117,9 @@ local function drag(frame,handle)
 	end)
 
 	UIS.InputChanged:Connect(function(input)
-		if not dragging then return end
+		if not dragging then
+			return
+		end
 
 		if input.UserInputType==Enum.UserInputType.MouseMovement
 		or input.UserInputType==Enum.UserInputType.Touch then
@@ -148,6 +155,7 @@ local function showLoading(callback)
 	loading.Size=UDim2.fromScale(1,1)
 	loading.BackgroundColor3=Color3.fromRGB(7,21,47)
 	loading.BackgroundTransparency=1
+	loading.ZIndex=100
 	loading.Parent=gui
 
 	local holder=Instance.new("Frame")
@@ -155,6 +163,7 @@ local function showLoading(callback)
 	holder.Position=UDim2.fromScale(.5,.5)
 	holder.Size=UDim2.fromOffset(320,190)
 	holder.BackgroundTransparency=1
+	holder.ZIndex=101
 	holder.Parent=loading
 
 	local title=label(
@@ -165,8 +174,10 @@ local function showLoading(callback)
 		25,
 		Color3.new(1,1,1)
 	)
+
 	title.TextXAlignment=Enum.TextXAlignment.Center
 	title.Font=Enum.Font.GothamBold
+	title.ZIndex=102
 
 	local subtitle=label(
 		holder,
@@ -176,18 +187,22 @@ local function showLoading(callback)
 		13,
 		Color3.fromRGB(150,190,235)
 	)
+
 	subtitle.TextXAlignment=Enum.TextXAlignment.Center
+	subtitle.ZIndex=102
 
 	local barBack=Instance.new("Frame")
 	barBack.Position=UDim2.fromOffset(35,105)
 	barBack.Size=UDim2.new(1,-70,0,8)
 	barBack.BackgroundColor3=Color3.fromRGB(18,43,78)
+	barBack.ZIndex=102
 	barBack.Parent=holder
 	corner(barBack,5)
 
 	local bar=Instance.new("Frame")
 	bar.Size=UDim2.new(0,0,1,0)
 	bar.BackgroundColor3=Color3.fromRGB(22,119,255)
+	bar.ZIndex=103
 	bar.Parent=barBack
 	corner(bar,5)
 
@@ -199,30 +214,46 @@ local function showLoading(callback)
 		12,
 		Color3.fromRGB(190,215,245)
 	)
-	dots.TextXAlignment=Enum.TextXAlignment.Center
 
-	tween(loading,.3,{BackgroundTransparency=0})
+	dots.TextXAlignment=Enum.TextXAlignment.Center
+	dots.ZIndex=102
+
+	tween(loading,.3,{
+		BackgroundTransparency=0
+	})
 
 	tween(bar,2.7,{
 		Size=UDim2.new(1,0,1,0)
 	})
 
 	task.spawn(function()
-		for i=1,3 do
-			if not loading.Parent then return end
+		local i=0
+
+		while loading.Parent do
+			i=i+1
+
+			if i>3 then
+				i=1
+			end
+
 			dots.Text="Loading"..string.rep(".",i)
+
 			task.wait(.35)
 		end
 	end)
 
 	task.delay(3,function()
-		if not loading.Parent then return end
+
+		if not loading.Parent then
+			return
+		end
 
 		tween(loading,.35,{
 			BackgroundTransparency=1
 		})
 
 		task.wait(.4)
+
 		loading:Destroy()
 
 		if callback then
@@ -234,14 +265,18 @@ end
 local function keyGui()
 
 	local frame=Instance.new("Frame")
-	frame.Size=UDim2.fromOffset(350,250)
-	frame.Position=UDim2.new(.5,-175,.5,-125)
+	frame.Size=UDim2.fromOffset(350,300)
+	frame.Position=UDim2.new(.5,-175,.5,-150)
 	frame.BackgroundColor3=Color3.fromRGB(245,247,252)
 	frame.Active=true
 	frame.Parent=gui
 
 	corner(frame,20)
-	stroke(frame,Color3.fromRGB(210,220,235),1)
+	stroke(
+		frame,
+		Color3.fromRGB(210,220,235),
+		1
+	)
 
 	local title=label(
 		frame,
@@ -251,12 +286,13 @@ local function keyGui()
 		22,
 		Color3.fromRGB(20,25,35)
 	)
+
 	title.Font=Enum.Font.GothamBold
 
 	label(
 		frame,
-		"Enter your key to continue",
-		UDim2.fromOffset(20,48),
+		"Enter your key",
+		UDim2.fromOffset(20,50),
 		UDim2.fromOffset(280,25),
 		13,
 		Color3.fromRGB(100,110,125)
@@ -284,9 +320,11 @@ local function keyGui()
 	box.TextSize=15
 	box.Font=Enum.Font.Gotham
 	box.TextColor3=Color3.fromRGB(20,25,35)
+	box.PlaceholderColor3=Color3.fromRGB(120,125,135)
 	box.BackgroundColor3=Color3.fromRGB(232,235,242)
 	box.ClearTextOnFocus=false
 	box.Parent=frame
+
 	corner(box,11)
 
 	local verify=button(
@@ -301,49 +339,73 @@ local function keyGui()
 		frame,
 		"",
 		UDim2.fromOffset(20,178),
-		UDim2.new(1,-40,0,24),
+		UDim2.new(1,-40,0,20),
 		12,
 		Color3.fromRGB(225,65,80)
 	)
 
+	status.TextXAlignment=Enum.TextXAlignment.Center
+
+	label(
+		frame,
+		"Join this Discord to get key",
+		UDim2.fromOffset(20,204),
+		UDim2.new(1,-40,0,20),
+		11,
+		Color3.fromRGB(90,100,115)
+	).TextXAlignment=Enum.TextXAlignment.Center
+
 	local discord=button(
 		frame,
-		"SUPPORT DISCORD",
-		UDim2.fromOffset(20,210),
-		UDim2.new(1,-40,0,30),
+		"Discord",
+		UDim2.fromOffset(20,232),
+		UDim2.new(1,-40,0,38),
 		Color3.fromRGB(80,90,200)
 	)
 
 	discord.MouseButton1Click:Connect(function()
+
 		if setclipboard then
 			setclipboard(DISCORD)
-			status.Text="Discord link copied!"
+
+			status.Text="Discord link copied"
 			status.TextColor3=Color3.fromRGB(50,160,90)
 		else
 			status.Text="Copy unavailable"
+			status.TextColor3=Color3.fromRGB(225,65,80)
 		end
 	end)
 
 	verify.MouseButton1Click:Connect(function()
 
 		if box.Text==KEY then
+
 			frame:Destroy()
 
 			showLoading(function()
 				mainGui()
 			end)
+
 		else
+
 			status.Text="Invalid key"
 			status.TextColor3=Color3.fromRGB(225,65,80)
 
-			tween(frame,.1,{
-				Position=UDim2.new(.5,-170,.5,-125)
+			local original=frame.Position
+
+			tween(frame,.06,{
+				Position=UDim2.new(
+					original.X.Scale,
+					original.X.Offset-6,
+					original.Y.Scale,
+					original.Y.Offset
+				)
 			})
 
-			task.wait(.1)
+			task.wait(.06)
 
-			tween(frame,.1,{
-				Position=UDim2.new(.5,-175,.5,-125)
+			tween(frame,.06,{
+				Position=original
 			})
 		end
 	end)
@@ -368,10 +430,16 @@ function mainGui()
 	frame.Parent=gui
 
 	corner(frame,22)
-	stroke(frame,Color3.fromRGB(35,125,255),1.5)
+
+	stroke(
+		frame,
+		Color3.fromRGB(35,125,255),
+		1.5
+	)
 
 	local expandedSize=UDim2.fromOffset(390,475)
 	local collapsedSize=UDim2.fromOffset(390,58)
+
 	local collapsed=false
 
 	local header=Instance.new("Frame")
@@ -382,17 +450,18 @@ function mainGui()
 	local title=label(
 		header,
 		"Server List",
-		UDim2.fromOffset(18,12),
+		UDim2.fromOffset(18,10),
 		UDim2.fromOffset(210,30),
 		21,
 		Color3.new(1,1,1)
 	)
+
 	title.Font=Enum.Font.GothamBold
 
 	local subtitle=label(
 		header,
 		"Find and join public servers",
-		UDim2.fromOffset(19,35),
+		UDim2.fromOffset(19,34),
 		UDim2.fromOffset(210,18),
 		10,
 		Color3.fromRGB(145,190,245)
@@ -427,6 +496,7 @@ function mainGui()
 	filter.Size=UDim2.new(1,-30,0,55)
 	filter.BackgroundColor3=Color3.fromRGB(10,43,88)
 	filter.Parent=content
+
 	corner(filter,14)
 
 	local input=Instance.new("TextBox")
@@ -441,6 +511,7 @@ function mainGui()
 	input.BackgroundColor3=Color3.fromRGB(7,31,68)
 	input.ClearTextOnFocus=false
 	input.Parent=filter
+
 	corner(input,10)
 
 	local refresh=button(
@@ -462,12 +533,13 @@ function mainGui()
 
 	local status=label(
 		content,
-		"● READY",
+		"READY",
 		UDim2.new(1,-170,0,70),
 		UDim2.fromOffset(150,22),
 		11,
 		Color3.fromRGB(70,255,175)
 	)
+
 	status.TextXAlignment=Enum.TextXAlignment.Right
 	status.Font=Enum.Font.GothamBold
 
@@ -498,7 +570,7 @@ function mainGui()
 
 	local topButton=button(
 		bottom,
-		"↑ TOP",
+		"TOP",
 		UDim2.fromOffset(0,0),
 		UDim2.fromOffset(65,35),
 		Color3.fromRGB(15,65,130)
@@ -506,7 +578,7 @@ function mainGui()
 
 	local autoButton=button(
 		bottom,
-		"AUTO: OFF",
+		"AUTO OFF",
 		UDim2.new(1,-105,0,0),
 		UDim2.fromOffset(105,35),
 		Color3.fromRGB(15,65,130)
@@ -520,6 +592,7 @@ function mainGui()
 		9,
 		Color3.fromRGB(100,145,195)
 	)
+
 	credit.TextXAlignment=Enum.TextXAlignment.Center
 
 	local function clearList()
@@ -535,22 +608,26 @@ function mainGui()
 
 		local playing=tonumber(server.playing) or 0
 		local maxPlayers=tonumber(server.maxPlayers) or 7
+
 		local full=playing>=maxPlayers
-		local isFavorite=favorites[server.id]==true
+		local favorite=favorites[server.id]==true
+		local selected=selectedServer==server.id
 
 		local card=Instance.new("Frame")
 		card.Size=UDim2.new(1,-5,0,72)
 		card.BackgroundColor3=
-			selectedServer==server.id
+			selected
 			and Color3.fromRGB(17,65,120)
 			or Color3.fromRGB(10,45,90)
+
 		card.LayoutOrder=index
 		card.Parent=list
 
 		corner(card,14)
+
 		stroke(
 			card,
-			selectedServer==server.id
+			selected
 			and Color3.fromRGB(35,150,255)
 			or Color3.fromRGB(25,85,160),
 			1
@@ -564,6 +641,7 @@ function mainGui()
 			13,
 			Color3.new(1,1,1)
 		)
+
 		serverName.Font=Enum.Font.GothamBold
 
 		label(
@@ -586,16 +664,18 @@ function mainGui()
 		idButton.TextSize=11
 
 		idButton.MouseButton1Click:Connect(function()
+
 			if setclipboard then
 				setclipboard(server.id)
-				status.Text="● ID COPIED"
+
+				status.Text="ID COPIED"
 				status.TextColor3=Color3.fromRGB(70,220,255)
 			end
 		end)
 
 		local fav=button(
 			card,
-			isFavorite and "★" or "☆",
+			favorite and "★" or "☆",
 			UDim2.new(1,-140,0,11),
 			UDim2.fromOffset(32,30),
 			Color3.fromRGB(15,65,130)
@@ -604,8 +684,13 @@ function mainGui()
 		fav.TextSize=17
 
 		fav.MouseButton1Click:Connect(function()
+
 			favorites[server.id]=not favorites[server.id]
-			fav.Text=favorites[server.id] and "★" or "☆"
+
+			fav.Text=
+				favorites[server.id]
+				and "★"
+				or "☆"
 		end)
 
 		local join=button(
@@ -621,26 +706,32 @@ function mainGui()
 		join.TextSize=12
 
 		if full then
+
 			join.Active=false
+
 		else
+
 			join.MouseButton1Click:Connect(function()
 
 				selectedServer=server.id
 
-				status.Text="● JOINING..."
+				status.Text="JOINING"
 				status.TextColor3=Color3.fromRGB(255,220,80)
 
 				pcall(function()
+
 					TeleportService:TeleportToPlaceInstance(
 						game.PlaceId,
 						server.id,
 						player
 					)
+
 				end)
 			end)
 		end
 
 		card.InputBegan:Connect(function(inputObj)
+
 			if inputObj.UserInputType==Enum.UserInputType.MouseButton1
 			or inputObj.UserInputType==Enum.UserInputType.Touch then
 
@@ -654,16 +745,20 @@ function mainGui()
 
 		clearList()
 
-		status.Text="● SCANNING..."
+		status.Text="SCANNING"
 		status.TextColor3=Color3.fromRGB(70,200,255)
+
 		info.Text="Loading servers..."
 
 		local req=getRequest()
 
 		if not req then
-			status.Text="● HTTP UNAVAILABLE"
+
+			status.Text="HTTP UNAVAILABLE"
 			status.TextColor3=Color3.fromRGB(255,90,110)
+
 			info.Text="0 servers"
+
 			return
 		end
 
@@ -673,32 +768,41 @@ function mainGui()
 			.."/servers/Public?sortOrder=Asc&limit=100"
 
 		local ok,res=pcall(function()
+
 			return req({
 				Url=url,
 				Method="GET"
 			})
+
 		end)
 
 		if not ok or not res or res.StatusCode~=200 then
-			status.Text="● SERVER ERROR"
+
+			status.Text="SERVER ERROR"
 			status.TextColor3=Color3.fromRGB(255,180,70)
+
 			info.Text="0 servers"
+
 			return
 		end
 
 		local good,data=pcall(function()
+
 			return HttpService:JSONDecode(res.Body)
+
 		end)
 
 		if not good or not data then
-			status.Text="● DATA ERROR"
+
+			status.Text="DATA ERROR"
 			status.TextColor3=Color3.fromRGB(255,90,110)
+
 			info.Text="0 servers"
+
 			return
 		end
 
 		local servers={}
-
 		local wanted=tonumber(input.Text)
 
 		for _,server in ipairs(data.data or {}) do
@@ -724,9 +828,10 @@ function mainGui()
 				return af>bf
 			end
 
-			return (tonumber(a.playing) or 0)
-				<
-				(tonumber(b.playing) or 0)
+			local ap=tonumber(a.playing) or 0
+			local bp=tonumber(b.playing) or 0
+
+			return ap<bp
 		end)
 
 		for i,server in ipairs(servers) do
@@ -735,7 +840,7 @@ function mainGui()
 
 		info.Text=#servers.." servers"
 
-		status.Text="● UPDATED"
+		status.Text="UPDATED"
 		status.TextColor3=Color3.fromRGB(70,255,175)
 	end
 
@@ -748,10 +853,6 @@ function mainGui()
 			title.Text="Server Hub"
 			subtitle.Visible=false
 			slide.Text="▼"
-
-			tween(content,.3,{
-				Position=UDim2.new(0,0,0,58)
-			})
 
 			tween(frame,.35,{
 				Size=collapsedSize
@@ -766,23 +867,20 @@ function mainGui()
 			tween(frame,.35,{
 				Size=expandedSize
 			})
-
-			task.delay(.1,function()
-				tween(content,.3,{
-					Position=UDim2.fromOffset(0,58)
-				})
-			end)
 		end
 	end)
 
 	close.MouseButton1Click:Connect(function()
 
-		if refreshConnection then
-			refreshConnection:Disconnect()
-			refreshConnection=nil
+		autoRefresh=false
+
+		if refreshThread then
+			task.cancel(refreshThread)
+			refreshThread=nil
 		end
 
 		savedPosition=frame.Position
+
 		frame:Destroy()
 	end)
 
@@ -795,6 +893,7 @@ function mainGui()
 	end)
 
 	topButton.MouseButton1Click:Connect(function()
+
 		list.CanvasPosition=Vector2.new(0,0)
 	end)
 
@@ -804,16 +903,17 @@ function mainGui()
 
 		if autoRefresh then
 
-			autoButton.Text="AUTO: ON"
+			autoButton.Text="AUTO ON"
 			autoButton.BackgroundColor3=Color3.fromRGB(20,125,90)
 
-			if refreshConnection then
-				refreshConnection:Disconnect()
+			if refreshThread then
+				task.cancel(refreshThread)
 			end
 
-			refreshConnection=task.spawn(function()
+			refreshThread=task.spawn(function()
 
 				while autoRefresh and frame.Parent do
+
 					task.wait(15)
 
 					if autoRefresh and frame.Parent then
@@ -824,24 +924,29 @@ function mainGui()
 
 		else
 
-			autoButton.Text="AUTO: OFF"
+			autoButton.Text="AUTO OFF"
 			autoButton.BackgroundColor3=Color3.fromRGB(15,65,130)
 
-			if refreshConnection then
-				task.cancel(refreshConnection)
-				refreshConnection=nil
+			if refreshThread then
+				task.cancel(refreshThread)
+				refreshThread=nil
 			end
 		end
 	end)
 
 	drag(frame,header)
+
 	fetchServers()
 end
 
 if KEY_SYSTEM then
+
 	keyGui()
+
 else
+
 	showLoading(function()
 		mainGui()
 	end)
+
 end
