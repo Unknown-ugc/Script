@@ -785,6 +785,17 @@ FarmText.TextSize = 7
 FarmText.TextXAlignment = Enum.TextXAlignment.Left
 FarmText.Parent = Header
 
+local DiscordInfo = Instance.new("TextLabel")
+DiscordInfo.BackgroundTransparency = 1
+DiscordInfo.Position = UDim2.fromOffset(10, 76)
+DiscordInfo.Size = UDim2.fromOffset(180, 14)
+DiscordInfo.Font = Enum.Font.Gotham
+DiscordInfo.Text = "🥚 Egg Notifier Discord Server"
+DiscordInfo.TextColor3 = CYAN
+DiscordInfo.TextSize = 7
+DiscordInfo.TextXAlignment = Enum.TextXAlignment.Left
+DiscordInfo.Parent = Header
+
 	local Profile = Instance.new("ImageLabel")
 	Profile.Position = UDim2.new(1, -47, 0, 32)
 	Profile.Size = UDim2.fromOffset(30, 30)
