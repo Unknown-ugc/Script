@@ -2,9 +2,9 @@ local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+if not player then return end
 
-local IMAGE_URL = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
+local playerGui = player:WaitForChild("PlayerGui")
 
 local old = playerGui:FindFirstChild("StealAnEggAllScript")
 if old then
@@ -14,6 +14,7 @@ end
 local gui = Instance.new("ScreenGui")
 gui.Name = "StealAnEggAllScript"
 gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = playerGui
 
@@ -23,8 +24,9 @@ main.Size = UDim2.fromOffset(270, 340)
 main.Position = UDim2.new(0.5, -135, 0.5, -170)
 main.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
 main.BorderSizePixel = 0
-main.Visible = false
+main.Visible = true
 main.Active = true
+main.ZIndex = 1
 main.Parent = gui
 
 local mainCorner = Instance.new("UICorner")
@@ -45,6 +47,7 @@ title.TextColor3 = Color3.new(1, 1, 1)
 title.TextSize = 13
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
+title.ZIndex = 2
 title.Parent = main
 
 local minimize = Instance.new("TextButton")
@@ -55,6 +58,7 @@ minimize.Text = "−"
 minimize.TextColor3 = Color3.new(1, 1, 1)
 minimize.TextSize = 21
 minimize.Font = Enum.Font.GothamBold
+minimize.ZIndex = 10
 minimize.Parent = main
 
 local close = Instance.new("TextButton")
@@ -65,6 +69,7 @@ close.Text = "×"
 close.TextColor3 = Color3.fromRGB(255, 90, 90)
 close.TextSize = 21
 close.Font = Enum.Font.GothamBold
+close.ZIndex = 10
 close.Parent = main
 
 local dragBar = Instance.new("TextButton")
@@ -84,8 +89,9 @@ list.BackgroundTransparency = 1
 list.BorderSizePixel = 0
 list.ScrollBarThickness = 3
 list.ScrollBarImageColor3 = Color3.fromRGB(70, 140, 255)
+list.CanvasSize = UDim2.new(0, 0, 0, 0)
 list.AutomaticCanvasSize = Enum.AutomaticSize.Y
-list.CanvasSize = UDim2.new()
+list.ZIndex = 2
 list.Parent = main
 
 local layout = Instance.new("UIListLayout")
@@ -108,6 +114,7 @@ local function addName(name, runFunction)
 	button.TextSize = 11
 	button.Font = Enum.Font.GothamBold
 	button.AutoButtonColor = true
+	button.ZIndex = 3
 	button.Parent = list
 
 	local corner = Instance.new("UICorner")
@@ -115,9 +122,9 @@ local function addName(name, runFunction)
 	corner.Parent = button
 
 	button.Activated:Connect(function()
-		if typeof(runFunction) == "function" then
-			runFunction()
-		end
+		task.spawn(function()
+			pcall(runFunction)
+		end)
 	end)
 end
 
@@ -161,6 +168,7 @@ local footer = Instance.new("Frame")
 footer.Position = UDim2.new(0, 10, 1, -53)
 footer.Size = UDim2.new(1, -20, 0, 45)
 footer.BackgroundTransparency = 1
+footer.ZIndex = 3
 footer.Parent = main
 
 local credit = Instance.new("TextLabel")
@@ -212,7 +220,7 @@ task.spawn(function()
 		)
 	end)
 
-	if success then
+	if success and content then
 		avatar.Image = content
 	end
 end)
@@ -229,6 +237,7 @@ username.TextXAlignment = Enum.TextXAlignment.Right
 username.Parent = footer
 
 local minimized = false
+local circle
 
 minimize.Activated:Connect(function()
 	if minimized then
@@ -238,16 +247,14 @@ minimize.Activated:Connect(function()
 	minimized = true
 	main.Visible = false
 
-	local circle = Instance.new("ImageButton")
+	circle = Instance.new("TextButton")
 	circle.Name = "OpenCircle"
 	circle.Size = UDim2.fromOffset(52, 52)
 	circle.Position = UDim2.new(0.5, -26, 0, 12)
 	circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
 	circle.BorderSizePixel = 0
-	circle.Image = IMAGE_URL
-	circle.ImageTransparency = 0
-	circle.ScaleType = Enum.ScaleType.Fit
-	circle.AutoButtonColor = true
+	circle.Text = "🥚"
+	circle.TextSize = 25
 	circle.ZIndex = 100
 	circle.Parent = gui
 
@@ -261,7 +268,11 @@ minimize.Activated:Connect(function()
 	circleStroke.Parent = circle
 
 	circle.Activated:Connect(function()
-		circle:Destroy()
+		if circle then
+			circle:Destroy()
+			circle = nil
+		end
+
 		main.Visible = true
 		minimized = false
 	end)
@@ -318,7 +329,7 @@ loading.Size = UDim2.fromOffset(270, 270)
 loading.Position = UDim2.new(0.5, -135, 0.5, -135)
 loading.BackgroundColor3 = Color3.fromRGB(10, 14, 22)
 loading.BorderSizePixel = 0
-loading.ZIndex = 50
+loading.ZIndex = 200
 loading.Parent = gui
 
 local loadingCorner = Instance.new("UICorner")
@@ -330,43 +341,34 @@ loadingStroke.Color = Color3.fromRGB(55, 130, 255)
 loadingStroke.Thickness = 1.5
 loadingStroke.Parent = loading
 
-local loadingImage = Instance.new("ImageLabel")
-loadingImage.Size = UDim2.fromOffset(80, 80)
-loadingImage.Position = UDim2.new(0.5, -40, 0, 40)
-loadingImage.BackgroundTransparency = 1
-loadingImage.Image = IMAGE_URL
-loadingImage.ScaleType = Enum.ScaleType.Fit
-loadingImage.ZIndex = 51
-loadingImage.Parent = loading
-
 local loadingTitle = Instance.new("TextLabel")
 loadingTitle.Size = UDim2.new(1, -20, 0, 30)
-loadingTitle.Position = UDim2.fromOffset(10, 125)
+loadingTitle.Position = UDim2.fromOffset(10, 75)
 loadingTitle.BackgroundTransparency = 1
 loadingTitle.Text = "Steal an Egg All Script"
 loadingTitle.TextColor3 = Color3.new(1, 1, 1)
 loadingTitle.TextSize = 14
 loadingTitle.Font = Enum.Font.GothamBold
-loadingTitle.ZIndex = 51
+loadingTitle.ZIndex = 201
 loadingTitle.Parent = loading
 
 local loadingText = Instance.new("TextLabel")
 loadingText.Size = UDim2.new(1, -20, 0, 20)
-loadingText.Position = UDim2.fromOffset(10, 157)
+loadingText.Position = UDim2.fromOffset(10, 110)
 loadingText.BackgroundTransparency = 1
 loadingText.Text = "Loading... 0%"
 loadingText.TextColor3 = Color3.fromRGB(170, 185, 205)
 loadingText.TextSize = 10
 loadingText.Font = Enum.Font.Gotham
-loadingText.ZIndex = 51
+loadingText.ZIndex = 201
 loadingText.Parent = loading
 
 local barBack = Instance.new("Frame")
 barBack.Size = UDim2.new(0.72, 0, 0, 7)
-barBack.Position = UDim2.new(0.14, 0, 0, 190)
+barBack.Position = UDim2.new(0.14, 0, 0, 145)
 barBack.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
 barBack.BorderSizePixel = 0
-barBack.ZIndex = 51
+barBack.ZIndex = 201
 barBack.Parent = loading
 
 local barBackCorner = Instance.new("UICorner")
@@ -377,7 +379,7 @@ local bar = Instance.new("Frame")
 bar.Size = UDim2.new(0, 0, 1, 0)
 bar.BackgroundColor3 = Color3.fromRGB(55, 130, 255)
 bar.BorderSizePixel = 0
-bar.ZIndex = 52
+bar.ZIndex = 202
 bar.Parent = barBack
 
 local barCorner = Instance.new("UICorner")
@@ -392,16 +394,15 @@ percent.Text = "0%"
 percent.TextColor3 = Color3.fromRGB(140, 155, 175)
 percent.TextSize = 8
 percent.Font = Enum.Font.Gotham
-percent.ZIndex = 52
+percent.ZIndex = 202
 percent.Parent = barBack
 
 task.spawn(function()
 	local duration = 3
 	local startTime = os.clock()
 
-	while true do
-		local elapsed = os.clock() - startTime
-		local progress = math.clamp(elapsed / duration, 0, 1)
+	while gui.Parent and loading.Parent do
+		local progress = math.clamp((os.clock() - startTime) / duration, 0, 1)
 		local value = math.floor(progress * 100)
 
 		bar.Size = UDim2.new(progress, 0, 1, 0)
@@ -412,15 +413,16 @@ task.spawn(function()
 			break
 		end
 
-		task.wait()
+		task.wait(0.03)
 	end
 
-	bar.Size = UDim2.new(1, 0, 1, 0)
-	loadingText.Text = "Loading... 100%"
-	percent.Text = "100%"
+	if loading.Parent then
+		bar.Size = UDim2.new(1, 0, 1, 0)
+		loadingText.Text = "Loading... 100%"
+		percent.Text = "100%"
 
-	task.wait(0.05)
+		task.wait(0.1)
 
-	loading.Visible = true
-	main.Visible = true
+		loading:Destroy()
+	end
 end)
