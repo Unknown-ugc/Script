@@ -1,0 +1,639 @@
+--// REALISTIC SHADER GUI
+--// LocalScript - put in StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+local GuiService = game:GetService("GuiService")
+
+local player = Players.LocalPlayer
+
+--==================================================
+-- SETTINGS
+--==================================================
+
+local DISCORD_LINK = "https://discord.gg/FJK6QzNnf7"
+local TIKTOK_LINK = "https://www.tiktok.com/@lts.chris"
+
+--==================================================
+-- SAVE ORIGINAL LIGHTING
+--==================================================
+
+local original = {
+	Brightness = Lighting.Brightness,
+	ClockTime = Lighting.ClockTime,
+	ExposureCompensation = Lighting.ExposureCompensation,
+	Ambient = Lighting.Ambient,
+	OutdoorAmbient = Lighting.OutdoorAmbient,
+	FogColor = Lighting.FogColor,
+	FogStart = Lighting.FogStart,
+	FogEnd = Lighting.FogEnd,
+	GlobalShadows = Lighting.GlobalShadows,
+}
+
+-- Remove effects created by this script
+local function clearEffects()
+	for _, obj in ipairs(Lighting:GetChildren()) do
+		if obj:GetAttribute("ChrisShader") then
+			obj:Destroy()
+		end
+	end
+end
+
+local function effect(className)
+	local obj = Instance.new(className)
+	obj:SetAttribute("ChrisShader", true)
+	obj.Parent = Lighting
+	return obj
+end
+
+--==================================================
+-- NORMAL
+--==================================================
+
+local function resetLighting()
+	clearEffects()
+
+	Lighting.Brightness = original.Brightness
+	Lighting.ClockTime = original.ClockTime
+	Lighting.ExposureCompensation = original.ExposureCompensation
+	Lighting.Ambient = original.Ambient
+	Lighting.OutdoorAmbient = original.OutdoorAmbient
+	Lighting.FogColor = original.FogColor
+	Lighting.FogStart = original.FogStart
+	Lighting.FogEnd = original.FogEnd
+	Lighting.GlobalShadows = original.GlobalShadows
+end
+
+--==================================================
+-- SHADERS
+--==================================================
+
+local shaders = {
+
+	{
+		name = "Morning",
+		icon = "🌅",
+		desc = "Soft sunrise lighting",
+		clock = 7,
+		brightness = 2.2,
+		exposure = 0.15,
+		ambient = Color3.fromRGB(180, 170, 160),
+		outdoor = Color3.fromRGB(210, 200, 190)
+	},
+
+	{
+		name = "Day",
+		icon = "☀️",
+		desc = "Bright natural daylight",
+		clock = 13,
+		brightness = 2.5,
+		exposure = 0.1,
+		ambient = Color3.fromRGB(190, 190, 190),
+		outdoor = Color3.fromRGB(210, 210, 210)
+	},
+
+	{
+		name = "Cloudy Day",
+		icon = "🌤️",
+		desc = "Soft overcast lighting",
+		clock = 13,
+		brightness = 1.8,
+		exposure = -0.05,
+		ambient = Color3.fromRGB(155, 165, 175),
+		outdoor = Color3.fromRGB(170, 180, 190)
+	},
+
+	{
+		name = "Sunset",
+		icon = "🌇",
+		desc = "Warm sunset atmosphere",
+		clock = 18,
+		brightness = 2,
+		exposure = 0.1,
+		ambient = Color3.fromRGB(190, 120, 100),
+		outdoor = Color3.fromRGB(220, 150, 110)
+	},
+
+	{
+		name = "Golden Hour",
+		icon = "🌆",
+		desc = "Golden cinematic sunlight",
+		clock = 17.3,
+		brightness = 2.3,
+		exposure = 0.2,
+		ambient = Color3.fromRGB(200, 150, 100),
+		outdoor = Color3.fromRGB(230, 175, 110)
+	},
+
+	{
+		name = "Night",
+		icon = "🌙",
+		desc = "Cool natural night",
+		clock = 21,
+		brightness = 0.8,
+		exposure = -0.15,
+		ambient = Color3.fromRGB(55, 65, 100),
+		outdoor = Color3.fromRGB(45, 55, 90)
+	},
+
+	{
+		name = "Midnight",
+		icon = "🌌",
+		desc = "Deep blue midnight",
+		clock = 0,
+		brightness = 0.45,
+		exposure = -0.3,
+		ambient = Color3.fromRGB(30, 40, 80),
+		outdoor = Color3.fromRGB(20, 30, 65)
+	},
+
+	{
+		name = "Moonlight",
+		icon = "🌃",
+		desc = "Soft moonlit world",
+		clock = 23,
+		brightness = 0.7,
+		exposure = -0.1,
+		ambient = Color3.fromRGB(65, 80, 125),
+		outdoor = Color3.fromRGB(55, 70, 115)
+	},
+
+	{
+		name = "Rainy",
+		icon = "🌧️",
+		desc = "Cool rainy atmosphere",
+		clock = 15,
+		brightness = 1.2,
+		exposure = -0.15,
+		ambient = Color3.fromRGB(105, 115, 130),
+		outdoor = Color3.fromRGB(90, 100, 120)
+	},
+
+	{
+		name = "Foggy",
+		icon = "🌫️",
+		desc = "Soft atmospheric fog",
+		clock = 12,
+		brightness = 1.4,
+		exposure = -0.1,
+		ambient = Color3.fromRGB(150, 155, 160),
+		outdoor = Color3.fromRGB(140, 145, 150),
+		fog = true
+	},
+
+	{
+		name = "Winter",
+		icon = "❄️",
+		desc = "Cold blue environment",
+		clock = 12,
+		brightness = 1.8,
+		exposure = 0,
+		ambient = Color3.fromRGB(175, 190, 215),
+		outdoor = Color3.fromRGB(190, 205, 230)
+	},
+
+	{
+		name = "Forest",
+		icon = "🌲",
+		desc = "Natural green atmosphere",
+		clock = 11,
+		brightness = 1.9,
+		exposure = 0.05,
+		ambient = Color3.fromRGB(120, 155, 120),
+		outdoor = Color3.fromRGB(140, 175, 135)
+	},
+
+	{
+		name = "Ocean",
+		icon = "🌊",
+		desc = "Cool blue atmosphere",
+		clock = 14,
+		brightness = 2,
+		exposure = 0.05,
+		ambient = Color3.fromRGB(100, 160, 190),
+		outdoor = Color3.fromRGB(120, 180, 210)
+	},
+
+	{
+		name = "Cinematic",
+		icon = "🎬",
+		desc = "High contrast cinematic look",
+		clock = 16,
+		brightness = 1.8,
+		exposure = -0.05,
+		ambient = Color3.fromRGB(110, 115, 125),
+		outdoor = Color3.fromRGB(155, 160, 175)
+	},
+
+	{
+		name = "Ultra Realistic",
+		icon = "✨",
+		desc = "Balanced realistic lighting",
+		clock = 14,
+		brightness = 2.2,
+		exposure = 0.05,
+		ambient = Color3.fromRGB(175, 175, 180),
+		outdoor = Color3.fromRGB(200, 200, 205)
+	},
+
+	{
+		name = "Vibrant",
+		icon = "🌈",
+		desc = "Colorful enhanced world",
+		clock = 13,
+		brightness = 2.4,
+		exposure = 0.15,
+		ambient = Color3.fromRGB(190, 180, 200),
+		outdoor = Color3.fromRGB(210, 200, 220)
+	},
+}
+
+--==================================================
+-- APPLY SHADER
+--==================================================
+
+local function applyShader(data)
+
+	clearEffects()
+
+	Lighting.ClockTime = data.clock
+	Lighting.Brightness = data.brightness
+	Lighting.ExposureCompensation = data.exposure
+	Lighting.Ambient = data.ambient
+	Lighting.OutdoorAmbient = data.outdoor
+	Lighting.GlobalShadows = true
+
+	local color = effect("ColorCorrectionEffect")
+
+	if data.name == "Vibrant" then
+		color.Saturation = 0.35
+		color.Contrast = 0.12
+	elseif data.name == "Cinematic" then
+		color.Saturation = -0.05
+		color.Contrast = 0.22
+	elseif data.name == "Night"
+		or data.name == "Midnight"
+		or data.name == "Moonlight" then
+
+		color.Saturation = -0.05
+		color.Contrast = 0.12
+		color.TintColor = Color3.fromRGB(180, 195, 255)
+	else
+		color.Saturation = 0.08
+		color.Contrast = 0.08
+	end
+
+	if data.fog then
+		Lighting.FogColor = Color3.fromRGB(185, 195, 205)
+		Lighting.FogStart = 20
+		Lighting.FogEnd = 350
+	else
+		Lighting.FogStart = original.FogStart
+		Lighting.FogEnd = original.FogEnd
+	end
+
+	local atmosphere = effect("Atmosphere")
+	atmosphere.Density = 0.12
+	atmosphere.Offset = 0.15
+	atmosphere.Glare = 0.05
+	atmosphere.Haze = 0.4
+
+	if data.name == "Foggy" then
+		atmosphere.Density = 0.35
+		atmosphere.Haze = 1
+	elseif data.name == "Night"
+		or data.name == "Midnight"
+		or data.name == "Moonlight" then
+
+		atmosphere.Density = 0.08
+		atmosphere.Haze = 0.2
+	end
+end
+
+--==================================================
+-- GUI
+--==================================================
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "ChrisRealisticShader"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0.88, 0, 0.82, 0)
+main.Position = UDim2.new(0.06, 0, 0.09, 0)
+main.BackgroundColor3 = Color3.fromRGB(12, 30, 65)
+main.BorderSizePixel = 0
+main.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 18)
+corner.Parent = main
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(70, 150, 255)
+stroke.Thickness = 2
+stroke.Transparency = 0.15
+stroke.Parent = main
+
+--==================================================
+-- HEADER
+--==================================================
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -60, 0, 40)
+title.Position = UDim2.new(0, 18, 0, 10)
+title.BackgroundTransparency = 1
+title.Text = "✦ REALISTIC SHADER ✦"
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = main
+
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, -30, 0, 25)
+subtitle.Position = UDim2.new(0, 15, 0, 48)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "Enhance your Roblox world"
+subtitle.TextColor3 = Color3.fromRGB(170,210,255)
+subtitle.TextScaled = true
+subtitle.Font = Enum.Font.Gotham
+subtitle.Parent = main
+
+--==================================================
+-- CLOSE
+--==================================================
+
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0, 40, 0, 40)
+close.Position = UDim2.new(1, -48, 0, 8)
+close.BackgroundColor3 = Color3.fromRGB(35, 65, 110)
+close.Text = "×"
+close.TextColor3 = Color3.new(1,1,1)
+close.TextScaled = true
+close.Font = Enum.Font.GothamBold
+close.Parent = main
+
+Instance.new("UICorner", close).CornerRadius = UDim.new(0,12)
+
+--==================================================
+-- SUPPORT
+--==================================================
+
+local support = Instance.new("TextLabel")
+support.Size = UDim2.new(1, -30, 0, 22)
+support.Position = UDim2.new(0, 15, 0, 76)
+support.BackgroundTransparency = 1
+support.Text = "🔗 Copy Link • Account Support"
+support.TextColor3 = Color3.fromRGB(220,235,255)
+support.TextScaled = true
+support.Font = Enum.Font.GothamBold
+support.Parent = main
+
+local tiktok = Instance.new("TextButton")
+tiktok.Size = UDim2.new(0.46, -8, 0, 34)
+tiktok.Position = UDim2.new(0.04, 0, 0, 103)
+tiktok.BackgroundColor3 = Color3.fromRGB(25, 55, 105)
+tiktok.Text = "TikTok • @lts.chris"
+tiktok.TextColor3 = Color3.new(1,1,1)
+tiktok.TextScaled = true
+tiktok.Font = Enum.Font.GothamBold
+tiktok.Parent = main
+
+Instance.new("UICorner", tiktok).CornerRadius = UDim.new(0,10)
+
+local credit = Instance.new("TextLabel")
+credit.Size = UDim2.new(0.46, -8, 0, 34)
+credit.Position = UDim2.new(0.52, 0, 0, 103)
+credit.BackgroundColor3 = Color3.fromRGB(25, 55, 105)
+credit.Text = "Credit: Chris"
+credit.TextColor3 = Color3.new(1,1,1)
+credit.TextScaled = true
+credit.Font = Enum.Font.GothamBold
+credit.Parent = main
+
+Instance.new("UICorner", credit).CornerRadius = UDim.new(0,10)
+
+--==================================================
+-- SCROLLING LIST
+--==================================================
+
+local scroll = Instance.new("ScrollingFrame")
+scroll.Size = UDim2.new(0.92, 0, 0.57, 0)
+scroll.Position = UDim2.new(0.04, 0, 0, 145)
+scroll.BackgroundColor3 = Color3.fromRGB(8, 22, 48)
+scroll.BackgroundTransparency = 0.15
+scroll.BorderSizePixel = 0
+scroll.ScrollBarThickness = 5
+scroll.ScrollBarImageColor3 = Color3.fromRGB(70,150,255)
+scroll.CanvasSize = UDim2.new(0,0,0,0)
+scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scroll.Parent = main
+
+Instance.new("UICorner", scroll).CornerRadius = UDim.new(0,12)
+
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0,8)
+padding.PaddingBottom = UDim.new(0,8)
+padding.PaddingLeft = UDim.new(0,8)
+padding.PaddingRight = UDim.new(0,8)
+padding.Parent = scroll
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0,7)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.Parent = scroll
+
+--==================================================
+-- SHADER BUTTONS
+--==================================================
+
+local selectedName = nil
+local lastTap = 0
+local lastShader = nil
+
+local function updateButton(button, active)
+
+	if active then
+		button.BackgroundColor3 = Color3.fromRGB(35,110,210)
+	else
+		button.BackgroundColor3 = Color3.fromRGB(22,48,90)
+	end
+end
+
+for _, data in ipairs(shaders) do
+
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(1, -4, 0, 48)
+	button.BackgroundColor3 = Color3.fromRGB(22,48,90)
+	button.BorderSizePixel = 0
+	button.Text = data.icon .. "  " .. data.name
+	button.TextColor3 = Color3.new(1,1,1)
+	button.TextScaled = true
+	button.Font = Enum.Font.GothamBold
+	button.AutoButtonColor = false
+	button.Parent = scroll
+
+	Instance.new("UICorner", button).CornerRadius = UDim.new(0,11)
+
+	local desc = Instance.new("TextLabel")
+	desc.Size = UDim2.new(0.42, 0, 0.65, 0)
+	desc.Position = UDim2.new(0.55, 0, 0.18, 0)
+	desc.BackgroundTransparency = 1
+	desc.Text = data.desc
+	desc.TextColor3 = Color3.fromRGB(165,195,230)
+	desc.TextScaled = true
+	desc.Font = Enum.Font.Gotham
+	desc.Parent = button
+
+	button.Activated:Connect(function()
+
+		local now = os.clock()
+
+		if lastShader == data.name and now - lastTap <= 0.4 then
+
+			resetLighting()
+
+			selectedName = nil
+			lastShader = nil
+
+			for _, child in ipairs(scroll:GetChildren()) do
+				if child:IsA("TextButton") then
+					updateButton(child, false)
+				end
+			end
+
+		else
+
+			applyShader(data)
+
+			selectedName = data.name
+			lastShader = data.name
+
+			for _, child in ipairs(scroll:GetChildren()) do
+				if child:IsA("TextButton") then
+					updateButton(child, child == button)
+				end
+			end
+		end
+
+		lastTap = now
+	end)
+end
+
+--==================================================
+-- DISCORD BUTTON
+--==================================================
+
+local discord = Instance.new("TextButton")
+discord.Size = UDim2.new(0.92, 0, 0, 42)
+discord.Position = UDim2.new(0.04, 0, 0.91, 0)
+discord.BackgroundColor3 = Color3.fromRGB(45, 100, 190)
+discord.Text = "💬  Discord Server"
+discord.TextColor3 = Color3.new(1,1,1)
+discord.TextScaled = true
+discord.Font = Enum.Font.GothamBold
+discord.Parent = main
+
+Instance.new("UICorner", discord).CornerRadius = UDim.new(0,12)
+
+--==================================================
+-- LINK BUTTONS
+--==================================================
+
+tiktok.Activated:Connect(function()
+	if setclipboard then
+		setclipboard(TIKTOK_LINK)
+	end
+end)
+
+discord.Activated:Connect(function()
+	if setclipboard then
+		setclipboard(DISCORD_LINK)
+	end
+end)
+
+--==================================================
+-- CLOSE / REOPEN
+--==================================================
+
+local reopen = Instance.new("TextButton")
+reopen.Size = UDim2.new(0, 58, 0, 58)
+reopen.Position = UDim2.new(0, 15, 0.5, 0)
+reopen.BackgroundColor3 = Color3.fromRGB(20,80,160)
+reopen.Text = "✦"
+reopen.TextColor3 = Color3.new(1,1,1)
+reopen.TextScaled = true
+reopen.Font = Enum.Font.GothamBold
+reopen.Visible = false
+reopen.Parent = gui
+
+Instance.new("UICorner", reopen).CornerRadius = UDim.new(0,18)
+
+close.Activated:Connect(function()
+	main.Visible = false
+	reopen.Visible = true
+end)
+
+reopen.Activated:Connect(function()
+	main.Visible = true
+	reopen.Visible = false
+end)
+
+--==================================================
+-- DRAG SUPPORT - MOBILE + PC
+--==================================================
+
+local dragging = false
+local dragStart
+local startPos
+
+local function updateDrag(input)
+
+	local delta = input.Position - dragStart
+
+	main.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
+
+title.InputBegan:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
+
+		input.Changed:Connect(function()
+
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+
+		end)
+	end
+end)
+
+title.InputChanged:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		if dragging then
+			updateDrag(input)
+		end
+	end
+end)
+
+--==================================================
+-- DONE
+--==================================================
+
+print("Chris Realistic Shader GUI loaded!")
