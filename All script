@@ -242,22 +242,18 @@ local function showKey()
 
     addName("Clover hub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Ryuun0x/Clover/refs/heads/main/main.lua"))()
-end)
     end)
 
     addName("Ajjans hub", function()
         loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/359e97f8618e9008afe5f496184ebb7c.lua"))()
-end)
     end)
 
     addName("Big Foot", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()
-end)
     end)
 
     addName("Speed Hub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-end)
     end)
 
     -- Highlight KEY
@@ -271,27 +267,22 @@ local function showKeyless()
 
     addName("Finding one player server", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
-end)
     end)
 
     addName("Lennon hub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
-end)
     end)
 
     addName("Fyy community", function()
         loadstring(game:HttpGet("https://FyyCommunity.my.id"))()
-end)
     end)
 
     addName("Foxname", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()
-end)
     end)
 
     addName("Ouroboros", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()
-end)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))(
     end)
 
     addName("Axonic", function()
