@@ -9,6 +9,8 @@ if old then
 	old:Destroy()
 end
 
+local IMAGE_ID = "rbxassetid://85422381974829"
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "StealAnEggAllScript"
 gui.ResetOnSpawn = false
@@ -16,6 +18,7 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = playerGui
 
 local main = Instance.new("Frame")
+main.Name = "Main"
 main.Size = UDim2.fromOffset(270, 340)
 main.Position = UDim2.new(0.5, -135, 0.5, -170)
 main.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
@@ -143,6 +146,7 @@ addName("Foxname", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()
 end)
 
+
 local footer = Instance.new("Frame")
 footer.Position = UDim2.new(0, 10, 1, -53)
 footer.Size = UDim2.new(1, -20, 0, 45)
@@ -150,8 +154,8 @@ footer.BackgroundTransparency = 1
 footer.Parent = main
 
 local credit = Instance.new("TextLabel")
-credit.Position = UDim2.fromOffset(3, 1)
-credit.Size = UDim2.fromOffset(105, 17)
+credit.Position = UDim2.fromOffset(3, 0)
+credit.Size = UDim2.fromOffset(110, 17)
 credit.BackgroundTransparency = 1
 credit.Text = "Credit: Chris"
 credit.TextColor3 = Color3.fromRGB(170, 180, 195)
@@ -161,8 +165,8 @@ credit.TextXAlignment = Enum.TextXAlignment.Left
 credit.Parent = footer
 
 local discord = Instance.new("TextButton")
-discord.Position = UDim2.fromOffset(3, 20)
-discord.Size = UDim2.fromOffset(105, 17)
+discord.Position = UDim2.fromOffset(3, 18)
+discord.Size = UDim2.fromOffset(110, 17)
 discord.BackgroundTransparency = 1
 discord.Text = "Discord Server"
 discord.TextColor3 = Color3.fromRGB(90, 155, 255)
@@ -171,13 +175,9 @@ discord.Font = Enum.Font.Gotham
 discord.TextXAlignment = Enum.TextXAlignment.Left
 discord.Parent = footer
 
-discord.Activated:Connect(function()
-	-- Discord link handling goes here
-end)
-
 local profile = Instance.new("TextLabel")
-profile.Position = UDim2.new(1, -108, 1, 0)
-profile.Size = UDim2.fromOffset(70, 17)
+profile.Position = UDim2.new(1, -105, 0, 0)
+profile.Size = UDim2.fromOffset(100, 17)
 profile.BackgroundTransparency = 1
 profile.Text = "Profile"
 profile.TextColor3 = Color3.new(1, 1, 1)
@@ -187,7 +187,7 @@ profile.TextXAlignment = Enum.TextXAlignment.Right
 profile.Parent = footer
 
 local username = Instance.new("TextLabel")
-username.Position = UDim2.new(1, -108, 1, 17)
+username.Position = UDim2.new(1, -105, 0, 18)
 username.Size = UDim2.fromOffset(100, 14)
 username.BackgroundTransparency = 1
 username.Text = "@" .. player.Name
@@ -196,6 +196,10 @@ username.TextSize = 8
 username.Font = Enum.Font.Gotham
 username.TextXAlignment = Enum.TextXAlignment.Right
 username.Parent = footer
+
+discord.Activated:Connect(function()
+	-- PUT DISCORD ACTION HERE
+end)
 
 local minimized = false
 
@@ -213,7 +217,7 @@ minimize.Activated:Connect(function()
 	circle.Position = UDim2.new(0.5, -29, 0, 12)
 	circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
 	circle.BorderSizePixel = 0
-	circle.Image = "rbxassetid://112426042912578"
+	circle.Image = IMAGE_ID
 	circle.ScaleType = Enum.ScaleType.Fit
 	circle.Parent = gui
 
@@ -275,64 +279,86 @@ UIS.InputChanged:Connect(function(input)
 end)
 
 local loading = Instance.new("Frame")
-loading.Size = UDim2.fromScale(1, 1)
+loading.Name = "Loading"
+loading.Size = UDim2.fromOffset(270, 340)
+loading.Position = UDim2.new(0.5, -135, 0.5, -170)
 loading.BackgroundColor3 = Color3.fromRGB(10, 14, 22)
 loading.BorderSizePixel = 0
+loading.ZIndex = 50
 loading.Parent = gui
 
 local loadingCorner = Instance.new("UICorner")
 loadingCorner.CornerRadius = UDim.new(0, 14)
 loadingCorner.Parent = loading
 
+local loadingStroke = Instance.new("UIStroke")
+loadingStroke.Color = Color3.fromRGB(55, 130, 255)
+loadingStroke.Thickness = 1.5
+loadingStroke.Parent = loading
+
+local loadingImage = Instance.new("ImageLabel")
+loadingImage.Size = UDim2.fromOffset(85, 85)
+loadingImage.Position = UDim2.new(0.5, -42.5, 0.5, -100)
+loadingImage.BackgroundTransparency = 1
+loadingImage.Image = IMAGE_ID
+loadingImage.ScaleType = Enum.ScaleType.Fit
+loadingImage.ZIndex = 51
+loadingImage.Parent = loading
+
 local loadingTitle = Instance.new("TextLabel")
-loadingTitle.Size = UDim2.new(1, -20, 0, 35)
-loadingTitle.Position = UDim2.new(0, 10, 0.5, -55)
+loadingTitle.Size = UDim2.new(1, -20, 0, 30)
+loadingTitle.Position = UDim2.new(0, 10, 0.5, -5)
 loadingTitle.BackgroundTransparency = 1
 loadingTitle.Text = "Steal an Egg All Script"
 loadingTitle.TextColor3 = Color3.new(1, 1, 1)
-loadingTitle.TextSize = 17
+loadingTitle.TextSize = 14
 loadingTitle.Font = Enum.Font.GothamBold
+loadingTitle.ZIndex = 51
 loadingTitle.Parent = loading
 
 local loadingText = Instance.new("TextLabel")
-loadingText.Size = UDim2.new(1, -20, 0, 22)
-loadingText.Position = UDim2.new(0, 10, 0.5, -20)
+loadingText.Size = UDim2.new(1, -20, 0, 20)
+loadingText.Position = UDim2.new(0, 10, 0.5, 27)
 loadingText.BackgroundTransparency = 1
 loadingText.Text = "Loading... 0%"
 loadingText.TextColor3 = Color3.fromRGB(170, 185, 205)
-loadingText.TextSize = 11
+loadingText.TextSize = 10
 loadingText.Font = Enum.Font.Gotham
+loadingText.ZIndex = 51
 loadingText.Parent = loading
 
 local barBack = Instance.new("Frame")
-barBack.Size = UDim2.new(0.75, 0, 0, 7)
-barBack.Position = UDim2.new(0.125, 0, 0.5, 15)
+barBack.Size = UDim2.new(0.72, 0, 0, 7)
+barBack.Position = UDim2.new(0.14, 0, 0.5, 55)
 barBack.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
 barBack.BorderSizePixel = 0
+barBack.ZIndex = 51
 barBack.Parent = loading
 
-local barCorner = Instance.new("UICorner")
-barCorner.CornerRadius = UDim.new(1, 0)
-barCorner.Parent = barBack
+local barBackCorner = Instance.new("UICorner")
+barBackCorner.CornerRadius = UDim.new(1, 0)
+barBackCorner.Parent = barBack
 
 local bar = Instance.new("Frame")
 bar.Size = UDim2.new(0, 0, 1, 0)
 bar.BackgroundColor3 = Color3.fromRGB(55, 130, 255)
 bar.BorderSizePixel = 0
+bar.ZIndex = 52
 bar.Parent = barBack
 
-local barFillCorner = Instance.new("UICorner")
-barFillCorner.CornerRadius = UDim.new(1, 0)
-barFillCorner.Parent = bar
+local barCorner = Instance.new("UICorner")
+barCorner.CornerRadius = UDim.new(1, 0)
+barCorner.Parent = bar
 
 local percent = Instance.new("TextLabel")
-percent.Size = UDim2.new(1, 0, 0, 20)
-percent.Position = UDim2.new(0, 0, 1, 8)
+percent.Size = UDim2.new(1, 0, 0, 18)
+percent.Position = UDim2.new(0, 0, 1, 5)
 percent.BackgroundTransparency = 1
 percent.Text = "0%"
 percent.TextColor3 = Color3.fromRGB(140, 155, 175)
-percent.TextSize = 9
+percent.TextSize = 8
 percent.Font = Enum.Font.Gotham
+percent.ZIndex = 52
 percent.Parent = barBack
 
 task.spawn(function()
