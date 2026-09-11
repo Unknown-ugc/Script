@@ -141,6 +141,10 @@ addName("Lennon hub", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
 end)
 
+addName("Fyy community", function()
+	loadstring(game:HttpGet("https://FyyCommunity.my.id"))()
+end)
+
 addName("Miranda hub", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaegg"))()
 end)
