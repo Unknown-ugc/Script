@@ -1,1202 +1,849 @@
+--// BLUE REALISTIC SHADER
+--// Rain automatically enables wet ground
+--// Mobile-friendly draggable GUI
+--// Original standalone LocalScript
+
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
-local Player = Players.LocalPlayer
-local PlayerGui = Player:WaitForChild("PlayerGui")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
 
-local GUI_NAME = "ChrisRealisticShader"
-local DISCORD = "https://discord.gg/FJK6QzNnf7"
-local TIKTOK = "https://www.tiktok.com/@lts.chris"
+local CONFIG = {
+	Enabled = true,
+	Rain = false,
+	WetGround = false,
+	DayNight = true,
+	Clouds = true,
 
-local oldGui = PlayerGui:FindFirstChild(GUI_NAME)
-if oldGui then
-	oldGui:Destroy()
-end
+	RainDrops = 160,
+	RainDistance = 75,
+	RainHeight = 55,
+	RainSpeed = 115,
 
-local Original = {
-	Brightness = Lighting.Brightness,
-	ClockTime = Lighting.ClockTime,
-	FogStart = Lighting.FogStart,
-	FogEnd = Lighting.FogEnd,
-	FogColor = Lighting.FogColor,
-	Ambient = Lighting.Ambient,
-	OutdoorAmbient = Lighting.OutdoorAmbient,
-	ExposureCompensation = Lighting.ExposureCompensation,
-	ColorShift_Top = Lighting.ColorShift_Top,
-	ColorShift_Bottom = Lighting.ColorShift_Bottom,
-	EnvironmentDiffuseScale = Lighting.EnvironmentDiffuseScale,
-	EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale,
-	GeographicLatitude = Lighting.GeographicLatitude
+	WetReflectance = 0.35,
+	ScanDistance = 70,
+	ScanRate = 0.25
 }
 
-local OriginalSkies = {}
+local original = {}
+local wetParts = {}
 
-for _, object in ipairs(Lighting:GetChildren()) do
-	if object:IsA("Sky") then
-		table.insert(OriginalSkies, object:Clone())
-	end
+local rootFolder = Instance.new("Folder")
+rootFolder.Name = "BlueRealisticShader"
+rootFolder.Parent = workspace
+
+local rainFolder = Instance.new("Folder")
+rainFolder.Name = "Rain"
+rainFolder.Parent = rootFolder
+
+--------------------------------------------------
+-- EFFECTS
+--------------------------------------------------
+
+local atmosphere = Lighting:FindFirstChild("BlueShaderAtmosphere")
+if not atmosphere then
+	atmosphere = Instance.new("Atmosphere")
+	atmosphere.Name = "BlueShaderAtmosphere"
+	atmosphere.Parent = Lighting
 end
 
-local CC = Lighting:FindFirstChild("ChrisShader_CC")
-if not CC then
-	CC = Instance.new("ColorCorrectionEffect")
-	CC.Name = "ChrisShader_CC"
-	CC.Parent = Lighting
+local bloom = Lighting:FindFirstChild("BlueShaderBloom")
+if not bloom then
+	bloom = Instance.new("BloomEffect")
+	bloom.Name = "BlueShaderBloom"
+	bloom.Parent = Lighting
 end
 
-local Bloom = Lighting:FindFirstChild("ChrisShader_Bloom")
-if not Bloom then
-	Bloom = Instance.new("BloomEffect")
-	Bloom.Name = "ChrisShader_Bloom"
-	Bloom.Parent = Lighting
+local color = Lighting:FindFirstChild("BlueShaderColor")
+if not color then
+	color = Instance.new("ColorCorrectionEffect")
+	color.Name = "BlueShaderColor"
+	color.Parent = Lighting
 end
 
-local SunRays = Lighting:FindFirstChild("ChrisShader_SunRays")
-if not SunRays then
-	SunRays = Instance.new("SunRaysEffect")
-	SunRays.Name = "ChrisShader_SunRays"
-	SunRays.Parent = Lighting
+local sunRays = Lighting:FindFirstChild("BlueShaderSunRays")
+if not sunRays then
+	sunRays = Instance.new("SunRaysEffect")
+	sunRays.Name = "BlueShaderSunRays"
+	sunRays.Parent = Lighting
 end
 
-local Atmosphere = Lighting:FindFirstChild("ChrisShader_Atmosphere")
-if not Atmosphere then
-	Atmosphere = Instance.new("Atmosphere")
-	Atmosphere.Name = "ChrisShader_Atmosphere"
-	Atmosphere.Parent = Lighting
+local clouds = workspace.Terrain:FindFirstChild("BlueShaderClouds")
+
+if not clouds then
+	clouds = Instance.new("Clouds")
+	clouds.Name = "BlueShaderClouds"
+	clouds.Parent = workspace.Terrain
 end
 
-local EffectFolder = workspace:FindFirstChild("ChrisShaderEffects")
-if EffectFolder then
-	EffectFolder:Destroy()
-end
+--------------------------------------------------
+-- LIGHTING
+--------------------------------------------------
 
-EffectFolder = Instance.new("Folder")
-EffectFolder.Name = "ChrisShaderEffects"
-EffectFolder.Parent = workspace
+local function updateLighting()
 
-local VerifiedWarmSky = {
-	Bk = "rbxassetid://162001887",
-	Dn = "rbxassetid://161998893",
-	Ft = "rbxassetid://162001897",
-	Lf = "rbxassetid://162001904",
-	Rt = "rbxassetid://162001919",
-	Up = "rbxassetid://162001926"
-}
-
-local Presets = {
-	{
-		Name = "Morning",
-		Icon = "🌅",
-		Clock = 7,
-		Brightness = 2.2,
-		Exposure = 0.1,
-		Ambient = Color3.fromRGB(145,130,120),
-		Outdoor = Color3.fromRGB(170,155,140),
-		FogStart = 100,
-		FogEnd = 8000,
-		FogColor = Color3.fromRGB(205,190,175),
-		CCBrightness = 0.04,
-		Contrast = 0.05,
-		Saturation = 0.05,
-		Tint = Color3.fromRGB(255,235,215),
-		Bloom = 0.12,
-		Sun = 0.08,
-		Density = 0.08,
-		Haze = 0.1,
-		Sky = true
-	},
-	{
-		Name = "Day",
-		Icon = "☀️",
-		Clock = 13,
-		Brightness = 2.5,
-		Exposure = 0.1,
-		Ambient = Color3.fromRGB(150,150,150),
-		Outdoor = Color3.fromRGB(185,185,185),
-		FogStart = 100,
-		FogEnd = 10000,
-		FogColor = Color3.fromRGB(200,215,235),
-		CCBrightness = 0.02,
-		Contrast = 0.04,
-		Saturation = 0.03,
-		Tint = Color3.fromRGB(255,255,255),
-		Bloom = 0.08,
-		Sun = 0.12,
-		Density = 0.04,
-		Haze = 0.05
-	},
-	{
-		Name = "Cloudy Day",
-		Icon = "🌤️",
-		Clock = 12,
-		Brightness = 2,
-		Exposure = 0,
-		Ambient = Color3.fromRGB(145,150,160),
-		Outdoor = Color3.fromRGB(160,165,175),
-		FogStart = 80,
-		FogEnd = 7500,
-		FogColor = Color3.fromRGB(175,185,200),
-		CCBrightness = 0,
-		Contrast = -0.02,
-		Saturation = -0.05,
-		Tint = Color3.fromRGB(225,230,240),
-		Bloom = 0.05,
-		Sun = 0.02,
-		Density = 0.12,
-		Haze = 0.18
-	},
-	{
-		Name = "Sunset",
-		Icon = "🌇",
-		Clock = 18,
-		Brightness = 1.8,
-		Exposure = 0.05,
-		Ambient = Color3.fromRGB(155,105,90),
-		Outdoor = Color3.fromRGB(190,125,95),
-		FogStart = 100,
-		FogEnd = 7000,
-		FogColor = Color3.fromRGB(210,150,125),
-		CCBrightness = 0.02,
-		Contrast = 0.08,
-		Saturation = 0.08,
-		Tint = Color3.fromRGB(255,210,180),
-		Bloom = 0.16,
-		Sun = 0.2,
-		Density = 0.08,
-		Haze = 0.12,
-		Sky = true
-	},
-	{
-		Name = "Golden Hour",
-		Icon = "🌆",
-		Clock = 17.3,
-		Brightness = 1.9,
-		Exposure = 0.08,
-		Ambient = Color3.fromRGB(170,125,90),
-		Outdoor = Color3.fromRGB(200,145,100),
-		FogStart = 100,
-		FogEnd = 7500,
-		FogColor = Color3.fromRGB(225,170,125),
-		CCBrightness = 0.03,
-		Contrast = 0.1,
-		Saturation = 0.12,
-		Tint = Color3.fromRGB(255,220,185),
-		Bloom = 0.2,
-		Sun = 0.25,
-		Density = 0.06,
-		Haze = 0.1,
-		Sky = true
-	},
-	{
-		Name = "Night",
-		Icon = "🌙",
-		Clock = 22,
-		Brightness = 1.4,
-		Exposure = 0,
-		Ambient = Color3.fromRGB(75,85,120),
-		Outdoor = Color3.fromRGB(95,105,145),
-		FogStart = 150,
-		FogEnd = 7000,
-		FogColor = Color3.fromRGB(55,65,95),
-		CCBrightness = 0,
-		Contrast = 0.08,
-		Saturation = 0,
-		Tint = Color3.fromRGB(190,205,255),
-		Bloom = 0.08,
-		Sun = 0,
-		Density = 0.09,
-		Haze = 0.2
-	},
-	{
-		Name = "Midnight",
-		Icon = "🌌",
-		Clock = 0,
-		Brightness = 1.15,
-		Exposure = -0.05,
-		Ambient = Color3.fromRGB(65,75,110),
-		Outdoor = Color3.fromRGB(80,90,130),
-		FogStart = 100,
-		FogEnd = 6000,
-		FogColor = Color3.fromRGB(45,55,85),
-		CCBrightness = 0,
-		Contrast = 0.1,
-		Saturation = 0,
-		Tint = Color3.fromRGB(175,195,255),
-		Bloom = 0.08,
-		Sun = 0,
-		Density = 0.12,
-		Haze = 0.25
-	},
-	{
-		Name = "Moonlight",
-		Icon = "🌃",
-		Clock = 23,
-		Brightness = 1.25,
-		Exposure = 0,
-		Ambient = Color3.fromRGB(70,80,120),
-		Outdoor = Color3.fromRGB(90,100,145),
-		FogStart = 100,
-		FogEnd = 7000,
-		FogColor = Color3.fromRGB(50,60,95),
-		CCBrightness = 0.02,
-		Contrast = 0.1,
-		Saturation = 0.03,
-		Tint = Color3.fromRGB(185,205,255),
-		Bloom = 0.1,
-		Sun = 0,
-		Density = 0.08,
-		Haze = 0.18
-	},
-	{
-		Name = "Rainy",
-		Icon = "🌧️",
-		Clock = 15,
-		Brightness = 1.7,
-		Exposure = -0.02,
-		Ambient = Color3.fromRGB(105,115,130),
-		Outdoor = Color3.fromRGB(125,135,150),
-		FogStart = 50,
-		FogEnd = 4500,
-		FogColor = Color3.fromRGB(115,130,150),
-		CCBrightness = -0.01,
-		Contrast = 0.06,
-		Saturation = -0.08,
-		Tint = Color3.fromRGB(205,220,240),
-		Bloom = 0.05,
-		Sun = 0,
-		Density = 0.18,
-		Haze = 0.3
-	},
-	{
-		Name = "Foggy",
-		Icon = "🌫️",
-		Clock = 11,
-		Brightness = 1.8,
-		Exposure = 0,
-		Ambient = Color3.fromRGB(145,150,155),
-		Outdoor = Color3.fromRGB(160,165,170),
-		FogStart = 10,
-		FogEnd = 900,
-		FogColor = Color3.fromRGB(190,195,200),
-		CCBrightness = 0,
-		Contrast = -0.05,
-		Saturation = -0.08,
-		Tint = Color3.fromRGB(230,235,240),
-		Bloom = 0.04,
-		Sun = 0,
-		Density = 0.42,
-		Haze = 0.65
-	},
-	{
-		Name = "Winter",
-		Icon = "❄️",
-		Clock = 12,
-		Brightness = 2.1,
-		Exposure = 0.05,
-		Ambient = Color3.fromRGB(165,180,205),
-		Outdoor = Color3.fromRGB(185,200,225),
-		FogStart = 80,
-		FogEnd = 6500,
-		FogColor = Color3.fromRGB(190,210,235),
-		CCBrightness = 0.02,
-		Contrast = 0.04,
-		Saturation = -0.05,
-		Tint = Color3.fromRGB(215,230,255),
-		Bloom = 0.1,
-		Sun = 0.05,
-		Density = 0.12,
-		Haze = 0.2
-	},
-	{
-		Name = "Forest",
-		Icon = "🌲",
-		Clock = 14,
-		Brightness = 1.9,
-		Exposure = 0,
-		Ambient = Color3.fromRGB(90,125,95),
-		Outdoor = Color3.fromRGB(110,145,110),
-		FogStart = 100,
-		FogEnd = 5000,
-		FogColor = Color3.fromRGB(100,135,105),
-		CCBrightness = 0,
-		Contrast = 0.08,
-		Saturation = 0.08,
-		Tint = Color3.fromRGB(205,235,205),
-		Bloom = 0.07,
-		Sun = 0.06,
-		Density = 0.1,
-		Haze = 0.2
-	},
-	{
-		Name = "Ocean",
-		Icon = "🌊",
-		Clock = 14,
-		Brightness = 2,
-		Exposure = 0.03,
-		Ambient = Color3.fromRGB(85,125,150),
-		Outdoor = Color3.fromRGB(105,155,180),
-		FogStart = 100,
-		FogEnd = 7000,
-		FogColor = Color3.fromRGB(95,165,190),
-		CCBrightness = 0.02,
-		Contrast = 0.06,
-		Saturation = 0.12,
-		Tint = Color3.fromRGB(195,235,255),
-		Bloom = 0.1,
-		Sun = 0.1,
-		Density = 0.08,
-		Haze = 0.14
-	},
-	{
-		Name = "Cinematic",
-		Icon = "🎬",
-		Clock = 16,
-		Brightness = 1.8,
-		Exposure = 0,
-		Ambient = Color3.fromRGB(120,125,135),
-		Outdoor = Color3.fromRGB(145,150,160),
-		FogStart = 150,
-		FogEnd = 8000,
-		FogColor = Color3.fromRGB(145,150,165),
-		CCBrightness = 0,
-		Contrast = 0.18,
-		Saturation = -0.03,
-		Tint = Color3.fromRGB(230,225,215),
-		Bloom = 0.12,
-		Sun = 0.1,
-		Density = 0.06,
-		Haze = 0.12
-	},
-	{
-		Name = "Ultra Realistic",
-		Icon = "✨",
-		Clock = 13,
-		Brightness = 2.2,
-		Exposure = 0.05,
-		Ambient = Color3.fromRGB(135,140,145),
-		Outdoor = Color3.fromRGB(175,180,185),
-		FogStart = 120,
-		FogEnd = 9000,
-		FogColor = Color3.fromRGB(195,205,215),
-		CCBrightness = 0.02,
-		Contrast = 0.12,
-		Saturation = 0.04,
-		Tint = Color3.fromRGB(245,245,240),
-		Bloom = 0.1,
-		Sun = 0.12,
-		Density = 0.05,
-		Haze = 0.08
-	},
-	{
-		Name = "Vibrant",
-		Icon = "🌈",
-		Clock = 13,
-		Brightness = 2.3,
-		Exposure = 0.08,
-		Ambient = Color3.fromRGB(145,150,150),
-		Outdoor = Color3.fromRGB(180,185,180),
-		FogStart = 100,
-		FogEnd = 10000,
-		FogColor = Color3.fromRGB(190,210,225),
-		CCBrightness = 0.04,
-		Contrast = 0.1,
-		Saturation = 0.25,
-		Tint = Color3.fromRGB(255,255,255),
-		Bloom = 0.1,
-		Sun = 0.12,
-		Density = 0.04,
-		Haze = 0.06
-	}
-}
-
-local selectedIndex = nil
-local lastClick = 0
-local WeatherParts = {}
-local WeatherConnection
-local WetOriginal = {}
-local WetEnabled = false
-local WetConnection
-
-local function ClearWeather()
-	if WeatherConnection then
-		WeatherConnection:Disconnect()
-		WeatherConnection = nil
-	end
-
-	for _, p in ipairs(WeatherParts) do
-		if p and p.Parent then
-			p:Destroy()
-		end
-	end
-
-	table.clear(WeatherParts)
-end
-
-local function CreateRain()
-	ClearWeather()
-
-	for i = 1, 40 do
-		local p = Instance.new("Part")
-		p.Name = "RainDrop"
-		p.Anchored = true
-		p.CanCollide = false
-		p.CanTouch = false
-		p.CanQuery = false
-		p.CastShadow = false
-		p.Material = Enum.Material.Neon
-		p.Color = Color3.fromRGB(190,210,255)
-		p.Transparency = 0.4
-		p.Size = Vector3.new(0.035,2.2,0.035)
-		p.Parent = EffectFolder
-		table.insert(WeatherParts,p)
-	end
-
-	WeatherConnection = RunService.RenderStepped:Connect(function(dt)
-		local character = Player.Character
-		local root = character and character:FindFirstChild("HumanoidRootPart")
-
-		if not root then
-			return
-		end
-
-		for _, p in ipairs(WeatherParts) do
-			if p.Parent then
-				if p.Position.Y < root.Position.Y - 5 then
-					p.Position = root.Position + Vector3.new(
-						math.random(-30,30),
-						math.random(20,35),
-						math.random(-30,30)
-					)
-				else
-					p.CFrame = p.CFrame + Vector3.new(0,-55 * dt,0)
-				end
-			end
-		end
-	end)
-end
-
-local function CreateSnow()
-	ClearWeather()
-
-	for i = 1, 30 do
-		local p = Instance.new("Part")
-		p.Name = "Snow"
-		p.Shape = Enum.PartType.Ball
-		p.Anchored = true
-		p.CanCollide = false
-		p.CanTouch = false
-		p.CanQuery = false
-		p.CastShadow = false
-		p.Material = Enum.Material.Neon
-		p.Color = Color3.fromRGB(245,250,255)
-		p.Transparency = 0.15
-
-		local s = math.random(2,4) / 10
-		p.Size = Vector3.new(s,s,s)
-		p.Parent = EffectFolder
-
-		table.insert(WeatherParts,p)
-	end
-
-	WeatherConnection = RunService.RenderStepped:Connect(function(dt)
-		local character = Player.Character
-		local root = character and character:FindFirstChild("HumanoidRootPart")
-
-		if not root then
-			return
-		end
-
-		for _, p in ipairs(WeatherParts) do
-			if p.Parent then
-				if p.Position.Y < root.Position.Y - 5 then
-					p.Position = root.Position + Vector3.new(
-						math.random(-30,30),
-						math.random(18,32),
-						math.random(-30,30)
-					)
-				else
-					p.CFrame = p.CFrame + Vector3.new(
-						math.sin(os.clock() + p.Position.X) * dt,
-						-7 * dt,
-						math.cos(os.clock() + p.Position.Z) * dt
-					)
-				end
-			end
-		end
-	end)
-end
-
-local function RestoreWet()
-	for part,data in pairs(WetOriginal) do
-		if part and part.Parent then
-			part.Reflectance = data.Reflectance
-		end
-	end
-
-	table.clear(WetOriginal)
-end
-
-local function StopWet()
-	WetEnabled = false
-
-	if WetConnection then
-		WetConnection:Disconnect()
-		WetConnection = nil
-	end
-
-	RestoreWet()
-end
-
-local function StartWet()
-	StopWet()
-	WetEnabled = true
-
-	local timer = 0
-
-	WetConnection = RunService.Heartbeat:Connect(function(dt)
-		timer += dt
-
-		if timer < 1.5 then
-			return
-		end
-
-		timer = 0
-
-		local character = Player.Character
-		local root = character and character:FindFirstChild("HumanoidRootPart")
-
-		if not root then
-			return
-		end
-
-		local checked = 0
-
-		for _, obj in ipairs(workspace:GetDescendants()) do
-			if checked >= 250 then
-				break
-			end
-
-			if obj:IsA("BasePart")
-				and obj.Transparency < 0.95
-				and not obj:IsDescendantOf(EffectFolder) then
-
-				local distance = (obj.Position - root.Position).Magnitude
-
-				if distance <= 50 then
-					if not WetOriginal[obj] then
-						WetOriginal[obj] = {
-							Reflectance = obj.Reflectance
-						}
-					end
-
-					obj.Reflectance = math.max(
-						WetOriginal[obj].Reflectance,
-						0.07
-					)
-
-					checked += 1
-				end
-			end
-		end
-	end)
-end
-
-local function RemoveSkies()
-	for _, object in ipairs(Lighting:GetChildren()) do
-		if object:IsA("Sky") then
-			object:Destroy()
-		end
-	end
-end
-
-local function RestoreOriginalSky()
-	RemoveSkies()
-
-	for _, sky in ipairs(OriginalSkies) do
-		sky:Clone().Parent = Lighting
-	end
-end
-
-local function ApplyWarmSky()
-	RemoveSkies()
-
-	local sky = Instance.new("Sky")
-	sky.Name = "ChrisShaderSky"
-
-	sky.SkyboxBk = VerifiedWarmSky.Bk
-	sky.SkyboxDn = VerifiedWarmSky.Dn
-	sky.SkyboxFt = VerifiedWarmSky.Ft
-	sky.SkyboxLf = VerifiedWarmSky.Lf
-	sky.SkyboxRt = VerifiedWarmSky.Rt
-	sky.SkyboxUp = VerifiedWarmSky.Up
-
-	sky.Parent = Lighting
-end
-
-local function RestoreNormal()
-	ClearWeather()
-	StopWet()
-	RestoreOriginalSky()
-
-	Lighting.Brightness = Original.Brightness
-	Lighting.ClockTime = Original.ClockTime
-	Lighting.FogStart = Original.FogStart
-	Lighting.FogEnd = Original.FogEnd
-	Lighting.FogColor = Original.FogColor
-	Lighting.Ambient = Original.Ambient
-	Lighting.OutdoorAmbient = Original.OutdoorAmbient
-	Lighting.ExposureCompensation = Original.ExposureCompensation
-	Lighting.ColorShift_Top = Original.ColorShift_Top
-	Lighting.ColorShift_Bottom = Original.ColorShift_Bottom
-	Lighting.EnvironmentDiffuseScale = Original.EnvironmentDiffuseScale
-	Lighting.EnvironmentSpecularScale = Original.EnvironmentSpecularScale
-	Lighting.GeographicLatitude = Original.GeographicLatitude
-
-	CC.Enabled = false
-	Bloom.Enabled = false
-	SunRays.Enabled = false
-	Atmosphere.Enabled = false
-end
-
-local function ApplyPreset(index)
-	local preset = Presets[index]
-
-	if not preset then
+	if not CONFIG.Enabled then
 		return
 	end
 
-	ClearWeather()
-	StopWet()
+	local night =
+		Lighting.ClockTime < 6
+		or Lighting.ClockTime >= 18
 
-	Lighting.Brightness = preset.Brightness
-	Lighting.ClockTime = preset.Clock
-	Lighting.FogStart = preset.FogStart
-	Lighting.FogEnd = preset.FogEnd
-	Lighting.FogColor = preset.FogColor
-	Lighting.Ambient = preset.Ambient
-	Lighting.OutdoorAmbient = preset.Outdoor
-	Lighting.ExposureCompensation = preset.Exposure
+	if CONFIG.Rain then
+		atmosphere.Density = 0.34
+		atmosphere.Haze = 2
+		atmosphere.Glare = 0.08
 
-	CC.Enabled = true
-	CC.Brightness = preset.CCBrightness
-	CC.Contrast = preset.Contrast
-	CC.Saturation = preset.Saturation
-	CC.TintColor = preset.Tint
-
-	Bloom.Enabled = true
-	Bloom.Intensity = preset.Bloom
-	Bloom.Size = 24
-	Bloom.Threshold = 1.1
-
-	SunRays.Enabled = true
-	SunRays.Intensity = preset.Sun
-	SunRays.Spread = 0.8
-
-	Atmosphere.Enabled = true
-	Atmosphere.Density = preset.Density
-	Atmosphere.Haze = preset.Haze
-	Atmosphere.Glare = 0.05
-	Atmosphere.Offset = 0
-
-	if preset.Sky then
-		ApplyWarmSky()
-	else
-		RestoreOriginalSky()
-	end
-
-	if preset.Name == "Rainy" then
-		CreateRain()
-		StartWet()
-	elseif preset.Name == "Winter" then
-		CreateSnow()
-	end
-
-	selectedIndex = index
-end
-
-local function Create(class,parent,properties)
-	local obj = Instance.new(class)
-
-	for property,value in pairs(properties) do
-		obj[property] = value
-	end
-
-	obj.Parent = parent
-	return obj
-end
-
-local ScreenGui = Create("ScreenGui",PlayerGui,{
-	Name = GUI_NAME,
-	ResetOnSpawn = false,
-	IgnoreGuiInset = true,
-	DisplayOrder = 50
-})
-
-local Main = Create("Frame",ScreenGui,{
-	Name = "Main",
-	Size = UDim2.new(0,285,0,410),
-	Position = UDim2.new(0,12,0.5,-205),
-	BackgroundColor3 = Color3.fromRGB(9,16,28),
-	BorderSizePixel = 0,
-	ClipsDescendants = true
-})
-
-Create("UICorner",Main,{
-	CornerRadius = UDim.new(0,14)
-})
-
-Create("UIStroke",Main,{
-	Color = Color3.fromRGB(45,120,210),
-	Thickness = 1.2,
-	Transparency = 0.25
-})
-
-local Header = Create("Frame",Main,{
-	Name = "Header",
-	Size = UDim2.new(1,0,0,58),
-	BackgroundColor3 = Color3.fromRGB(12,28,48),
-	BorderSizePixel = 0
-})
-
-Create("UICorner",Header,{
-	CornerRadius = UDim.new(0,14)
-})
-
-local HeaderCover = Create("Frame",Header,{
-	Size = UDim2.new(1,0,0,15),
-	Position = UDim2.new(0,0,1,-15),
-	BackgroundColor3 = Color3.fromRGB(12,28,48),
-	BorderSizePixel = 0
-})
-
-local Title = Create("TextLabel",Header,{
-	Size = UDim2.new(1,-95,0,25),
-	Position = UDim2.new(0,14,0,8),
-	BackgroundTransparency = 1,
-	Text = "✦ REALISTIC SHADER ✦",
-	TextColor3 = Color3.fromRGB(235,245,255),
-	Font = Enum.Font.GothamBold,
-	TextSize = 14,
-	TextXAlignment = Enum.TextXAlignment.Left
-})
-
-local Subtitle = Create("TextLabel",Header,{
-	Size = UDim2.new(1,-95,0,18),
-	Position = UDim2.new(0,14,0,32),
-	BackgroundTransparency = 1,
-	Text = "Enhance your Roblox world",
-	TextColor3 = Color3.fromRGB(135,165,195),
-	Font = Enum.Font.Gotham,
-	TextSize = 9,
-	TextXAlignment = Enum.TextXAlignment.Left
-})
-
-local SlideButton = Create("TextButton",Header,{
-	Size = UDim2.new(0,28,0,28),
-	Position = UDim2.new(1,-72,0,15),
-	BackgroundColor3 = Color3.fromRGB(20,58,95),
-	Text = "▲",
-	TextColor3 = Color3.fromRGB(225,240,255),
-	Font = Enum.Font.GothamBold,
-	TextSize = 13,
-	AutoButtonColor = false
-})
-
-Create("UICorner",SlideButton,{
-	CornerRadius = UDim.new(0,8)
-})
-
-local CloseButton = Create("TextButton",Header,{
-	Size = UDim2.new(0,28,0,28),
-	Position = UDim2.new(1,-38,0,15),
-	BackgroundColor3 = Color3.fromRGB(55,35,45),
-	Text = "×",
-	TextColor3 = Color3.fromRGB(255,220,225),
-	Font = Enum.Font.GothamBold,
-	TextSize = 17,
-	AutoButtonColor = false
-})
-
-Create("UICorner",CloseButton,{
-	CornerRadius = UDim.new(0,8)
-})
-
-local ShaderLabel = Create("TextLabel",Main,{
-	Size = UDim2.new(1,-28,0,20),
-	Position = UDim2.new(0,14,0,67),
-	BackgroundTransparency = 1,
-	Text = "VISUAL PRESETS",
-	TextColor3 = Color3.fromRGB(110,175,235),
-	Font = Enum.Font.GothamBold,
-	TextSize = 9,
-	TextXAlignment = Enum.TextXAlignment.Left
-})
-
-local List = Create("ScrollingFrame",Main,{
-	Name = "PresetList",
-	Size = UDim2.new(1,-28,0,245),
-	Position = UDim2.new(0,14,0,91),
-	BackgroundTransparency = 1,
-	BorderSizePixel = 0,
-	ScrollBarThickness = 3,
-	ScrollBarImageColor3 = Color3.fromRGB(45,120,210),
-	CanvasSize = UDim2.new(0,0,0,0),
-	AutomaticCanvasSize = Enum.AutomaticSize.Y
-})
-
-Create("UIListLayout",List,{
-	Padding = UDim.new(0,5),
-	SortOrder = Enum.SortOrder.LayoutOrder
-})
-
-Create("UIPadding",List,{
-	PaddingTop = UDim.new(0,2),
-	PaddingBottom = UDim.new(0,2)
-})
-
-local Buttons = {}
-
-for i,preset in ipairs(Presets) do
-	local Card = Create("TextButton",List,{
-		Name = preset.Name,
-		Size = UDim2.new(1,-5,0,36),
-		BackgroundColor3 = Color3.fromRGB(15,27,43),
-		BorderSizePixel = 0,
-		Text = "",
-		AutoButtonColor = false,
-		LayoutOrder = i
-	})
-
-	Create("UICorner",Card,{
-		CornerRadius = UDim.new(0,9)
-	})
-
-	local Stroke = Create("UIStroke",Card,{
-		Color = Color3.fromRGB(40,65,90),
-		Thickness = 1,
-		Transparency = 0.25
-	})
-
-	local Accent = Create("Frame",Card,{
-		Size = UDim2.new(0,3,1,-12),
-		Position = UDim2.new(0,6,0,6),
-		BackgroundColor3 = Color3.fromRGB(45,130,220),
-		BorderSizePixel = 0
-	})
-
-	Create("UICorner",Accent,{
-		CornerRadius = UDim.new(1,0)
-	})
-
-	local Icon = Create("TextLabel",Card,{
-		Size = UDim2.new(0,30,1,0),
-		Position = UDim2.new(0,13,0,0),
-		BackgroundTransparency = 1,
-		Text = preset.Icon,
-		Font = Enum.Font.Gotham,
-		TextSize = 15
-	})
-
-	local Name = Create("TextLabel",Card,{
-		Size = UDim2.new(1,-82,1,0),
-		Position = UDim2.new(0,46,0,0),
-		BackgroundTransparency = 1,
-		Text = preset.Name,
-		TextColor3 = Color3.fromRGB(220,232,245),
-		Font = Enum.Font.GothamMedium,
-		TextSize = 10,
-		TextXAlignment = Enum.TextXAlignment.Left
-	})
-
-	local Check =
-Create("TextLabel",Card,{
-		Size = UDim2.new(0,24,1,0),
-		Position = UDim2.new(1,-31,0,0),
-		BackgroundTransparency = 1,
-		Text = "",
-		TextColor3 = Color3.fromRGB(90,190,255),
-		Font = Enum.Font.GothamBold,
-		TextSize = 13
-	})
-
-	Buttons[i] = {
-		Card = Card,
-		Stroke = Stroke,
-		Accent = Accent,
-		Check = Check
-	}
-
-	Card.MouseButton1Click:Connect(function()
-		local now = os.clock()
-
-		if selectedIndex == i and now - lastClick <= 0.35 then
-			RestoreNormal()
-
-			selectedIndex = nil
-
-			for _,buttonData in pairs(Buttons) do
-				buttonData.Card.BackgroundColor3 = Color3.fromRGB(15,27,43)
-				buttonData.Stroke.Color = Color3.fromRGB(40,65,90)
-				buttonData.Check.Text = ""
-				buttonData.Accent.BackgroundColor3 = Color3.fromRGB(45,130,220)
-			end
-
-			lastClick = 0
-			return
-		end
-
-		lastClick = now
-
-		ApplyPreset(i)
-
-		for number,buttonData in pairs(Buttons) do
-			if number == i then
-				buttonData.Card.BackgroundColor3 = Color3.fromRGB(20,68,112)
-				buttonData.Stroke.Color = Color3.fromRGB(65,165,245)
-				buttonData.Check.Text = "✓"
-				buttonData.Accent.BackgroundColor3 = Color3.fromRGB(80,190,255)
-			else
-				buttonData.Card.BackgroundColor3 = Color3.fromRGB(15,27,43)
-				buttonData.Stroke.Color = Color3.fromRGB(40,65,90)
-				buttonData.Check.Text = ""
-				buttonData.Accent.BackgroundColor3 = Color3.fromRGB(45,130,220)
-			end
-		end
-	end)
-end
-
-local Support = Create("TextLabel",Main,{
-	Size = UDim2.new(1,-28,0,18),
-	Position = UDim2.new(0,14,0,342),
-	BackgroundTransparency = 1,
-	Text = "🔗 Account Support",
-	TextColor3 = Color3.fromRGB(115,170,220),
-	Font = Enum.Font.GothamBold,
-	TextSize = 9,
-	TextXAlignment = Enum.TextXAlignment.Left
-})
-
-local TikTok = Create("TextButton",Main,{
-	Size = UDim2.new(0.48,-7,0,28),
-	Position = UDim2.new(0,14,0,364),
-	BackgroundColor3 = Color3.fromRGB(18,31,48),
-	BorderSizePixel = 0,
-	Text = "TikTok • @lts.chris",
-	TextColor3 = Color3.fromRGB(215,230,245),
-	Font = Enum.Font.GothamMedium,
-	TextSize = 8,
-	AutoButtonColor = false
-})
-
-Create("UICorner",TikTok,{
-	CornerRadius = UDim.new(0,8)
-})
-
-Create("UIStroke",TikTok,{
-	Color = Color3.fromRGB(45,75,105),
-	Thickness = 1
-})
-
-local Discord = Create("TextButton",Main,{
-	Size = UDim2.new(0.48,-7,0,28),
-	Position = UDim2.new(0.52,0,0,364),
-	BackgroundColor3 = Color3.fromRGB(18,31,48),
-	BorderSizePixel = 0,
-	Text = "💬 Discord Server",
-	TextColor3 = Color3.fromRGB(215,230,245),
-	Font = Enum.Font.GothamMedium,
-	TextSize = 8,
-	AutoButtonColor = false
-})
-
-Create("UICorner",Discord,{
-	CornerRadius = UDim.new(0,8)
-})
-
-Create("UIStroke",Discord,{
-	Color = Color3.fromRGB(45,75,105),
-	Thickness = 1
-})
-
-local Credit = Create("TextLabel",Main,{
-	Size = UDim2.new(1,-28,0,14),
-	Position = UDim2.new(0,14,1,-17),
-	BackgroundTransparency = 1,
-	Text = "Credit: Chris",
-	TextColor3 = Color3.fromRGB(80,105,130),
-	Font = Enum.Font.Gotham,
-	TextSize = 7,
-	TextXAlignment = Enum.TextXAlignment.Right
-})
-
-local Reopen = Create("TextButton",ScreenGui,{
-	Name = "Reopen",
-	Size = UDim2.new(0,45,0,45),
-	Position = UDim2.new(0,12,0.5,-22),
-	BackgroundColor3 = Color3.fromRGB(12,28,48),
-	BorderSizePixel = 0,
-	Text = "✦",
-	TextColor3 = Color3.fromRGB(100,190,255),
-	Font = Enum.Font.GothamBold,
-	TextSize = 20,
-	Visible = false,
-	AutoButtonColor = false
-})
-
-Create("UICorner",Reopen,{
-	CornerRadius = UDim.new(0,13)
-})
-
-Create("UIStroke",Reopen,{
-	Color = Color3.fromRGB(45,120,210),
-	Thickness = 1.2
-})
-
-local ExpandedPosition = Main.Position
-local Collapsed = false
-local Closed = false
-
-local function SlidePanel()
-	if Closed then
-		return
-	end
-
-	Collapsed = not Collapsed
-
-	local target
-
-	if Collapsed then
-		target = UDim2.new(
-			ExpandedPosition.X.Scale,
-			ExpandedPosition.X.Offset,
-			ExpandedPosition.Y.Scale,
-			ExpandedPosition.Y.Offset - (Main.AbsoluteSize.Y - 58)
+		color.Contrast = 0.1
+		color.Saturation = -0.04
+		color.TintColor = Color3.fromRGB(
+			215,
+			225,
+			245
 		)
 
-		SlideButton.Text = "▼"
+		bloom.Intensity = 0.2
+		sunRays.Intensity = 0.02
+
+	elseif night and CONFIG.DayNight then
+
+		Lighting.Brightness = 0.8
+		Lighting.Ambient =
+			Color3.fromRGB(55,65,90)
+
+		Lighting.OutdoorAmbient =
+			Color3.fromRGB(45,55,80)
+
+		atmosphere.Density = 0.25
+		atmosphere.Haze = 1.4
+
+		color.TintColor =
+			Color3.fromRGB(205,220,255)
+
+		color.Contrast = 0.08
+		color.Saturation = 0.02
+
+		bloom.Intensity = 0.24
+
 	else
-		target = ExpandedPosition
-		SlideButton.Text = "▲"
+
+		Lighting.Brightness = 2.2
+
+		Lighting.Ambient =
+			Color3.fromRGB(120,120,120)
+
+		Lighting.OutdoorAmbient =
+			Color3.fromRGB(135,135,135)
+
+		atmosphere.Density = 0.2
+		atmosphere.Haze = 1
+
+		color.TintColor =
+			Color3.fromRGB(255,255,255)
+
+		color.Contrast = 0.06
+		color.Saturation = 0.04
+
+		bloom.Intensity = 0.16
 	end
 
-	TweenService:Create(
-		Main,
-		TweenInfo.new(0.35,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),
-		{Position = target}
-	):Play()
+	Lighting.GlobalShadows = true
+	Lighting.ShadowSoftness = 0.25
+
+	pcall(function()
+		Lighting.EnvironmentDiffuseScale = 0.7
+		Lighting.EnvironmentSpecularScale = 0.8
+	end)
 end
 
-SlideButton.MouseButton1Click:Connect(SlidePanel)
+--------------------------------------------------
+-- RAIN
+--------------------------------------------------
 
-CloseButton.MouseButton1Click:Connect(function()
-	Closed = true
+local rainDrops = {}
 
-	TweenService:Create(
-		Main,
-		TweenInfo.new(0.3,Enum.EasingStyle.Quint,Enum.EasingDirection.In),
-		{
-			Position = UDim2.new(
-				ExpandedPosition.X.Scale,
-				ExpandedPosition.X.Offset,
-				ExpandedPosition.Y.Scale,
-				-500
-			)
-		}
-	):Play()
+local function createRain()
 
-	task.delay(0.3,function()
-		Main.Visible = false
-		Reopen.Visible = true
-	end)
-end)
+	local drop = Instance.new("Part")
 
-Reopen.MouseButton1Click:Connect(function()
-	Closed = false
-	Collapsed = false
+	drop.Name = "RainDrop"
+	drop.Anchored = true
+	drop.CanCollide = false
+	drop.CanTouch = false
+	drop.CanQuery = false
 
-	Main.Visible = true
-	Reopen.Visible = false
-	SlideButton.Text = "▲"
-
-	Main.Position = UDim2.new(
-		ExpandedPosition.X.Scale,
-		ExpandedPosition.X.Offset,
-		ExpandedPosition.Y.Scale,
-		-500
+	drop.Material = Enum.Material.Neon
+	drop.Color = Color3.fromRGB(
+		190,
+		220,
+		255
 	)
 
-	TweenService:Create(
-		Main,
-		TweenInfo.new(0.35,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),
-		{Position = ExpandedPosition}
-	):Play()
+	drop.Transparency = 1
+
+	drop.Size = Vector3.new(
+		0.025,
+		math.random(35,65)/100,
+		0.025
+	)
+
+	drop.Parent = rainFolder
+
+	table.insert(rainDrops,drop)
+
+	return drop
+end
+
+for i = 1,CONFIG.RainDrops do
+	createRain()
+end
+
+local function randomRainPosition()
+
+	local pos = camera.CFrame.Position
+
+	return pos + Vector3.new(
+		math.random(
+			-CONFIG.RainDistance,
+			CONFIG.RainDistance
+		),
+		math.random(
+			20,
+			CONFIG.RainHeight
+		),
+		math.random(
+			-CONFIG.RainDistance,
+			CONFIG.RainDistance
+		)
+	)
+end
+
+local function showRain(enabled)
+
+	for _,drop in ipairs(rainDrops) do
+
+		if enabled then
+			drop.Transparency = 0.35
+			drop.Position = randomRainPosition()
+		else
+			drop.Transparency = 1
+		end
+	end
+end
+
+--------------------------------------------------
+-- WET GROUND
+--------------------------------------------------
+
+local rayParams = RaycastParams.new()
+
+rayParams.FilterType =
+	Enum.RaycastFilterType.Exclude
+
+local function setupRaycastFilter()
+
+	local character = player.Character
+
+	local list = {
+		rootFolder
+	}
+
+	if character then
+		table.insert(list,character)
+	end
+
+	rayParams.FilterDescendantsInstances = list
+end
+
+setupRaycastFilter()
+
+player.CharacterAdded:Connect(function()
+
+	task.wait(1)
+
+	setupRaycastFilter()
+
 end)
+
+local function makeWet(part)
+
+	if not CONFIG.WetGround then
+		return
+	end
+
+	if not part:IsA("BasePart") then
+		return
+	end
+
+	if part:IsDescendantOf(rootFolder) then
+		return
+	end
+
+	if part.Transparency >= 0.95 then
+		return
+	end
+
+	if part:IsA("Terrain") then
+		return
+	end
+
+	if not original[part] then
+
+		original[part] = {
+			Reflectance = part.Reflectance,
+			Material = part.Material
+		}
+
+	end
+
+	wetParts[part] = true
+
+	-- Keep the original material.
+	-- Only increase reflectance so the ground
+	-- looks wet instead of changing the whole map.
+
+	part.Reflectance =
+		math.max(
+			part.Reflectance,
+			CONFIG.WetReflectance
+		)
+end
+
+local function restoreWet()
+
+	for part,data in pairs(original) do
+
+		if part and part.Parent then
+
+			part.Reflectance =
+				data.Reflectance
+
+			part.Material =
+				data.Material
+		end
+	end
+
+	table.clear(original)
+	table.clear(wetParts)
+end
+
+local function scanGround()
+
+	if not CONFIG.WetGround then
+		return
+	end
+
+	setupRaycastFilter()
+
+	local center =
+		camera.CFrame.Position
+
+	local amount = 14
+
+	for i = 1,amount do
+
+		local offset = Vector3.new(
+			math.random(
+				-CONFIG.ScanDistance,
+				CONFIG.ScanDistance
+			),
+			0,
+			math.random(
+				-CONFIG.ScanDistance,
+				CONFIG.ScanDistance
+			)
+		)
+
+		local origin =
+			center
+			+ offset
+			+ Vector3.new(0,45,0)
+
+		local result =
+			workspace:Raycast(
+				origin,
+				Vector3.new(0,-100,0),
+				rayParams
+			)
+
+		if result then
+			makeWet(result.Instance)
+		end
+	end
+end
+
+--------------------------------------------------
+-- WEATHER CONTROL
+--------------------------------------------------
+
+local function setRain(enabled)
+
+	CONFIG.Rain = enabled
+
+	-- AUTOMATIC WET GROUND
+	if enabled then
+
+		CONFIG.WetGround = true
+
+		showRain(true)
+
+	else
+
+		CONFIG.WetGround = false
+
+		showRain(false)
+
+		restoreWet()
+	end
+
+	updateLighting()
+end
+
+--------------------------------------------------
+-- CLOUDS
+--------------------------------------------------
+
+local function updateClouds()
+
+	if CONFIG.Clouds then
+
+		clouds.Enabled = true
+		clouds.Cover = CONFIG.Rain and 0.8 or 0.45
+		clouds.Density = CONFIG.Rain and 0.75 or 0.35
+
+	else
+
+		clouds.Enabled = false
+	end
+end
+
+--------------------------------------------------
+-- GUI
+--------------------------------------------------
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "BlueShaderGUI"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local main = Instance.new("Frame")
+main.Name = "Main"
+main.Size = UDim2.fromOffset(300,330)
+main.Position = UDim2.new(0,20,0.5,-165)
+main.BackgroundColor3 =
+	Color3.fromRGB(13,24,45)
+main.BorderSizePixel = 0
+main.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0,14)
+corner.Parent = main
+
+local stroke = Instance.new("UIStroke")
+stroke.Color =
+	Color3.fromRGB(40,140,255)
+stroke.Thickness = 1.5
+stroke.Transparency = 0.15
+stroke.Parent = main
+
+local header = Instance.new("Frame")
+header.Size =
+	UDim2.new(1,0,0,52)
+header.BackgroundColor3 =
+	Color3.fromRGB(18,55,105)
+header.BorderSizePixel = 0
+header.Parent = main
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius =
+	UDim.new(0,14)
+headerCorner.Parent = header
+
+local title = Instance.new("TextLabel")
+title.BackgroundTransparency = 1
+title.Size =
+	UDim2.new(1,-100,1,0)
+title.Position =
+	UDim2.fromOffset(16,0)
+title.Text = "SHADER"
+title.TextColor3 =
+	Color3.fromRGB(235,245,255)
+title.Font =
+	Enum.Font.GothamBold
+title.TextSize = 18
+title.TextXAlignment =
+	Enum.TextXAlignment.Left
+title.Parent = header
+
+local collapse = Instance.new("TextButton")
+collapse.Size =
+	UDim2.fromOffset(42,38)
+collapse.Position =
+	UDim2.new(1,-88,0,7)
+collapse.BackgroundColor3 =
+	Color3.fromRGB(25,85,155)
+collapse.Text = "▲"
+collapse.TextColor3 =
+	Color3.new(1,1,1)
+collapse.Font =
+	Enum.Font.GothamBold
+collapse.TextSize = 18
+collapse.Parent = header
+
+local collapseCorner = Instance.new("UICorner")
+collapseCorner.CornerRadius =
+	UDim.new(0,10)
+collapseCorner.Parent = collapse
+
+local close = Instance.new("TextButton")
+close.Size =
+	UDim2.fromOffset(36,38)
+close.Position =
+	UDim2.new(1,-43,0,7)
+close.BackgroundColor3 =
+	Color3.fromRGB(160,45,65)
+close.Text = "×"
+close.TextColor3 =
+	Color3.new(1,1,1)
+close.Font =
+	Enum.Font.GothamBold
+close.TextSize = 20
+close.Parent = header
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius =
+	UDim.new(0,10)
+closeCorner.Parent = close
+
+--------------------------------------------------
+-- TOGGLE CREATOR
+--------------------------------------------------
+
+local content = Instance.new("Frame")
+content.BackgroundTransparency = 1
+content.Position =
+	UDim2.fromOffset(12,62)
+content.Size =
+	UDim2.new(1,-24,1,-72)
+content.Parent = main
+
+local layout = Instance.new("UIListLayout")
+layout.Padding =
+	UDim.new(0,7)
+layout.SortOrder =
+	Enum.SortOrder.LayoutOrder
+layout.Parent = content
+
+local function makeToggle(text,default,callback)
+
+	local button = Instance.new("TextButton")
+
+	button.Size =
+	UDim2.new(1,0,0,38)
+
+	button.BackgroundColor3 =
+		Color3.fromRGB(22,40,68)
+
+	button.TextColor3 =
+		Color3.fromRGB(225,235,250)
+
+	button.Font =
+		Enum.Font.GothamMedium
+
+	button.TextSize = 14
+
+	button.TextXAlignment =
+		Enum.TextXAlignment.Left
+
+	button.AutoButtonColor = false
+
+	button.Text =
+		"  "..text.."   "..(
+			default and "ON" or "OFF"
+		)
+
+	button.Parent = content
+
+	local c = Instance.new("UICorner")
+	c.CornerRadius =
+		UDim.new(0,9)
+	c.Parent = button
+
+	local enabled = default
+
+	local function refresh()
+
+		button.Text =
+			"  "..text.."   "..(
+				enabled and "ON" or "OFF"
+			)
+
+		if enabled then
+			button.BackgroundColor3 =
+				Color3.fromRGB(25,100,190)
+		else
+			button.BackgroundColor3 =
+				Color3.fromRGB(22,40,68)
+		end
+	end
+
+	button.MouseButton1Click:Connect(function()
+
+		enabled = not enabled
+
+		refresh()
+
+		callback(enabled)
+
+	end)
+
+	refresh()
+
+	return button
+end
+
+makeToggle(
+	"Shader",
+	true,
+	function(v)
+
+		CONFIG.Enabled = v
+
+		if not v then
+			restoreWet()
+		end
+
+		updateLighting()
+	end
+)
+
+makeToggle(
+	"Rain",
+	false,
+	function(v)
+
+		setRain(v)
+
+		updateClouds()
+	end
+)
+
+makeToggle(
+	"Day / Night",
+	true,
+	function(v)
+
+		CONFIG.DayNight = v
+
+		updateLighting()
+	end
+)
+
+makeToggle(
+	"Clouds",
+	true,
+	function(v)
+
+		CONFIG.Clouds = v
+
+		updateClouds()
+	end
+)
+
+--------------------------------------------------
+-- DRAGGING
+--------------------------------------------------
 
 local dragging = false
 local dragStart
 local startPosition
 
-Header.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-		or input.UserInputType == Enum.UserInputType.Touch then
+local function updateDrag(input)
 
-		if input.Position.X > Header.AbsolutePosition.X + Header.AbsoluteSize.X - 105 then
-			return
-		end
+	local delta =
+		input.Position - dragStart
 
-		if Collapsed or Closed then
-			return
-		end
-
-		dragging = true
-		dragStart = input.Position
-		startPosition = Main.Position
-
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-				ExpandedPosition = Main.Position
-			end
-		end)
-	end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-	if not dragging then
-		return
-	end
-
-	if input.UserInputType == Enum.UserInputType.MouseMovement
-		or input.UserInputType == Enum.UserInputType.Touch then
-
-		local delta = input.Position - dragStart
-
-		Main.Position = UDim2.new(
+	main.Position =
+		UDim2.new(
 			startPosition.X.Scale,
 			startPosition.X.Offset + delta.X,
 			startPosition.Y.Scale,
 			startPosition.Y.Offset + delta.Y
 		)
-	end
-end)
+end
 
-TikTok.MouseButton1Click:Connect(function()
-	if setclipboard then
-		pcall(function()
-			setclipboard(TIKTOK)
+header.InputBegan:Connect(function(input)
+
+	if input.UserInputType ==
+		Enum.UserInputType.MouseButton1
+		or
+		input.UserInputType ==
+		Enum.UserInputType.Touch then
+
+		dragging = true
+
+		dragStart =
+			input.Position
+
+		startPosition =
+			main.Position
+
+		input.Changed:Connect(function()
+
+			if input.UserInputState ==
+				Enum.UserInputState.End then
+
+				dragging = false
+			end
 		end)
 	end
 end)
 
-Discord.MouseButton1Click:Connect(function()
-	if setclipboard then
-		pcall(function()
-			setclipboard(DISCORD)
-		end)
+header.InputChanged:Connect(function(input)
+
+	if input.UserInputType ==
+		Enum.UserInputType.MouseMovement
+		or
+		input.UserInputType ==
+		Enum.UserInputType.Touch then
+
+		dragInput = input
 	end
 end)
 
-RestoreNormal()
+local dragInput
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+
+	if input == dragInput and dragging then
+		updateDrag(input)
+	end
+end)
+
+--------------------------------------------------
+-- SLIDE UP / DOWN
+--------------------------------------------------
+
+local expanded = true
+
+local expandedSize =
+	UDim2.fromOffset(300,330)
+
+local collapsedSize =
+	UDim2.fromOffset(300,52)
+
+local function slide()
+
+	expanded = not expanded
+
+	if expanded then
+
+		collapse.Text = "▲"
+
+		TweenService:Create(
+			main,
+			TweenInfo.new(
+				0.3,
+				Enum.EasingStyle.Quint,
+				Enum.EasingDirection.Out
+			),
+			{
+				Size = expandedSize
+			}
+		):Play()
+
+	else
+
+		collapse.Text = "▼"
+
+		TweenService:Create(
+			main,
+			TweenInfo.new(
+				0.3,
+				Enum.EasingStyle.Quint,
+				Enum.EasingDirection.Out
+			),
+			{
+				Size = collapsedSize
+			}
+		):Play()
+	end
+end
+
+collapse.MouseButton1Click:Connect(slide)
+
+--------------------------------------------------
+-- CLOSE
+--------------------------------------------------
+
+close.MouseButton1Click:Connect(function()
+
+	restoreWet()
+
+	rootFolder:Destroy()
+	gui:Destroy()
+
+end)
+
+--------------------------------------------------
+-- UPDATE LOOP
+--------------------------------------------------
+
+local timer = 0
+
+RunService.RenderStepped:Connect(function(dt)
+
+	if not CONFIG.Enabled then
+		return
+	end
+
+	if CONFIG.Rain then
+
+		for _,drop in ipairs(rainDrops) do
+
+			if drop.Transparency < 1 then
+
+				drop.Position -= Vector3.new(
+					0,
+					CONFIG.RainSpeed * dt,
+					0
+				)
+
+				if drop.Position.Y <
+					camera.CFrame.Position.Y - 10 then
+
+					drop.Position =
+						randomRainPosition()
+				end
+			end
+		end
+	end
+
+	timer += dt
+
+	if timer >= CONFIG.ScanRate then
+
+		timer = 0
+
+		if CONFIG.Rain then
+			scanGround()
+		end
+
+		updateLighting()
+	end
+end)
+
+--------------------------------------------------
+-- START
+--------------------------------------------------
+
+updateLighting()
+updateClouds()
+showRain(false)
+
+print("Blue Realistic Shader loaded")
