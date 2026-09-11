@@ -633,6 +633,40 @@ welcome.Position = UDim2.fromOffset(40, 19)
 welcome.Size = UDim2.new(1, -40, 0, 15)
 welcome.Font = Enum.Font.Gotham
 welcome.Text = "Welcome to the script!"
+welcome.TextSize = 8
+welcome.TextColor3 = GRAY
+welcome.TextXAlignment = Enum.TextXAlignment.Left
+welcome.Parent = profile
+
+local thanks = Instance.new("TextLabel")
+thanks.BackgroundTransparency = 1
+thanks.Position = UDim2.fromOffset(40, 34)
+thanks.Size = UDim2.new(1, -40, 0, 15)
+thanks.Font = Enum.Font.Gotham
+thanks.Text = "Thank you for using it ❤️"
+thanks.TextSize = 8
+thanks.TextColor3 = GRAY
+thanks.TextXAlignment = Enum.TextXAlignment.Left
+thanks.Parent = profile
+
+local username = Instance.new("TextLabel")
+username.BackgroundTransparency = 1
+username.Position = UDim2.fromOffset(40, 0)
+username.Size = UDim2.new(1, -40, 0, 18)
+username.Font = Enum.Font.GothamBold
+username.Text = LocalPlayer.DisplayName
+username.TextSize = 10
+username.TextColor3 = WHITE
+username.TextXAlignment = Enum.TextXAlignment.Left
+username.TextTruncate = Enum.TextTruncate.AtEnd
+username.Parent = profile
+
+local welcome = Instance.new("TextLabel")
+welcome.BackgroundTransparency = 1
+welcome.Position = UDim2.fromOffset(40, 19)
+welcome.Size = UDim2.new(1, -40, 0, 15)
+welcome.Font = Enum.Font.Gotham
+welcome.Text = "Welcome to the script!"
 
 local title = Instance.new("TextLabel")
 title.BackgroundTransparency = 1
@@ -733,42 +767,9 @@ local ok, avatarUrl = pcall(function()
 end)
 
 if ok then
-    avatar.Image = avatarUrl
-end
 
-local username = Instance.new("TextLabel")
-username.BackgroundTransparency = 1
-username.Position = UDim2.fromOffset(40, 0)
-username.Size = UDim2.new(1, -40, 0, 18)
-username.Font = Enum.Font.GothamBold
-username.Text = LocalPlayer.DisplayName
-username.TextSize = 10
-username.TextColor3 = WHITE
-username.TextXAlignment = Enum.TextXAlignment.Left
-username.TextTruncate = Enum.TextTruncate.AtEnd
-username.Parent = profile
 
-local welcome = Instance.new("TextLabel")
-welcome.BackgroundTransparency = 1
-welcome.Position = UDim2.fromOffset(40, 19)
-welcome.Size = UDim2.new(1, -40, 0, 15)
-welcome.Font = Enum.Font.Gotham
-welcome.Text = "Welcome to the script!"
-welcome.TextSize = 8
-welcome.TextColor3 = GRAY
-welcome.TextXAlignment = Enum.TextXAlignment.Left
-welcome.Parent = profile
 
-local thanks = Instance.new("TextLabel")
-thanks.BackgroundTransparency = 1
-thanks.Position = UDim2.fromOffset(40, 34)
-thanks.Size = UDim2.new(1, -40, 0, 15)
-thanks.Font = Enum.Font.Gotham
-thanks.Text = "Thank you for using it ❤️"
-thanks.TextSize = 8
-thanks.TextColor3 = GRAY
-thanks.TextXAlignment = Enum.TextXAlignment.Left
-thanks.Parent = profile
 
     local status = Instance.new("TextLabel")
     status.BackgroundTransparency = 1
