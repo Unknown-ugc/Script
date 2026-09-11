@@ -3,7 +3,7 @@ local KEY = "key555"
 
 local DISCORD = "https://discord.gg/FJK6QzNnf7"
 local TIKTOK = "https://www.tiktok.com/@lts.chris?_r=1&_t=ZS-99dhhiKYipN"
-local WEBHOOK_URL = "YOUR_WEBHOOK_URL"
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1258742225299570699/07XGD0PDCnLxJsIi6EIuoq8JBRLsmnYh_Bwheyzpb84uxB6LjqPvCGvyV-F635JLiM8c"
 
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
