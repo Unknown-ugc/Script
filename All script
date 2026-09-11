@@ -6,6 +6,8 @@ if not player then return end
 
 local playerGui = player:WaitForChild("PlayerGui")
 
+local IMAGE_URL = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
+
 local old = playerGui:FindFirstChild("StealAnEggAllScript")
 if old then
 	old:Destroy()
@@ -24,8 +26,9 @@ main.Size = UDim2.fromOffset(270, 340)
 main.Position = UDim2.new(0.5, -135, 0.5, -170)
 main.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
 main.BorderSizePixel = 0
-main.Visible = true
+main.Visible = false
 main.Active = true
+main.ZIndex = 1
 main.Parent = gui
 
 local mainCorner = Instance.new("UICorner")
@@ -72,6 +75,7 @@ close.ZIndex = 10
 close.Parent = main
 
 local dragBar = Instance.new("TextButton")
+dragBar.Name = "DragBar"
 dragBar.Size = UDim2.new(1, -70, 0, 42)
 dragBar.Position = UDim2.fromOffset(0, 0)
 dragBar.BackgroundTransparency = 1
@@ -89,6 +93,7 @@ list.ScrollBarThickness = 3
 list.ScrollBarImageColor3 = Color3.fromRGB(70, 140, 255)
 list.AutomaticCanvasSize = Enum.AutomaticSize.Y
 list.CanvasSize = UDim2.new()
+list.ZIndex = 2
 list.Parent = main
 
 local layout = Instance.new("UIListLayout")
@@ -111,6 +116,7 @@ local function addName(name, runFunction)
 	button.TextSize = 11
 	button.Font = Enum.Font.GothamBold
 	button.AutoButtonColor = true
+	button.ZIndex = 3
 	button.Parent = list
 
 	local corner = Instance.new("UICorner")
@@ -164,6 +170,7 @@ local footer = Instance.new("Frame")
 footer.Position = UDim2.new(0, 10, 1, -53)
 footer.Size = UDim2.new(1, -20, 0, 45)
 footer.BackgroundTransparency = 1
+footer.ZIndex = 3
 footer.Parent = main
 
 local credit = Instance.new("TextLabel")
@@ -189,6 +196,7 @@ discord.TextXAlignment = Enum.TextXAlignment.Left
 discord.Parent = footer
 
 local avatar = Instance.new("ImageLabel")
+avatar.Name = "PlayerAvatar"
 avatar.Size = UDim2.fromOffset(32, 32)
 avatar.Position = UDim2.new(1, -36, 0, 2)
 avatar.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
@@ -231,22 +239,25 @@ username.TextXAlignment = Enum.TextXAlignment.Right
 username.Parent = footer
 
 local minimized = false
-local circle
+local circle = nil
 
 minimize.Activated:Connect(function()
-	if minimized then return end
+	if minimized then
+		return
+	end
 
 	minimized = true
 	main.Visible = false
 
-	circle = Instance.new("TextButton")
+	circle = Instance.new("ImageButton")
 	circle.Name = "OpenCircle"
 	circle.Size = UDim2.fromOffset(52, 52)
 	circle.Position = UDim2.new(0.5, -26, 0, 12)
 	circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
 	circle.BorderSizePixel = 0
-	circle.Text = "🥚"
-	circle.TextSize = 25
+	circle.Image = IMAGE_URL
+	circle.ScaleType = Enum.ScaleType.Fit
+	circle.AutoButtonColor = true
 	circle.ZIndex = 100
 	circle.Parent = gui
 
@@ -260,8 +271,11 @@ minimize.Activated:Connect(function()
 	circleStroke.Parent = circle
 
 	circle.Activated:Connect(function()
-		circle:Destroy()
-		circle = nil
+		if circle then
+			circle:Destroy()
+			circle = nil
+		end
+
 		main.Visible = true
 		minimized = false
 	end)
@@ -288,12 +302,15 @@ end)
 UIS.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseButton1 then
+
 		dragging = false
 	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if not dragging then return end
+	if not dragging then
+		return
+	end
 
 	if input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseMovement then
@@ -315,6 +332,7 @@ loading.Size = UDim2.fromOffset(270, 270)
 loading.Position = UDim2.new(0.5, -135, 0.5, -135)
 loading.BackgroundColor3 = Color3.fromRGB(10, 14, 22)
 loading.BorderSizePixel = 0
+loading.Visible = true
 loading.ZIndex = 200
 loading.Parent = gui
 
@@ -387,8 +405,12 @@ task.spawn(function()
 	local duration = 3
 	local startTime = os.clock()
 
+	main.Visible = false
+	loading.Visible = true
+
 	while true do
-		local progress = math.clamp((os.clock() - startTime) / duration, 0, 1)
+		local elapsed = os.clock() - startTime
+		local progress = math.clamp(elapsed / duration, 0, 1)
 		local value = math.floor(progress * 100)
 
 		bar.Size = UDim2.new(progress, 0, 1, 0)
@@ -402,14 +424,15 @@ task.spawn(function()
 		task.wait(0.03)
 	end
 
-	-- Make absolutely sure it shows 100%
 	bar.Size = UDim2.new(1, 0, 1, 0)
 	loadingText.Text = "Loading... 100%"
 	percent.Text = "100%"
 
-	-- Keep main hidden until 100% is displayed
-	task.wait(0.2)
+	task.wait(0.5)
 
 	loading:Destroy()
+
+	task.wait()
+
 	main.Visible = true
 end)
