@@ -4,172 +4,204 @@ local UIS = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+local old = playerGui:FindFirstChild("StealAnEggAllScript")
+if old then
+	old:Destroy()
+end
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "StealAnEggAllScript"
 gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = playerGui
 
 local main = Instance.new("Frame")
-main.Size = UDim2.fromOffset(330, 390)
-main.Position = UDim2.new(0.5, -165, 0.5, -195)
-main.BackgroundColor3 = Color3.fromRGB(20, 25, 35)
+main.Size = UDim2.fromOffset(300, 380)
+main.Position = UDim2.new(0.5, -150, 0.5, -190)
+main.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
 main.BorderSizePixel = 0
 main.Parent = gui
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 14)
-corner.Parent = main
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 14)
+mainCorner.Parent = main
 
-local stroke = Instance.new("UIStroke")
-stroke.Thickness = 1.5
-stroke.Color = Color3.fromRGB(60, 130, 255)
-stroke.Parent = main
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(55, 130, 255)
+mainStroke.Thickness = 1.5
+mainStroke.Parent = main
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -75, 0, 48)
-title.Position = UDim2.fromOffset(14, 0)
+title.Size = UDim2.new(1, -80, 0, 42)
+title.Position = UDim2.fromOffset(12, 0)
 title.BackgroundTransparency = 1
 title.Text = "Steal an Egg All Script"
-title.TextColor3 = Color3.new(1,1,1)
-title.TextSize = 16
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 14
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = main
 
 local minimize = Instance.new("TextButton")
-minimize.Size = UDim2.fromOffset(35, 35)
-minimize.Position = UDim2.new(1, -75, 0, 7)
+minimize.Size = UDim2.fromOffset(32, 32)
+minimize.Position = UDim2.new(1, -68, 0, 5)
 minimize.BackgroundTransparency = 1
 minimize.Text = "−"
-minimize.TextColor3 = Color3.new(1,1,1)
-minimize.TextSize = 25
+minimize.TextColor3 = Color3.new(1, 1, 1)
+minimize.TextSize = 23
 minimize.Font = Enum.Font.GothamBold
 minimize.Parent = main
 
 local close = Instance.new("TextButton")
-close.Size = UDim2.fromOffset(35, 35)
-close.Position = UDim2.new(1, -38, 0, 7)
+close.Size = UDim2.fromOffset(32, 32)
+close.Position = UDim2.new(1, -35, 0, 5)
 close.BackgroundTransparency = 1
 close.Text = "×"
-close.TextColor3 = Color3.fromRGB(255,100,100)
-close.TextSize = 24
+close.TextColor3 = Color3.fromRGB(255, 90, 90)
+close.TextSize = 22
 close.Font = Enum.Font.GothamBold
 close.Parent = main
 
 local list = Instance.new("ScrollingFrame")
-list.Position = UDim2.fromOffset(12, 52)
-list.Size = UDim2.new(1, -24, 1, -112)
+list.Position = UDim2.fromOffset(10, 45)
+list.Size = UDim2.new(1, -20, 1, -115)
 list.BackgroundTransparency = 1
 list.BorderSizePixel = 0
-list.ScrollBarThickness = 4
-list.CanvasSize = UDim2.new()
+list.ScrollBarThickness = 3
+list.ScrollBarImageColor3 = Color3.fromRGB(70, 140, 255)
 list.AutomaticCanvasSize = Enum.AutomaticSize.Y
+list.CanvasSize = UDim2.new()
 list.Parent = main
 
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 8)
+layout.Padding = UDim.new(0, 6)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = list
 
 local padding = Instance.new("UIPadding")
-padding.PaddingBottom = UDim.new(0, 8)
+padding.PaddingBottom = UDim.new(0, 6)
 padding.Parent = list
 
-local function addName(name, callback)
-    local item = Instance.new("Frame")
-    item.Size = UDim2.new(1, -6, 0, 65)
-    item.BackgroundColor3 = Color3.fromRGB(30, 38, 52)
-    item.BorderSizePixel = 0
-    item.Parent = list
+local function addName(name, runFunction)
+	local button = Instance.new("TextButton")
+	button.Name = name
+	button.Size = UDim2.new(1, -4, 0, 43)
+	button.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
+	button.BorderSizePixel = 0
+	button.Text = name
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.TextSize = 12
+	button.Font = Enum.Font.GothamBold
+	button.AutoButtonColor = true
+	button.Parent = list
 
-    local itemCorner = Instance.new("UICorner")
-    itemCorner.CornerRadius = UDim.new(0, 10)
-    itemCorner.Parent = item
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 9)
+	corner.Parent = button
 
-    local nameLabel = Instance.new("TextLabel")
-    nameLabel.Position = UDim2.fromOffset(12, 5)
-    nameLabel.Size = UDim2.new(1, -24, 0, 22)
-    nameLabel.BackgroundTransparency = 1
-    nameLabel.Text = name
-    nameLabel.TextColor3 = Color3.new(1,1,1)
-    nameLabel.TextSize = 14
-    nameLabel.Font = Enum.Font.GothamBold
-    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-    nameLabel.Parent = item
-
-    local execute = Instance.new("TextButton")
-    execute.Position = UDim2.fromOffset(10, 31)
-    execute.Size = UDim2.new(1, -20, 0, 27)
-    execute.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
-    execute.Text = "EXECUTE"
-    execute.TextColor3 = Color3.new(1,1,1)
-    execute.TextSize = 12
-    execute.Font = Enum.Font.GothamBold
-    execute.BorderSizePixel = 0
-    execute.Parent = item
-
-    local executeCorner = Instance.new("UICorner")
-    executeCorner.CornerRadius = UDim.new(0, 7)
-    executeCorner.Parent = execute
-
-    execute.Activated:Connect(function()
-        if callback then
-            callback()
-        end
-    end)
+	button.Activated:Connect(function()
+		if typeof(runFunction) == "function" then
+			runFunction()
+		end
+	end)
 end
 
-addName("Name 1", function()
-    print("Name 1 executed")
+addName("Finding one player server", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
 end)
 
-addName("Name 2", function()
-    print("Name 2 executed")
+addName("Lennon hub", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
 end)
 
-addName("Name 3", function()
-    print("Name 3 executed")
+addName("Miranda hub", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent. com/miirandahub/loader/refs/heads/main/stealaegg"))()
 end)
 
-addName("Name 4", function()
-    print("Name 4 executed")
+addName("Clover hub ", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Ryuun0x/Clover/refs/heads/main/main.lua"))()
 end)
 
-addName("Name 5", function()
-    print("Name 5 executed")
+addName("Ajjans hub", function()
+	loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/359e97f8618e9008afe5f496184ebb7c.lua"))()
+end)
+
+addName("Big Foot", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()
+end)
+
+addName("Speed Hub", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+end)
+
+addName("Ouroboros", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()
+end)
+
+addName("Foxname", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()
 end)
 
 local footer = Instance.new("Frame")
-footer.Position = UDim2.new(0, 12, 1, -52)
-footer.Size = UDim2.new(1, -24, 0, 42)
+footer.Position = UDim2.new(0, 10, 1, -63)
+footer.Size = UDim2.new(1, -20, 0, 53)
 footer.BackgroundTransparency = 1
 footer.Parent = main
 
 local credit = Instance.new("TextLabel")
-credit.Size = UDim2.new(0.6, 0, 1, 0)
+credit.Position = UDim2.fromOffset(3, 25)
+credit.Size = UDim2.fromOffset(120, 18)
 credit.BackgroundTransparency = 1
 credit.Text = "Credit: Chris"
-credit.TextColor3 = Color3.fromRGB(180,185,195)
-credit.TextSize = 11
+credit.TextColor3 = Color3.fromRGB(170, 180, 195)
+credit.TextSize = 10
 credit.Font = Enum.Font.Gotham
 credit.TextXAlignment = Enum.TextXAlignment.Left
 credit.Parent = footer
 
+local discord = Instance.new("TextButton")
+discord.Position = UDim2.fromOffset(3, 39)
+discord.Size = UDim2.fromOffset(120, 14)
+discord.BackgroundTransparency = 1
+discord.Text = "Discord Server"
+discord.TextColor3 = Color3.fromRGB(90, 155, 255)
+discord.TextSize = 9
+discord.Font = Enum.Font.Gotham
+discord.TextXAlignment = Enum.TextXAlignment.Left
+discord.Parent = footer
+
+discord.Activated:Connect(function()
+	-- Ilagay dito ang Discord-link handling mo.
+	print("Discord Server clicked")
+end)
+
+local profile = Instance.new("TextLabel")
+profile.Position = UDim2.new(1, -108, 0, 1)
+profile.Size = UDim2.fromOffset(72, 17)
+profile.BackgroundTransparency = 1
+profile.Text = "Profile"
+profile.TextColor3 = Color3.new(1, 1, 1)
+profile.TextSize = 11
+profile.Font = Enum.Font.GothamBold
+profile.TextXAlignment = Enum.TextXAlignment.Right
+profile.Parent = footer
+
 local username = Instance.new("TextLabel")
-username.Position = UDim2.new(0.6, 0, 0, 4)
-username.Size = UDim2.new(0.4, -4, 0, 16)
+username.Position = UDim2.new(1, -140, 0, 18)
+username.Size = UDim2.fromOffset(104, 14)
 username.BackgroundTransparency = 1
 username.Text = "@" .. player.Name
-username.TextColor3 = Color3.fromRGB(180,185,195)
-username.TextSize = 10
+username.TextColor3 = Color3.fromRGB(145, 155, 170)
+username.TextSize = 8
 username.Font = Enum.Font.Gotham
 username.TextXAlignment = Enum.TextXAlignment.Right
 username.Parent = footer
 
 local avatar = Instance.new("ImageLabel")
-avatar.Size = UDim2.fromOffset(30, 30)
-avatar.Position = UDim2.new(1, -32, 0, 12)
-avatar.BackgroundTransparency = 1
+avatar.Position = UDim2.new(1, -31, 0, 0)
+avatar.Size = UDim2.fromOffset(28, 28)
+avatar.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
+avatar.BorderSizePixel = 0
 avatar.Parent = footer
 
 local avatarCorner = Instance.new("UICorner")
@@ -177,84 +209,116 @@ avatarCorner.CornerRadius = UDim.new(1, 0)
 avatarCorner.Parent = avatar
 
 task.spawn(function()
-    local image = Players:GetUserThumbnailAsync(
-        player.UserId,
-        Enum.ThumbnailType.HeadShot,
-        Enum.ThumbnailSize.Size100x100
-    )
-    avatar.Image = image
+	local success, image = pcall(function()
+		return Players:GetUserThumbnailAsync(
+			player.UserId,
+			Enum.ThumbnailType.HeadShot,
+			Enum.ThumbnailSize.Size100x100
+		)
+	end)
+
+	if success then
+		avatar.Image = image
+	end
+end)
+
+close.Activated:Connect(function()
+	gui:Destroy()
 end)
 
 local minimized = false
 
 minimize.Activated:Connect(function()
-    minimized = true
-    main.Visible = false
+	if minimized then
+		return
+	end
 
-    local circle = Instance.new("TextButton")
-    circle.Name = "OpenCircle"
-    circle.Size = UDim2.fromOffset(58, 58)
-    circle.Position = UDim2.new(0, 20, 0.5, -29)
-    circle.BackgroundColor3 = Color3.fromRGB(35, 110, 235)
-    circle.Text = "🥚"
-    circle.TextSize = 25
-    circle.Parent = gui
+	minimized = true
+	main.Visible = false
 
-    local circleCorner = Instance.new("UICorner")
-    circleCorner.CornerRadius = UDim.new(1, 0)
-    circleCorner.Parent = circle
+	local circle = Instance.new("ImageButton")
+	circle.Name = "OpenCircle"
+	circle.Size = UDim2.fromOffset(52, 52)
+	circle.Position = UDim2.new(0, 18, 0.5, -26)
+	circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
+	circle.BorderSizePixel = 0
+	circle.Image = ""
+	circle.Parent = gui
 
-    local circleStroke = Instance.new("UIStroke")
-    circleStroke.Color = Color3.fromRGB(80, 160, 255)
-    circleStroke.Thickness = 2
-    circleStroke.Parent = circle
+	local circleCorner = Instance.new("UICorner")
+	circleCorner.CornerRadius = UDim.new(1, 0)
+	circleCorner.Parent = circle
 
-    circle.Activated:Connect(function()
-        circle:Destroy()
-        main.Visible = true
-        minimized = false
-    end)
-end)
+	local circleStroke = Instance.new("UIStroke")
+	circleStroke.Color = Color3.fromRGB(75, 155, 255)
+	circleStroke.Thickness = 2
+	circleStroke.Parent = circle
 
-close.Activated:Connect(function()
-    gui:Destroy()
+	local circleImage = Instance.new("ImageLabel")
+	circleImage.Size = UDim2.new(1, -6, 1, -6)
+	circleImage.Position = UDim2.fromOffset(3, 3)
+	circleImage.BackgroundTransparency = 1
+	circleImage.Parent = circle
+
+	local imageCorner = Instance.new("UICorner")
+	imageCorner.CornerRadius = UDim.new(1, 0)
+	imageCorner.Parent = circleImage
+
+	task.spawn(function()
+		local success, image = pcall(function()
+			return Players:GetUserThumbnailAsync(
+				player.UserId,
+				Enum.ThumbnailType.HeadShot,
+				Enum.ThumbnailSize.Size100x100
+			)
+		end)
+
+		if success then
+			circleImage.Image = image
+		end
+	end)
+
+	-- Fixed: hindi draggable ang bilog
+	circle.Activated:Connect(function()
+		circle:Destroy()
+		main.Visible = true
+		minimized = false
+	end)
 end)
 
 local dragging = false
 local dragStart
-local startPos
+local startPosition
 
-local function updateDrag(input)
-    local delta = input.Position - dragStart
-    main.Position = UDim2.new(
-        startPos.X.Scale,
-        startPos.X.Offset + delta.X,
-        startPos.Y.Scale,
-        startPos.Y.Offset + delta.Y
-    )
-end
+title.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
 
-main.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPosition = main.Position
 
-        dragging = true
-        dragStart = input.Position
-        startPos = main.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-    if dragging and (
-        input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch
-    ) then
-        updateDrag(input)
-    end
+	if dragging and (
+		input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch
+	) then
+
+		local delta = input.Position - dragStart
+
+		main.Position = UDim2.new(
+			startPosition.X.Scale,
+			startPosition.X.Offset + delta.X,
+			startPosition.Y.Scale,
+			startPosition.Y.Offset + delta.Y
+		)
+	end
 end)
