@@ -238,23 +238,28 @@ local function showKey()
 
     addName("Miranda hub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaegg"))()
-    end)
+
+end)
 
     addName("Clover hub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Ryuun0x/Clover/refs/heads/main/main.lua"))()
-    end)
+
+end)
 
     addName("Ajjans hub", function()
         loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/359e97f8618e9008afe5f496184ebb7c.lua"))()
-    end)
+
+end)
 
     addName("Big Foot", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()
-    end)
+
+end)
 
     addName("Speed Hub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-    end)
+
+end)
 
     -- Highlight KEY
     keyTab.BackgroundColor3 = Color3.fromRGB(35, 110, 190)
@@ -267,39 +272,49 @@ local function showKeyless()
 
     addName("Finding one player server", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
-    end)
+ 
+end)
 
     addName("Lennon hub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
-    end)
+
+end)
 
     addName("Fyy community", function()
         loadstring(game:HttpGet("https://FyyCommunity.my.id"))()
-    end)
+
+end)
 
     addName("Foxname", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()
-    end)
+
+end)
 
     addName("Ouroboros", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))(
-    end)
+
+end)
 
     addName("Axonic", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Kenniel123/Steal-A-Egg/refs/heads/main/Steal%20A%20Egg"))()
-    end)
+ 
+end)
 
     addName("bobloscript-v2", function()
         loadstring(game:HttpGet("https://github.com/bobloscript/scripts/raw/refs/heads/main/opensource_egg", true))()
-    end)
+   
+
+end)
 
     addName("Mcrzhub", function()
         loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))() 
-    end)
+  
+end)
 
     addName("ub-hub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/TeamUBHub/UBLoader/refs/heads/main/index/Key.lua"))()
-    end)
+ 
+end)
 
     -- Highlight KEYLESS
     keyTab.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
