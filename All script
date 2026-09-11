@@ -421,6 +421,6 @@ task.spawn(function()
 
 	task.wait(0.05)
 
-	loading.Visible = false
+	loading.Visible = true
 	main.Visible = true
 end)
