@@ -242,87 +242,90 @@ local minimized = false
 local circle = nil
 
 minimize.Activated:Connect(function()
-	if minimized then
-		return
-	end
+if minimized then
+	return
+end
 
-	minimized = true
-	main.Visible = false
+minimized = true
+main.Visible = false
 
-	circle = Instance.new("ImageButton")
-	circle.Name = "OpenCircle"
-	circle.Size = UDim2.fromOffset(52, 52)
-	circle.Position = UDim2.new(0.5, -26, 0, 12)
-	circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
-	circle.BorderSizePixel = 0
-	circle.Image = IMAGE_URL
-	circle.ScaleType = Enum.ScaleType.Fit
-	circle.AutoButtonColor = true
-	circle.ZIndex = 100
-	circle.Parent = gui
+circle = Instance.new("ImageButton")
+circle.Name = "OpenCircle"
+circle.Size = UDim2.fromOffset(52, 52)
+circle.Position = UDim2.new(0.5, -26, 0, 12)
+circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
+circle.BorderSizePixel = 0
+circle.Image = IMAGE_URL
+circle.ScaleType = Enum.ScaleType.Fit
+circle.AutoButtonColor = true
+circle.Active = true
+circle.ZIndex = 100
+circle.Parent = gui
 
-	local circleCorner = Instance.new("UICorner")
-	circleCorner.CornerRadius = UDim.new(1, 0)
-	circleCorner.Parent = circle
+local circleCorner = Instance.new("UICorner")
+circleCorner.CornerRadius = UDim.new(1, 0)
+circleCorner.Parent = circle
 
-	local circleStroke = Instance.new("UIStroke")
-	circleStroke.Color = Color3.fromRGB(75, 155, 255)
-	circleStroke.Thickness = 2
-	circleStroke.Parent = circle
+local circleStroke = Instance.new("UIStroke")
+circleStroke.Color = Color3.fromRGB(75, 155, 255)
+circleStroke.Thickness = 2
+circleStroke.Parent = circle
 
-	circle.Activated:Connect(function()
-		if circle then
-			circle:Destroy()
-			circle = nil
-		end
+local circleDragging = false
+local circleMoved = false
+local circleDragStart
+local circleStartPosition
 
-		main.Visible = true
-		minimized = false
-	end)
-end)
-
-close.Activated:Connect(function()
-	gui:Destroy()
-end)
-
-local dragging = false
-local dragStart
-local startPosition
-
-dragBar.InputBegan:Connect(function(input)
+circle.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseButton1 then
 
-		dragging = true
-		dragStart = input.Position
-		startPosition = main.Position
-	end
-end)
-
-UIS.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.Touch
-		or input.UserInputType == Enum.UserInputType.MouseButton1 then
-
-		dragging = false
+		circleDragging = true
+		circleMoved = false
+		circleDragStart = input.Position
+		circleStartPosition = circle.Position
 	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if not dragging then
+	if not circleDragging or not circle then
 		return
 	end
 
 	if input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseMovement then
 
-		local delta = input.Position - dragStart
+		local delta = input.Position - circleDragStart
 
-		main.Position = UDim2.new(
-			startPosition.X.Scale,
-			startPosition.X.Offset + delta.X,
-			startPosition.Y.Scale,
-			startPosition.Y.Offset + delta.Y
+		if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then
+			circleMoved = true
+		end
+
+		circle.Position = UDim2.new(
+			circleStartPosition.X.Scale,
+			circleStartPosition.X.Offset + delta.X,
+			circleStartPosition.Y.Scale,
+			circleStartPosition.Y.Offset + delta.Y
 		)
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if not circleDragging then
+		return
+	end
+
+	if input.UserInputType == Enum.UserInputType.Touch
+		or input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+		circleDragging = false
+
+		if not circleMoved and circle then
+			circle:Destroy()
+			circle = nil
+			main.Visible = true
+			minimized = false
+		end
 	end
 end)
 
