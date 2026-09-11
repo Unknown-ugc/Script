@@ -122,7 +122,7 @@ local function addName(name, runFunction)
 end
 
 addName("Finding one player server", function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
 end)
 
 addName("Lennon hub", function()
@@ -130,10 +130,10 @@ addName("Lennon hub", function()
 end)
 
 addName("Miranda hub", function()
-	loadstring(game:HttpGet("https://raw.githubusercontent. com/miirandahub/loader/refs/heads/main/stealaegg"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaegg"))()
 end)
 
-addName("Clover hub ", function()
+addName("Clover hub", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Ryuun0x/Clover/refs/heads/main/main.lua"))()
 end)
 
@@ -191,7 +191,6 @@ avatar.Size = UDim2.fromOffset(32, 32)
 avatar.Position = UDim2.new(1, -36, 0, 2)
 avatar.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
 avatar.BorderSizePixel = 0
-avatar.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=150&height=150&format=png"
 avatar.ScaleType = Enum.ScaleType.Crop
 avatar.Parent = footer
 
@@ -203,6 +202,20 @@ local avatarStroke = Instance.new("UIStroke")
 avatarStroke.Color = Color3.fromRGB(75, 155, 255)
 avatarStroke.Thickness = 1
 avatarStroke.Parent = avatar
+
+task.spawn(function()
+	local success, content = pcall(function()
+		return Players:GetUserThumbnailAsync(
+			player.UserId,
+			Enum.ThumbnailType.HeadShot,
+			Enum.ThumbnailSize.Size150x150
+		)
+	end)
+
+	if success then
+		avatar.Image = content
+	end
+end)
 
 local username = Instance.new("TextLabel")
 username.Position = UDim2.new(1, -125, 0, 22)
