@@ -185,11 +185,29 @@ discord.Font = Enum.Font.Gotham
 discord.TextXAlignment = Enum.TextXAlignment.Left
 discord.Parent = footer
 
+local profileImage = Instance.new("ImageLabel")
+profileImage.Size = UDim2.fromOffset(32, 32)
+profileImage.Position = UDim2.new(1, -36, 0, 5)
+profileImage.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
+profileImage.BorderSizePixel = 0
+profileImage.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=150&height=150&format=png"
+profileImage.ScaleType = Enum.ScaleType.Crop
+profileImage.Parent = footer
+
+local profileCorner = Instance.new("UICorner")
+profileCorner.CornerRadius = UDim.new(1, 0)
+profileCorner.Parent = profileImage
+
+local profileStroke = Instance.new("UIStroke")
+profileStroke.Color = Color3.fromRGB(75, 155, 255)
+profileStroke.Thickness = 1
+profileStroke.Parent = profileImage
+
 local profile = Instance.new("TextLabel")
 profile.Position = UDim2.new(1, -120, 0, 0)
-profile.Size = UDim2.fromOffset(115, 17)
+profile.Size = UDim2.fromOffset(78, 17)
 profile.BackgroundTransparency = 1
-profile.Text = "Player Profile"
+profile.Text = "Profile"
 profile.TextColor3 = Color3.new(1, 1, 1)
 profile.TextSize = 10
 profile.Font = Enum.Font.GothamBold
@@ -198,7 +216,7 @@ profile.Parent = footer
 
 local username = Instance.new("TextLabel")
 username.Position = UDim2.new(1, -120, 0, 18)
-username.Size = UDim2.fromOffset(115, 14)
+username.Size = UDim2.fromOffset(78, 14)
 username.BackgroundTransparency = 1
 username.Text = "@" .. player.Name
 username.TextColor3 = Color3.fromRGB(145, 155, 170)
@@ -219,11 +237,8 @@ minimize.Activated:Connect(function()
 
 	local circle = Instance.new("ImageButton")
 	circle.Name = "OpenCircle"
-
-	-- Smaller circle
 	circle.Size = UDim2.fromOffset(52, 52)
 	circle.Position = UDim2.new(0.5, -26, 0, 12)
-
 	circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
 	circle.BorderSizePixel = 0
 	circle.Image = IMAGE_URL
