@@ -4,7 +4,7 @@ local UIS = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local IMAGE_ID = "rbxassetid://85422381974829"
+local IMAGE_URL = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
 
 local old = playerGui:FindFirstChild("StealAnEggAllScript")
 if old then
@@ -37,7 +37,7 @@ mainStroke.Thickness = 1.5
 mainStroke.Parent = main
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -80, 0, 40)
+title.Size = UDim2.new(1, -75, 0, 40)
 title.Position = UDim2.fromOffset(10, 0)
 title.BackgroundTransparency = 1
 title.Text = "Steal an Egg All Script"
@@ -45,7 +45,6 @@ title.TextColor3 = Color3.new(1, 1, 1)
 title.TextSize = 13
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
-title.Active = true
 title.Parent = main
 
 local minimize = Instance.new("TextButton")
@@ -67,6 +66,16 @@ close.TextColor3 = Color3.fromRGB(255, 90, 90)
 close.TextSize = 21
 close.Font = Enum.Font.GothamBold
 close.Parent = main
+
+local dragBar = Instance.new("TextButton")
+dragBar.Name = "DragBar"
+dragBar.Size = UDim2.new(1, -70, 0, 42)
+dragBar.Position = UDim2.fromOffset(0, 0)
+dragBar.BackgroundTransparency = 1
+dragBar.Text = ""
+dragBar.AutoButtonColor = false
+dragBar.ZIndex = 5
+dragBar.Parent = main
 
 local list = Instance.new("ScrollingFrame")
 list.Position = UDim2.fromOffset(10, 43)
@@ -148,7 +157,6 @@ addName("Foxname", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()
 end)
 
-
 local footer = Instance.new("Frame")
 footer.Position = UDim2.new(0, 10, 1, -53)
 footer.Size = UDim2.new(1, -20, 0, 45)
@@ -199,9 +207,6 @@ username.Font = Enum.Font.Gotham
 username.TextXAlignment = Enum.TextXAlignment.Right
 username.Parent = footer
 
-discord.Activated:Connect(function()
-end)
-
 local minimized = false
 
 minimize.Activated:Connect(function()
@@ -214,14 +219,16 @@ minimize.Activated:Connect(function()
 
 	local circle = Instance.new("ImageButton")
 	circle.Name = "OpenCircle"
-	circle.Size = UDim2.fromOffset(64, 64)
-	circle.Position = UDim2.new(0.5, -32, 0, 12)
+
+	-- Smaller circle
+	circle.Size = UDim2.fromOffset(52, 52)
+	circle.Position = UDim2.new(0.5, -26, 0, 12)
+
 	circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
 	circle.BorderSizePixel = 0
-	circle.Image = IMAGE_ID
+	circle.Image = IMAGE_URL
 	circle.ImageTransparency = 0
 	circle.ScaleType = Enum.ScaleType.Fit
-	circle.Active = true
 	circle.AutoButtonColor = true
 	circle.ZIndex = 100
 	circle.Parent = gui
@@ -250,7 +257,7 @@ local dragging = false
 local dragStart
 local startPosition
 
-title.InputBegan:Connect(function(input)
+dragBar.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseButton1 then
 
@@ -260,7 +267,7 @@ title.InputBegan:Connect(function(input)
 	end
 end)
 
-title.InputEnded:Connect(function(input)
+UIS.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseButton1 then
 
@@ -309,8 +316,7 @@ local loadingImage = Instance.new("ImageLabel")
 loadingImage.Size = UDim2.fromOffset(80, 80)
 loadingImage.Position = UDim2.new(0.5, -40, 0, 40)
 loadingImage.BackgroundTransparency = 1
-loadingImage.Image = IMAGE_ID
-loadingImage.ImageTransparency = 0
+loadingImage.Image = IMAGE_URL
 loadingImage.ScaleType = Enum.ScaleType.Fit
 loadingImage.ZIndex = 51
 loadingImage.Parent = loading
