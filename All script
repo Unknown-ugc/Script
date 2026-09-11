@@ -299,11 +299,13 @@ credit.Font = Enum.Font.Gotham
 credit.TextXAlignment = Enum.TextXAlignment.Left
 credit.Parent = footer
 
+local DISCORD_LINK = "https://discord.gg/FJK6QzNnf7"
+
 local discord = Instance.new("TextButton")
 discord.Position = UDim2.fromOffset(3, 18)
-discord.Size = UDim2.fromOffset(110, 17)
+discord.Size = UDim2.fromOffset(130, 17)
 discord.BackgroundTransparency = 1
-discord.Text = "Discord Server"
+discord.Text = "Copy Discord Link"
 discord.TextColor3 = Color3.fromRGB(90, 155, 255)
 discord.TextSize = 9
 discord.Font = Enum.Font.Gotham
@@ -311,9 +313,15 @@ discord.TextXAlignment = Enum.TextXAlignment.Left
 discord.Parent = footer
 
 discord.Activated:Connect(function()
-	print("Discord Server clicked")
+	if setclipboard then
+		setclipboard(DISCORD_LINK)
+		discord.Text = "Copied!"
+		task.wait(1)
+		discord.Text = "Copy Discord Link"
+	else
+		print(DISCORD_LINK)
+	end
 end)
-
 -- AVATAR
 
 local avatar = Instance.new("ImageLabel")
