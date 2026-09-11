@@ -723,6 +723,127 @@ welcome.Position = UDim2.fromOffset(40, 19)
 welcome.Size = UDim2.new(1, -40, 0, 15)
 welcome.Font = Enum.Font.Gotham
 welcome.Text = "Welcome to the script!"
+
+local title = Instance.new("TextLabel")
+title.BackgroundTransparency = 1
+title.Position = UDim2.fromOffset(55, 8)
+title.Size = UDim2.new(1, -110, 0, 32)
+title.Font = Enum.Font.GothamBold
+title.Text = "🌐 Server List"
+title.TextSize = 20
+title.TextColor3 = WHITE
+title.TextXAlignment = Enum.TextXAlignment.Center
+title.Parent = main
+
+local credit = Instance.new("TextLabel")
+credit.BackgroundTransparency = 1
+credit.Position = UDim2.fromOffset(14, 45)
+credit.Size = UDim2.fromOffset(150, 18)
+credit.Font = Enum.Font.Gotham
+credit.Text = "👤 Credit: Chris"
+credit.TextSize = 10
+credit.TextColor3 = GRAY
+credit.TextXAlignment = Enum.TextXAlignment.Left
+credit.Parent = main
+
+local eggDiscord = Instance.new("TextLabel")
+eggDiscord.BackgroundTransparency = 1
+eggDiscord.Position = UDim2.fromOffset(14, 64)
+eggDiscord.Size = UDim2.fromOffset(210, 18)
+eggDiscord.Font = Enum.Font.GothamMedium
+eggDiscord.Text = "🥚 Egg Notifier Discord Server"
+eggDiscord.TextSize = 10
+eggDiscord.TextColor3 = CYAN
+eggDiscord.TextXAlignment = Enum.TextXAlignment.Left
+eggDiscord.Parent = main
+
+local farms = Instance.new("TextLabel")
+farms.BackgroundTransparency = 1
+farms.Position = UDim2.fromOffset(14, 83)
+farms.Size = UDim2.fromOffset(210, 18)
+farms.Font = Enum.Font.Gotham
+farms.Text = "Farm scripts in Discord"
+farms.TextSize = 9
+farms.TextColor3 = GRAY
+farms.TextXAlignment = Enum.TextXAlignment.Left
+farms.Parent = main
+
+local tiktokLabel = Instance.new("TextLabel")
+tiktokLabel.BackgroundTransparency = 1
+tiktokLabel.Position = UDim2.fromOffset(14, 101)
+tiktokLabel.Size = UDim2.fromOffset(100, 18)
+tiktokLabel.Font = Enum.Font.GothamMedium
+tiktokLabel.Text = "TikTok"
+tiktokLabel.TextSize = 10
+tiktokLabel.TextColor3 = CYAN
+tiktokLabel.TextXAlignment = Enum.TextXAlignment.Left
+tiktokLabel.Parent = main
+
+local tiktok = Instance.new("TextButton")
+tiktok.Size = UDim2.fromOffset(105, 25)
+tiktok.Position = UDim2.fromOffset(14, 120)
+tiktok.BackgroundColor3 = NAVY2
+tiktok.Text = "@lts_chris"
+tiktok.TextSize = 10
+tiktok.Font = Enum.Font.GothamBold
+tiktok.TextColor3 = WHITE
+tiktok.Parent = main
+corner(tiktok, 8)
+
+tiktok.MouseButton1Click:Connect(function()
+    copyText(TIKTOK)
+    tiktok.Text = "✓ Copied!"
+
+    task.delay(1.5, function()
+        if tiktok.Parent then
+            tiktok.Text = "@lts_chris"
+        end
+    end)
+end)
+
+local profile = Instance.new("Frame")
+profile.BackgroundTransparency = 1
+profile.Size = UDim2.fromOffset(125, 70)
+profile.Position = UDim2.new(1, -137, 0, 43)
+profile.Parent = main
+
+local avatar = Instance.new("ImageLabel")
+avatar.Size = UDim2.fromOffset(34, 34)
+avatar.Position = UDim2.fromOffset(0, 0)
+avatar.BackgroundColor3 = NAVY2
+avatar.Parent = profile
+corner(avatar, 17)
+
+local ok, avatarUrl = pcall(function()
+    return Players:GetUserThumbnailAsync(
+        LocalPlayer.UserId,
+        Enum.ThumbnailType.HeadShot,
+        Enum.ThumbnailSize.Size100x100
+    )
+end)
+
+if ok then
+    avatar.Image = avatarUrl
+end
+
+local username = Instance.new("TextLabel")
+username.BackgroundTransparency = 1
+username.Position = UDim2.fromOffset(40, 0)
+username.Size = UDim2.new(1, -40, 0, 18)
+username.Font = Enum.Font.GothamBold
+username.Text = LocalPlayer.DisplayName
+username.TextSize = 10
+username.TextColor3 = WHITE
+username.TextXAlignment = Enum.TextXAlignment.Left
+username.TextTruncate = Enum.TextTruncate.AtEnd
+username.Parent = profile
+
+local welcome = Instance.new("TextLabel")
+welcome.BackgroundTransparency = 1
+welcome.Position = UDim2.fromOffset(40, 19)
+welcome.Size = UDim2.new(1, -40, 0, 15)
+welcome.Font = Enum.Font.Gotham
+welcome.Text = "Welcome to the script!"
 welcome.TextSize = 8
 welcome.TextColor3 = GRAY
 welcome.TextXAlignment = Enum.TextXAlignment.Left
