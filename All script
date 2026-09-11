@@ -121,7 +121,7 @@ local function addName(name, runFunction)
 	end)
 end
 
-addName("Finding One player server", function()
+addName("Finding one player server", function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
 end)
 
@@ -130,7 +130,7 @@ addName("Lennon hub", function()
 end)
 
 addName("Miranda hub", function()
-	loadstring(:HttpGet("https://raw.githubusercontent. com/miirandahub/loader/refs/heads/main/stealaegg"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent. com/miirandahub/loader/refs/heads/main/stealaegg"))()
 end)
 
 addName("Clover hub ", function()
