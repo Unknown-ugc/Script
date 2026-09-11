@@ -395,22 +395,21 @@ task.spawn(function()
 		loadingText.Text = "Loading... " .. value .. "%"
 		percent.Text = value .. "%"
 
-		if progress >= 1 then
+		if value >= 100 then
 			break
 		end
 
 		task.wait(0.03)
 	end
 
+	-- Make absolutely sure it shows 100%
 	bar.Size = UDim2.new(1, 0, 1, 0)
 	loadingText.Text = "Loading... 100%"
 	percent.Text = "100%"
 
-	task.wait(0.15)
+	-- Keep main hidden until 100% is displayed
+	task.wait(0.2)
 
-	if loading then
-		loading:Destroy()
-	end
-
+	loading:Destroy()
 	main.Visible = true
 end)
