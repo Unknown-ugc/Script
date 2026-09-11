@@ -4,12 +4,12 @@ local UIS = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+local IMAGE_ID = "rbxassetid://85422381974829"
+
 local old = playerGui:FindFirstChild("StealAnEggAllScript")
 if old then
 	old:Destroy()
 end
-
-local IMAGE_ID = "rbxassetid://85422381974829"
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "StealAnEggAllScript"
@@ -24,6 +24,7 @@ main.Position = UDim2.new(0.5, -135, 0.5, -170)
 main.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
 main.BorderSizePixel = 0
 main.Visible = false
+main.Active = true
 main.Parent = gui
 
 local mainCorner = Instance.new("UICorner")
@@ -44,6 +45,7 @@ title.TextColor3 = Color3.new(1, 1, 1)
 title.TextSize = 13
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
+title.Active = true
 title.Parent = main
 
 local minimize = Instance.new("TextButton")
@@ -176,10 +178,10 @@ discord.TextXAlignment = Enum.TextXAlignment.Left
 discord.Parent = footer
 
 local profile = Instance.new("TextLabel")
-profile.Position = UDim2.new(1, -105, 0, 0)
-profile.Size = UDim2.fromOffset(100, 17)
+profile.Position = UDim2.new(1, -120, 0, 0)
+profile.Size = UDim2.fromOffset(115, 17)
 profile.BackgroundTransparency = 1
-profile.Text = "Profile"
+profile.Text = "Player Profile"
 profile.TextColor3 = Color3.new(1, 1, 1)
 profile.TextSize = 10
 profile.Font = Enum.Font.GothamBold
@@ -187,8 +189,8 @@ profile.TextXAlignment = Enum.TextXAlignment.Right
 profile.Parent = footer
 
 local username = Instance.new("TextLabel")
-username.Position = UDim2.new(1, -105, 0, 18)
-username.Size = UDim2.fromOffset(100, 14)
+username.Position = UDim2.new(1, -120, 0, 18)
+username.Size = UDim2.fromOffset(115, 14)
 username.BackgroundTransparency = 1
 username.Text = "@" .. player.Name
 username.TextColor3 = Color3.fromRGB(145, 155, 170)
@@ -198,7 +200,6 @@ username.TextXAlignment = Enum.TextXAlignment.Right
 username.Parent = footer
 
 discord.Activated:Connect(function()
-	-- PUT DISCORD ACTION HERE
 end)
 
 local minimized = false
@@ -213,12 +214,16 @@ minimize.Activated:Connect(function()
 
 	local circle = Instance.new("ImageButton")
 	circle.Name = "OpenCircle"
-	circle.Size = UDim2.fromOffset(58, 58)
-	circle.Position = UDim2.new(0.5, -29, 0, 12)
+	circle.Size = UDim2.fromOffset(64, 64)
+	circle.Position = UDim2.new(0.5, -32, 0, 12)
 	circle.BackgroundColor3 = Color3.fromRGB(45, 115, 235)
 	circle.BorderSizePixel = 0
 	circle.Image = IMAGE_ID
+	circle.ImageTransparency = 0
 	circle.ScaleType = Enum.ScaleType.Fit
+	circle.Active = true
+	circle.AutoButtonColor = true
+	circle.ZIndex = 100
 	circle.Parent = gui
 
 	local circleCorner = Instance.new("UICorner")
@@ -246,26 +251,30 @@ local dragStart
 local startPosition
 
 title.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-		or input.UserInputType == Enum.UserInputType.Touch then
+	if input.UserInputType == Enum.UserInputType.Touch
+		or input.UserInputType == Enum.UserInputType.MouseButton1 then
 
 		dragging = true
 		dragStart = input.Position
 		startPosition = main.Position
+	end
+end)
 
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
+title.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch
+		or input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+		dragging = false
 	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if dragging and (
-		input.UserInputType == Enum.UserInputType.MouseMovement
-		or input.UserInputType == Enum.UserInputType.Touch
-	) then
+	if not dragging then
+		return
+	end
+
+	if input.UserInputType == Enum.UserInputType.Touch
+		or input.UserInputType == Enum.UserInputType.MouseMovement then
 
 		local delta = input.Position - dragStart
 
@@ -280,8 +289,8 @@ end)
 
 local loading = Instance.new("Frame")
 loading.Name = "Loading"
-loading.Size = UDim2.fromOffset(270, 340)
-loading.Position = UDim2.new(0.5, -135, 0.5, -170)
+loading.Size = UDim2.fromOffset(270, 270)
+loading.Position = UDim2.new(0.5, -135, 0.5, -135)
 loading.BackgroundColor3 = Color3.fromRGB(10, 14, 22)
 loading.BorderSizePixel = 0
 loading.ZIndex = 50
@@ -297,17 +306,18 @@ loadingStroke.Thickness = 1.5
 loadingStroke.Parent = loading
 
 local loadingImage = Instance.new("ImageLabel")
-loadingImage.Size = UDim2.fromOffset(85, 85)
-loadingImage.Position = UDim2.new(0.5, -42.5, 0.5, -100)
+loadingImage.Size = UDim2.fromOffset(80, 80)
+loadingImage.Position = UDim2.new(0.5, -40, 0, 40)
 loadingImage.BackgroundTransparency = 1
 loadingImage.Image = IMAGE_ID
+loadingImage.ImageTransparency = 0
 loadingImage.ScaleType = Enum.ScaleType.Fit
 loadingImage.ZIndex = 51
 loadingImage.Parent = loading
 
 local loadingTitle = Instance.new("TextLabel")
 loadingTitle.Size = UDim2.new(1, -20, 0, 30)
-loadingTitle.Position = UDim2.new(0, 10, 0.5, -5)
+loadingTitle.Position = UDim2.fromOffset(10, 125)
 loadingTitle.BackgroundTransparency = 1
 loadingTitle.Text = "Steal an Egg All Script"
 loadingTitle.TextColor3 = Color3.new(1, 1, 1)
@@ -318,7 +328,7 @@ loadingTitle.Parent = loading
 
 local loadingText = Instance.new("TextLabel")
 loadingText.Size = UDim2.new(1, -20, 0, 20)
-loadingText.Position = UDim2.new(0, 10, 0.5, 27)
+loadingText.Position = UDim2.fromOffset(10, 157)
 loadingText.BackgroundTransparency = 1
 loadingText.Text = "Loading... 0%"
 loadingText.TextColor3 = Color3.fromRGB(170, 185, 205)
@@ -329,7 +339,7 @@ loadingText.Parent = loading
 
 local barBack = Instance.new("Frame")
 barBack.Size = UDim2.new(0.72, 0, 0, 7)
-barBack.Position = UDim2.new(0.14, 0, 0.5, 55)
+barBack.Position = UDim2.new(0.14, 0, 0, 190)
 barBack.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
 barBack.BorderSizePixel = 0
 barBack.ZIndex = 51
