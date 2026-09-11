@@ -1,49 +1,56 @@
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
+local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local old = playerGui:FindFirstChild("StealAnEggAllScript")
+if old then
+	old:Destroy()
+end
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "StealAnEggAllScript"
 gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = playerGui
 
--- Loading screen
+-- LOADING
+
 local loading = Instance.new("Frame")
 loading.Size = UDim2.fromOffset(270, 270)
 loading.Position = UDim2.new(0.5, -135, 0.5, -135)
-loading.BackgroundColor3 = Color3.fromRGB(20, 30, 45)
-loading.BorderSizePixel = 0
+loading.BackgroundColor3 = Color3.fromRGB(18, 27, 40)
 loading.Parent = gui
 
-local loadCorner = Instance.new("UICorner")
-loadCorner.CornerRadius = UDim.new(0, 16)
-loadCorner.Parent = loading
+local lc = Instance.new("UICorner")
+lc.CornerRadius = UDim.new(0, 16)
+lc.Parent = loading
 
 local loadTitle = Instance.new("TextLabel")
+loadTitle.Size = UDim2.new(1, 0, 0, 40)
+loadTitle.Position = UDim2.fromOffset(0, 82)
 loadTitle.BackgroundTransparency = 1
-loadTitle.Size = UDim2.new(1, 0, 0, 45)
-loadTitle.Position = UDim2.fromOffset(0, 55)
 loadTitle.Text = "SERVER HUB"
 loadTitle.TextColor3 = Color3.new(1, 1, 1)
 loadTitle.Font = Enum.Font.GothamBold
-loadTitle.TextSize = 25
+loadTitle.TextSize = 24
 loadTitle.Parent = loading
 
-local percent = Instance.new("TextLabel")
-percent.BackgroundTransparency = 1
-percent.Size = UDim2.new(1, 0, 0, 40)
-percent.Position = UDim2.fromOffset(0, 105)
-percent.Text = "0%"
-percent.TextColor3 = Color3.new(1, 1, 1)
-percent.Font = Enum.Font.GothamBold
-percent.TextSize = 22
-percent.Parent = loading
+local loadText = Instance.new("TextLabel")
+loadText.Size = UDim2.new(1, 0, 0, 25)
+loadText.Position = UDim2.fromOffset(0, 125)
+loadText.BackgroundTransparency = 1
+loadText.Text = "Loading... 0%"
+loadText.TextColor3 = Color3.fromRGB(150, 190, 230)
+loadText.Font = Enum.Font.Gotham
+loadText.TextSize = 13
+loadText.Parent = loading
 
 local barBack = Instance.new("Frame")
 barBack.Size = UDim2.fromOffset(210, 8)
-barBack.Position = UDim2.fromOffset(30, 160)
-barBack.BackgroundColor3 = Color3.fromRGB(45, 55, 70)
+barBack.Position = UDim2.fromOffset(30, 165)
+barBack.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
 barBack.BorderSizePixel = 0
 barBack.Parent = loading
 
@@ -53,7 +60,7 @@ barBackCorner.Parent = barBack
 
 local bar = Instance.new("Frame")
 bar.Size = UDim2.new(0, 0, 1, 0)
-bar.BackgroundColor3 = Color3.fromRGB(40, 140, 255)
+bar.BackgroundColor3 = Color3.fromRGB(35, 110, 190)
 bar.BorderSizePixel = 0
 bar.Parent = barBack
 
@@ -61,13 +68,13 @@ local barCorner = Instance.new("UICorner")
 barCorner.CornerRadius = UDim.new(1, 0)
 barCorner.Parent = bar
 
--- Main GUI
+-- MAIN
+
 local main = Instance.new("Frame")
 main.Name = "Main"
 main.Size = UDim2.fromOffset(270, 340)
 main.Position = UDim2.new(0.5, -135, 0.5, -170)
 main.BackgroundColor3 = Color3.fromRGB(18, 27, 40)
-main.BorderSizePixel = 0
 main.Visible = false
 main.Parent = gui
 
@@ -75,412 +82,405 @@ local mainCorner = Instance.new("UICorner")
 mainCorner.CornerRadius = UDim.new(0, 14)
 mainCorner.Parent = main
 
-local stroke = Instance.new("UIStroke")
-stroke.Color = Color3.fromRGB(45, 150, 255)
-stroke.Thickness = 1
-stroke.Parent = main
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(45, 100, 160)
+mainStroke.Thickness = 1
+mainStroke.Parent = main
 
--- Drag area
-local drag = Instance.new("TextButton")
-drag.Size = UDim2.new(1, -70, 0, 38)
-drag.BackgroundTransparency = 1
-drag.Text = ""
-drag.Parent = main
+-- DRAG BAR
 
--- Title
+local dragBar = Instance.new("Frame")
+dragBar.Size = UDim2.new(1, -70, 0, 38)
+dragBar.BackgroundTransparency = 1
+dragBar.Active = true
+dragBar.Parent = main
+
+local dragging = false
+local dragStart
+local startPos
+
+dragBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and (
+		input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch
+	) then
+
+		local delta = input.Position - dragStart
+
+		main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- TITLE
+
 local title = Instance.new("TextLabel")
-title.BackgroundTransparency = 1
 title.Size = UDim2.new(1, -75, 0, 38)
-title.Position = UDim2.fromOffset(10, 0)
+title.Position = UDim2.fromOffset(10, 2)
+title.BackgroundTransparency = 1
 title.Text = "Steal an Egg All Script"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
-title.TextSize = 14
+title.TextSize = 15
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = main
 
--- Minimize
+-- MINIMIZE
+
 local minimize = Instance.new("TextButton")
-minimize.Size = UDim2.fromOffset(30, 30)
-minimize.Position = UDim2.new(1, -65, 0, 4)
-minimize.BackgroundTransparency = 1
+minimize.Size = UDim2.fromOffset(28, 28)
+minimize.Position = UDim2.new(1, -64, 0, 6)
+minimize.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
 minimize.Text = "−"
 minimize.TextColor3 = Color3.new(1, 1, 1)
 minimize.Font = Enum.Font.GothamBold
-minimize.TextSize = 22
+minimize.TextSize = 18
 minimize.Parent = main
 
--- Close
+local minCorner = Instance.new("UICorner")
+minCorner.CornerRadius = UDim.new(0, 8)
+minCorner.Parent = minimize
+
+-- CLOSE
+
 local close = Instance.new("TextButton")
-close.Size = UDim2.fromOffset(30, 30)
-close.Position = UDim2.new(1, -32, 0, 4)
-close.BackgroundTransparency = 1
+close.Size = UDim2.fromOffset(28, 28)
+close.Position = UDim2.new(1, -32, 0, 6)
+close.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
 close.Text = "X"
 close.TextColor3 = Color3.new(1, 1, 1)
 close.Font = Enum.Font.GothamBold
-close.TextSize = 15
+close.TextSize = 13
 close.Parent = main
 
--- KEY tab
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 8)
+closeCorner.Parent = close
+
+-- TABS
+
 local keyTab = Instance.new("TextButton")
-keyTab.Size = UDim2.fromOffset(120, 28)
+keyTab.Size = UDim2.fromOffset(118, 28)
 keyTab.Position = UDim2.fromOffset(8, 40)
 keyTab.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
-keyTab.BorderSizePixel = 0
 keyTab.Text = "KEY"
 keyTab.TextColor3 = Color3.new(1, 1, 1)
 keyTab.Font = Enum.Font.GothamBold
-keyTab.TextSize = 11
+keyTab.TextSize = 12
 keyTab.Parent = main
 
--- KEYLESS tab
+local keyCorner = Instance.new("UICorner")
+keyCorner.CornerRadius = UDim.new(0, 8)
+keyCorner.Parent = keyTab
+
 local keylessTab = Instance.new("TextButton")
-keylessTab.Size = UDim2.fromOffset(120, 28)
-keylessTab.Position = UDim2.fromOffset(142, 40)
+keylessTab.Size = UDim2.fromOffset(118, 28)
+keylessTab.Position = UDim2.fromOffset(144, 40)
 keylessTab.BackgroundColor3 = Color3.fromRGB(35, 110, 190)
-keylessTab.BorderSizePixel = 0
 keylessTab.Text = "KEYLESS"
 keylessTab.TextColor3 = Color3.new(1, 1, 1)
 keylessTab.Font = Enum.Font.GothamBold
-keylessTab.TextSize = 11
+keylessTab.TextSize = 12
 keylessTab.Parent = main
 
-for _, tab in ipairs({keyTab, keylessTab}) do
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 7)
-    corner.Parent = tab
-end
+local keylessCorner = Instance.new("UICorner")
+keylessCorner.CornerRadius = UDim.new(0, 8)
+keylessCorner.Parent = keylessTab
 
--- List
+-- LIST
+
 local list = Instance.new("ScrollingFrame")
 list.Name = "ScriptList"
-list.Size = UDim2.fromOffset(254, 185)
+list.Size = UDim2.fromOffset(254, 178)
 list.Position = UDim2.fromOffset(8, 74)
 list.BackgroundTransparency = 1
 list.BorderSizePixel = 0
 list.ScrollBarThickness = 3
+list.ScrollBarImageColor3 = Color3.fromRGB(60, 130, 200)
 list.CanvasSize = UDim2.new(0, 0, 0, 0)
 list.Parent = main
 
 local layout = Instance.new("UIListLayout")
 layout.Padding = UDim.new(0, 5)
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.Parent = list
 
-layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    list.CanvasSize = UDim2.new(
-        0,
-        0,
-        0,
-        layout.AbsoluteContentSize.Y + 8
-    )
-end)
+-- NAMES
 
--- Button function
-local function addName(name, runFunction)
-    local button = Instance.new("TextButton")
+local keyNames = {
+	"Miranda hub",
+	"Clover hub",
+	"Ajjans hub",
+	"Big Foot",
+	"Speed Hub"
+}
 
-    button.Name = name
-    button.Size = UDim2.new(1, -4, 0, 34)
-    button.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
-    button.BorderSizePixel = 0
-    button.Text = name
-    button.TextColor3 = Color3.new(1, 1, 1)
-    button.TextSize = 11
-    button.Font = Enum.Font.GothamBold
-    button.AutoButtonColor = true
-    button.Parent = list
+local keylessNames = {
+	"Finding one player server",
+	"Lennon hub",
+	"Fyy community",
+	"Foxname",
+	"Ouroboros",
+	"Axonic",
+	"bobloscript-v2",
+	"Mcrzhub",
+	"ub-hub"
+}
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 9)
-    corner.Parent = button
+-- BUTTON
 
-    button.Activated:Connect(function()
-        task.spawn(function()
-            pcall(runFunction)
-        end)
-    end)
+local function addName(name)
+	local button = Instance.new("TextButton")
+
+	button.Name = name
+	button.Size = UDim2.new(1, -4, 0, 34)
+	button.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
+	button.BorderSizePixel = 0
+	button.Text = name
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.TextSize = 11
+	button.Font = Enum.Font.GothamBold
+	button.AutoButtonColor = true
+	button.Parent = list
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 9)
+	corner.Parent = button
+
+	button.Activated:Connect(function()
+
+		if name == "Miranda hub" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaegg"))()
+
+		elseif name == "Clover hub" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/Ryuun0x/Clover/refs/heads/main/main.lua"))()
+
+		elseif name == "Ajjans hub" then
+			loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/359e97f8618e9008afe5f496184ebb7c.lua"))()
+
+		elseif name == "Big Foot" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()
+		elseif name == "Speed Hub" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+
+		elseif name == "Finding one player server" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
+
+		elseif name == "Lennon hub" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
+
+		elseif name == "Fyy community" then
+			loadstring(game:HttpGet("https://FyyCommunity.my.id"))()
+
+		elseif name == "Foxname" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()
+
+		elseif name == "Ouroboros" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()
+
+		elseif name == "Axonic" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/Kenniel123/Steal-A-Egg/refs/heads/main/Steal%20A%20Egg"))()
+
+		elseif name == "bobloscript-v2" then
+			loadstring(game:HttpGet("https://github.com/bobloscript/scripts/raw/refs/heads/main/opensource_egg", true))()
+
+		elseif name == "Mcrzhub" then
+			loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))() 
+
+		elseif name == "ub-hub" then
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/TeamUBHub/UBLoader/refs/heads/main/index/Key.lua"))()
+	end)
 end
 
--- KEY BUTTONS
-local keyNames = {
-    "Miranda hub",
-    "Clover hub",
-    "Ajjans hub",
-    "Big Foot",
-    "Speed Hub"
-}
-
--- KEYLESS BUTTONS
-local keylessNames = {
-    "Finding one player server",
-    "Lennon hub",
-    "Fyy community",
-    "Foxname",
-    "Ouroboros",
-    "Axonic",
-    "bobloscript-v2",
-    "Mcrzhub",
-    "ub-hub"
-}
-
 local function clearList()
-    for _, child in ipairs(list:GetChildren()) do
-        if child:IsA("TextButton") then
-            child:Destroy()
-        end
-    end
+	for _, child in ipairs(list:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
+end
+
+local function updateCanvas()
+	task.wait()
+	list.CanvasSize = UDim2.fromOffset(
+		0,
+		layout.AbsoluteContentSize.Y + 8
+	)
 end
 
 -- KEY TAB
+
 local function showKey()
-    clearList()
+	clearList()
 
-    addName("Miranda hub", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaegg"))()
+	keyTab.BackgroundColor3 = Color3.fromRGB(35, 110, 190)
+	keylessTab.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
 
-end)
+	for _, name in ipairs(keyNames) do
+		addName(name)
+	end
 
-    addName("Clover hub", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Ryuun0x/Clover/refs/heads/main/main.lua"))()
-
-end)
-
-    addName("Ajjans hub", function()
-        loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/359e97f8618e9008afe5f496184ebb7c.lua"))()
-
-end)
-
-    addName("Big Foot", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()
-
-end)
-
-    addName("Speed Hub", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-
-end)
-
-    -- Highlight KEY
-    keyTab.BackgroundColor3 = Color3.fromRGB(35, 110, 190)
-    keylessTab.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
+	updateCanvas()
 end
 
 -- KEYLESS TAB
+
 local function showKeyless()
-    clearList()
+	clearList()
 
-    addName("Finding one player server", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
- 
-end)
+	keyTab.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
+	keylessTab.BackgroundColor3 = Color3.fromRGB(35, 110, 190)
 
-    addName("Lennon hub", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
+	for _, name in ipairs(keylessNames) do
+		addName(name)
+	end
 
-end)
-
-    addName("Fyy community", function()
-        loadstring(game:HttpGet("https://FyyCommunity.my.id"))()
-
-end)
-
-    addName("Foxname", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()
-
-end)
-
-    addName("Ouroboros", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))(
-
-end)
-
-    addName("Axonic", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Kenniel123/Steal-A-Egg/refs/heads/main/Steal%20A%20Egg"))()
- 
-end)
-
-    addName("bobloscript-v2", function()
-        loadstring(game:HttpGet("https://github.com/bobloscript/scripts/raw/refs/heads/main/opensource_egg", true))()
-   
-
-end)
-
-    addName("Mcrzhub", function()
-        loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))() 
-  
-end)
-
-    addName("ub-hub", function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/TeamUBHub/UBLoader/refs/heads/main/index/Key.lua"))()
- 
-end)
-
-    -- Highlight KEYLESS
-    keyTab.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
-    keylessTab.BackgroundColor3 = Color3.fromRGB(35, 110, 190)
+	updateCanvas()
 end
 
--- Tab clicks
 keyTab.Activated:Connect(showKey)
 keylessTab.Activated:Connect(showKeyless)
 
--- Credit
+-- FOOTER
+
 local credit = Instance.new("TextLabel")
-credit.BackgroundTransparency = 1
-credit.Position = UDim2.fromOffset(10, 267)
 credit.Size = UDim2.fromOffset(120, 18)
+credit.Position = UDim2.fromOffset(10, 267)
+credit.BackgroundTransparency = 1
 credit.Text = "Credit: Chris"
-credit.TextColor3 = Color3.fromRGB(190, 200, 215)
+credit.TextColor3 = Color3.fromRGB(170, 180, 195)
 credit.Font = Enum.Font.Gotham
 credit.TextSize = 10
 credit.TextXAlignment = Enum.TextXAlignment.Left
 credit.Parent = main
 
--- Discord
 local discord = Instance.new("TextButton")
+discord.Size = UDim2.fromOffset(125, 20)
+discord.Position = UDim2.fromOffset(8, 287)
 discord.BackgroundTransparency = 1
-discord.Position = UDim2.fromOffset(10, 287)
-discord.Size = UDim2.fromOffset(120, 18)
 discord.Text = "Discord Server"
-discord.TextColor3 = Color3.fromRGB(80, 170, 255)
+discord.TextColor3 = Color3.fromRGB(80, 160, 230)
 discord.Font = Enum.Font.GothamBold
 discord.TextSize = 10
 discord.TextXAlignment = Enum.TextXAlignment.Left
 discord.Parent = main
 
 discord.Activated:Connect(function()
-    if setclipboard then
-        setclipboard("https://discord.gg/FJK6QzNnf7")
-    end
+	print("Discord Server clicked")
 end)
 
--- Avatar
+-- AVATAR
+
 local avatar = Instance.new("ImageLabel")
-avatar.BackgroundTransparency = 1
 avatar.Size = UDim2.fromOffset(42, 42)
-avatar.Position = UDim2.new(1, -54, 1, -65)
+avatar.Position = UDim2.new(1, -52, 1, -61)
+avatar.BackgroundColor3 = Color3.fromRGB(29, 39, 55)
 avatar.Parent = main
 
 local avatarCorner = Instance.new("UICorner")
 avatarCorner.CornerRadius = UDim.new(1, 0)
 avatarCorner.Parent = avatar
 
-local success, content = pcall(function()
-    return Players:GetUserThumbnailAsync(
-        player.UserId,
-        Enum.ThumbnailType.HeadShot,
-        Enum.ThumbnailSize.Size150x150
-    )
+local success, image = pcall(function()
+	return Players:GetUserThumbnailAsync(
+		player.UserId,
+		Enum.ThumbnailType.HeadShot,
+		Enum.ThumbnailSize.Size150x150
+	)
 end)
 
 if success then
-    avatar.Image = content
+	avatar.Image = image
 end
 
--- Username
 local username = Instance.new("TextLabel")
+username.Size = UDim2.fromOffset(90, 16)
+username.Position = UDim2.new(1, -101, 1, -18)
 username.BackgroundTransparency = 1
-username.Position = UDim2.new(1, -80, 1, -21)
-username.Size = UDim2.fromOffset(70, 16)
 username.Text = "@" .. player.Name
-username.TextColor3 = Color3.new(1, 1, 1)
+username.TextColor3 = Color3.fromRGB(170, 180, 195)
 username.Font = Enum.Font.Gotham
 username.TextSize = 9
-username.TextXAlignment = Enum.TextXAlignment.Center
+username.TextXAlignment = Enum.TextXAlignment.Right
 username.Parent = main
 
--- Minimized button
-local mini = Instance.new("ImageButton")
-mini.Size = UDim2.fromOffset(52, 52)
-mini.Position = UDim2.new(0.5, -26, 0, 8)
-mini.BackgroundColor3 = Color3.fromRGB(18, 27, 40)
-mini.BorderSizePixel = 0
-mini.Visible = false
-mini.Parent = gui
+-- MINIMIZED CIRCLE
 
-local miniCorner = Instance.new("UICorner")
-miniCorner.CornerRadius = UDim.new(1, 0)
-miniCorner.Parent = mini
+local circle = Instance.new("ImageButton")
+circle.Name = "MinimizedCircle"
+circle.Size = UDim2.fromOffset(52, 52)
+circle.Position = UDim2.new(0.5, -26, 0, 10)
+circle.BackgroundColor3 = Color3.fromRGB(18, 27, 40)
+circle.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
+circle.Visible = false
+circle.AutoButtonColor = true
+circle.Parent = gui
 
-local miniStroke = Instance.new("UIStroke")
-miniStroke.Color = Color3.fromRGB(45, 150, 255)
-miniStroke.Thickness = 2
-miniStroke.Parent = mini
+local circleCorner = Instance.new("UICorner")
+circleCorner.CornerRadius = UDim.new(1, 0)
+circleCorner.Parent = circle
 
-mini.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
+local circleStroke = Instance.new("UIStroke")
+circleStroke.Color = Color3.fromRGB(45, 100, 160)
+circleStroke.Thickness = 2
+circleStroke.Parent = circle
 
--- Minimize
+-- MINIMIZE
+
 minimize.Activated:Connect(function()
-    main.Visible = false
-    mini.Visible = true
+	main.Visible = false
+	circle.Visible = true
 end)
 
--- Reopen
-mini.Activated:Connect(function()
-    mini.Visible = false
-    main.Visible = true
+-- REOPEN
+
+circle.Activated:Connect(function()
+	circle.Visible = false
+	main.Visible = true
 end)
 
--- Close
+-- CLOSE
+
 close.Activated:Connect(function()
-    gui:Destroy()
+	main.Visible = false
+	circle.Visible = false
 end)
 
--- Mobile dragging
-local dragging = false
-local dragStart
-local startPos
+-- LOADING 3 SECONDS
 
-drag.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
-
-        dragging = true
-        dragStart = input.Position
-        startPos = main.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-UIS.InputChanged:Connect(function(input)
-    if dragging and (
-        input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch
-    ) then
-
-        local delta = input.Position - dragStart
-
-        main.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
-        )
-    end
-end)
-
--- Loading
 task.spawn(function()
-    for i = 0, 100 do
-        percent.Text = i .. "%"
-        bar.Size = UDim2.new(i / 100, 0, 1, 0)
-        task.wait(0.03)
-    end
 
-    percent.Text = "100%"
-    bar.Size = UDim2.new(1, 0, 1, 0)
+	for i = 0, 100 do
+		loadText.Text = "Loading... " .. i .. "%"
+		bar.Size = UDim2.new(i / 100, 0, 1, 0)
+		task.wait(0.03)
+	end
 
-    task.wait(0.2)
+	loadText.Text = "Loading... 100%"
 
-    loading:Destroy()
-    main.Visible = true
+	task.wait(0.15)
 
-    -- Start on KEYLESS
-    showKeyless()
+	loading.Visible = false
+	main.Visible = true
+
+	showKeyless()
 end)
