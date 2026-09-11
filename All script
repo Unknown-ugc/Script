@@ -26,7 +26,6 @@ main.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
 main.BorderSizePixel = 0
 main.Visible = true
 main.Active = true
-main.ZIndex = 1
 main.Parent = gui
 
 local mainCorner = Instance.new("UICorner")
@@ -73,7 +72,6 @@ close.ZIndex = 10
 close.Parent = main
 
 local dragBar = Instance.new("TextButton")
-dragBar.Name = "DragBar"
 dragBar.Size = UDim2.new(1, -70, 0, 42)
 dragBar.Position = UDim2.fromOffset(0, 0)
 dragBar.BackgroundTransparency = 1
@@ -89,9 +87,8 @@ list.BackgroundTransparency = 1
 list.BorderSizePixel = 0
 list.ScrollBarThickness = 3
 list.ScrollBarImageColor3 = Color3.fromRGB(70, 140, 255)
-list.CanvasSize = UDim2.new(0, 0, 0, 0)
 list.AutomaticCanvasSize = Enum.AutomaticSize.Y
-list.ZIndex = 2
+list.CanvasSize = UDim2.new()
 list.Parent = main
 
 local layout = Instance.new("UIListLayout")
@@ -114,7 +111,6 @@ local function addName(name, runFunction)
 	button.TextSize = 11
 	button.Font = Enum.Font.GothamBold
 	button.AutoButtonColor = true
-	button.ZIndex = 3
 	button.Parent = list
 
 	local corner = Instance.new("UICorner")
@@ -168,7 +164,6 @@ local footer = Instance.new("Frame")
 footer.Position = UDim2.new(0, 10, 1, -53)
 footer.Size = UDim2.new(1, -20, 0, 45)
 footer.BackgroundTransparency = 1
-footer.ZIndex = 3
 footer.Parent = main
 
 local credit = Instance.new("TextLabel")
@@ -194,7 +189,6 @@ discord.TextXAlignment = Enum.TextXAlignment.Left
 discord.Parent = footer
 
 local avatar = Instance.new("ImageLabel")
-avatar.Name = "PlayerAvatar"
 avatar.Size = UDim2.fromOffset(32, 32)
 avatar.Position = UDim2.new(1, -36, 0, 2)
 avatar.BackgroundColor3 = Color3.fromRGB(35, 45, 60)
@@ -240,9 +234,7 @@ local minimized = false
 local circle
 
 minimize.Activated:Connect(function()
-	if minimized then
-		return
-	end
+	if minimized then return end
 
 	minimized = true
 	main.Visible = false
@@ -268,11 +260,8 @@ minimize.Activated:Connect(function()
 	circleStroke.Parent = circle
 
 	circle.Activated:Connect(function()
-		if circle then
-			circle:Destroy()
-			circle = nil
-		end
-
+		circle:Destroy()
+		circle = nil
 		main.Visible = true
 		minimized = false
 	end)
@@ -299,15 +288,12 @@ end)
 UIS.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseButton1 then
-
 		dragging = false
 	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if not dragging then
-		return
-	end
+	if not dragging then return end
 
 	if input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseMovement then
@@ -401,7 +387,7 @@ task.spawn(function()
 	local duration = 3
 	local startTime = os.clock()
 
-	while gui.Parent and loading.Parent do
+	while true do
 		local progress = math.clamp((os.clock() - startTime) / duration, 0, 1)
 		local value = math.floor(progress * 100)
 
@@ -416,13 +402,15 @@ task.spawn(function()
 		task.wait(0.03)
 	end
 
-	if loading.Parent then
-		bar.Size = UDim2.new(1, 0, 1, 0)
-		loadingText.Text = "Loading... 100%"
-		percent.Text = "100%"
+	bar.Size = UDim2.new(1, 0, 1, 0)
+	loadingText.Text = "Loading... 100%"
+	percent.Text = "100%"
 
-		task.wait(0.1)
+	task.wait(0.15)
 
+	if loading then
 		loading:Destroy()
 	end
+
+	main.Visible = true
 end)
