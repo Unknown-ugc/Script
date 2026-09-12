@@ -143,6 +143,7 @@ end
 
 local function Shader()
 	loadstring(game:HttpGet("https://pastebin.com/raw/Zpaf00Nu"))()
+end
 
 local function LennonHub()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
