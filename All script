@@ -368,7 +368,7 @@ loadingTitle.BackgroundTransparency = 1
 loadingTitle.Position = UDim2.fromOffset(10,15)
 loadingTitle.Size = UDim2.new(1,-20,0,28)
 loadingTitle.Font = Enum.Font.GothamBold
-loadingTitle.Text = "SERVER HUB"
+loadingTitle.Text = "ALL SCRIPT HUB"
 loadingTitle.TextSize = 18
 loadingTitle.TextColor3 = Theme.Main
 loadingTitle.ZIndex = 501
@@ -566,10 +566,6 @@ local function Foxname()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()
 end
 
-local function Ouroboros()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()
-end
-
 local function Axonic()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Kenniel123/Steal-A-Egg/refs/heads/main/Steal%20A%20Egg"))()
 end
@@ -656,7 +652,6 @@ local function showKeylessScripts()
 	makeScriptButton("Lennon hub",LennonHub)
 	makeScriptButton("Fyy community",FyyCommunity)
 	makeScriptButton("Foxname",Foxname)
-	makeScriptButton("Ouroboros",Ouroboros)
 	makeScriptButton("Axonic",Axonic)
 	makeScriptButton("bobloscript-v2",BobloscriptV2)
 	makeScriptButton("Mcrzhub",Mcrzhub)
