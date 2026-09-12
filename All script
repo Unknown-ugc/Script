@@ -554,7 +554,7 @@ local function Shader()
 	loadstring(game:HttpGet("https://pastebin.com/raw/Zpaf00Nu"))()
 end
 
-local function BypassCheatandSpeed()
+local function BypassSpeed()
 	loadstring(game:HttpGet("https://rawscripts.net/raw/Steal-An-Egg-bypass-anti-cheat-224212"))()
 end
 
@@ -653,7 +653,7 @@ local function showKeylessScripts()
 
 	makeScriptButton("Finding one player server",FindingOnePlayerServer)
 	makeScriptButton("Shader",Shader)
-    makeScriptButton("Bypass Cheat and Speed",BypassCheatandSpeed)
+    makeScriptButton("Bypass Speed",BypassSpeed)
 	makeScriptButton("Lennon hub",LennonHub)
 	makeScriptButton("Fyy community",FyyCommunity)
 	makeScriptButton("Foxname",Foxname)
