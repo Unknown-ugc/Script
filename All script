@@ -23,6 +23,8 @@ main.Position = UDim2.new(.5,-175,.5,-135)
 main.BackgroundColor3 = Theme.BG
 main.BorderSizePixel = 0
 main.Parent = gui
+main.Active = true
+main.Selectable = true
 
 Instance.new("UICorner",main).CornerRadius = UDim.new(0,12)
 
@@ -41,6 +43,10 @@ title.TextSize = 13
 title.TextColor3 = Color3.new(1,1,1)
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = main
+
+title.Active = true
+title.Selectable = true
+title.ZIndex = 100
 
 local subtitle = Instance.new("TextLabel")
 subtitle.Position = UDim2.fromOffset(72,25)
