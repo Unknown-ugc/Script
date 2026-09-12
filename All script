@@ -733,7 +733,6 @@ local startPos
 title.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1
 	or input.UserInputType == Enum.UserInputType.Touch then
-
 		dragging = true
 		dragStart = input.Position
 		startPos = main.Position
@@ -741,10 +740,10 @@ title.InputBegan:Connect(function(input)
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if dragging and
-		(input.UserInputType == Enum.UserInputType.MouseMovement
-		or input.UserInputType == Enum.UserInputType.Touch) then
-
+	if dragging and (
+		input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch
+	) then
 		local delta = input.Position - dragStart
 
 		main.Position = UDim2.new(
@@ -765,7 +764,7 @@ end)
 
 local mini = Instance.new("ImageButton")
 mini.Size = UDim2.fromOffset(50,50)
-mini.Position = UDim2.new(.5,-25,.5,-25)
+mini.Position = UDim2.new(0.5,-25,0,10)
 mini.BackgroundColor3 = Theme.BG
 mini.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
 mini.Visible = false
