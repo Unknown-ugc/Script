@@ -1,5 +1,5 @@
 -- UI TEST ONLY
--- No external loaders / no script execution
+-- No external loaders / no external script execution
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
@@ -18,12 +18,11 @@ local CARD = Color3.fromRGB(18,27,43)
 local TEXT = Color3.fromRGB(240,245,255)
 local SUB = Color3.fromRGB(150,165,190)
 
-local main = Instance.new("Frame")
+local main = Instance.new("Frame",gui)
 main.Size = UDim2.fromOffset(350,270)
 main.Position = UDim2.new(0.5,-175,0.5,-135)
 main.BackgroundColor3 = BG
 main.BorderSizePixel = 0
-main.Parent = gui
 
 Instance.new("UICorner",main).CornerRadius = UDim.new(0,14)
 
@@ -73,11 +72,14 @@ close.Font = Enum.Font.GothamBold
 close.TextSize = 15
 Instance.new("UICorner",close).CornerRadius = UDim.new(0,8)
 
+-- NAV
+
 local nav = Instance.new("Frame",main)
 nav.Size = UDim2.fromOffset(57,226)
 nav.Position = UDim2.fromOffset(8,36)
 nav.BackgroundColor3 = CARD
 nav.BorderSizePixel = 0
+
 Instance.new("UICorner",nav).CornerRadius = UDim.new(0,10)
 
 local content = Instance.new("Frame",main)
@@ -89,13 +91,15 @@ local function navButton(text,y)
 	local b = Instance.new("TextButton",nav)
 	b.Size = UDim2.fromOffset(45,36)
 	b.Position = UDim2.fromOffset(6,y)
-	b.BackgroundColor3 = BG
+	b.BackgroundTransparency = 1
 	b.BorderSizePixel = 0
 	b.Text = text
 	b.TextColor3 = TEXT
 	b.Font = Enum.Font.GothamBold
 	b.TextSize = 7
+
 	Instance.new("UICorner",b).CornerRadius = UDim.new(0,8)
+
 	return b
 end
 
@@ -115,6 +119,7 @@ discord.Position = UDim2.fromOffset(2,0)
 discord.BackgroundColor3 = CARD
 discord.BorderSizePixel = 0
 discord.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=10367063084&width=420&height=420&format=png"
+
 Instance.new("UICorner",discord).CornerRadius = UDim.new(1,0)
 
 local DISCORD_LINK = "https://discord.gg/FJK6QzNnf7"
@@ -129,6 +134,7 @@ local avatar = Instance.new("ImageLabel",home)
 avatar.Size = UDim2.fromOffset(34,34)
 avatar.Position = UDim2.new(1,-36,0,0)
 avatar.BackgroundTransparency = 1
+
 Instance.new("UICorner",avatar).CornerRadius = UDim.new(1,0)
 
 local thumb = Players:GetUserThumbnailAsync(
@@ -150,14 +156,15 @@ username.TextSize = 7
 username.TextXAlignment = Enum.TextXAlignment.Right
 
 local info = Instance.new("ScrollingFrame",home)
-info.Position = UDim2.fromOffset(0,42)
-info.Size = UDim2.fromOffset(270,104)
+info.Position = UDim2.fromOffset(0,40)
+info.Size = UDim2.fromOffset(270,115)
 info.BackgroundColor3 = CARD
 info.BorderSizePixel = 0
 info.ScrollBarThickness = 3
 info.ScrollBarImageColor3 = THEME
 info.CanvasSize = UDim2.fromOffset(0,0)
 info.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
 Instance.new("UICorner",info).CornerRadius = UDim.new(0,10)
 
 local infoText = Instance.new("TextLabel",info)
@@ -192,7 +199,7 @@ infoText.TextYAlignment = Enum.TextYAlignment.Top
 
 local most = Instance.new("TextLabel",home)
 most.BackgroundTransparency = 1
-most.Position = UDim2.fromOffset(0,151)
+most.Position = UDim2.fromOffset(0,158)
 most.Size = UDim2.fromOffset(270,14)
 most.Font = Enum.Font.GothamBold
 most.Text = "MOST USED"
@@ -202,8 +209,8 @@ most.TextXAlignment = Enum.TextXAlignment.Left
 
 for i = 1,3 do
 	local row = Instance.new("TextLabel",home)
-	row.Size = UDim2.fromOffset(270,18)
-	row.Position = UDim2.fromOffset(0,167+(i-1)*20)
+	row.Size = UDim2.fromOffset(270,17)
+	row.Position = UDim2.fromOffset(0,174+(i-1)*18)
 	row.BackgroundColor3 = CARD
 	row.BorderSizePixel = 0
 	row.Font = Enum.Font.Gotham
@@ -211,6 +218,7 @@ for i = 1,3 do
 	row.TextColor3 = SUB
 	row.TextSize = 7
 	row.TextXAlignment = Enum.TextXAlignment.Left
+
 	Instance.new("UICorner",row).CornerRadius = UDim.new(0,7)
 end
 
@@ -229,6 +237,7 @@ key.Text = "KEY"
 key.TextColor3 = TEXT
 key.Font = Enum.Font.GothamBold
 key.TextSize = 8
+
 Instance.new("UICorner",key).CornerRadius = UDim.new(0,8)
 
 local keyless = Instance.new("TextButton",scripts)
@@ -240,6 +249,7 @@ keyless.Text = "KEYLESS"
 keyless.TextColor3 = TEXT
 keyless.Font = Enum.Font.GothamBold
 keyless.TextSize = 8
+
 Instance.new("UICorner",keyless).CornerRadius = UDim.new(0,8)
 
 local list = Instance.new("ScrollingFrame",scripts)
@@ -289,6 +299,7 @@ local function addScript(name)
 	row.Size = UDim2.new(1,-4,0,30)
 	row.BackgroundColor3 = CARD
 	row.BorderSizePixel = 0
+
 	Instance.new("UICorner",row).CornerRadius = UDim.new(0,8)
 
 	local nameLabel = Instance.new("TextLabel",row)
@@ -310,6 +321,7 @@ local function addScript(name)
 	run.TextColor3 = TEXT
 	run.Font = Enum.Font.GothamBold
 	run.TextSize = 7
+
 	Instance.new("UICorner",run).CornerRadius = UDim.new(0,7)
 
 	run.Activated:Connect(function()
@@ -319,6 +331,7 @@ end
 
 local function showList(data)
 	clearList()
+
 	for _,name in ipairs(data) do
 		addScript(name)
 	end
@@ -353,82 +366,158 @@ settings.CanvasSize = UDim2.fromOffset(0,0)
 local settingsLayout = Instance.new("UIListLayout",settings)
 settingsLayout.Padding = UDim.new(0,5)
 
-local colorTitle = Instance.new("TextLabel",settings)
-colorTitle.Size = UDim2.new(1,0,0,18)
-colorTitle.BackgroundTransparency = 1
-colorTitle.Text = "ACCENT COLOR"
-colorTitle.TextColor3 = TEXT
-colorTitle.Font = Enum.Font.GothamBold
-colorTitle.TextSize = 9
-colorTitle.TextXAlignment = Enum.TextXAlignment.Left
+local colorButton = Instance.new("TextButton",settings)
+colorButton.Size = UDim2.new(1,0,0,30)
+colorButton.BackgroundColor3 = CARD
+colorButton.BorderSizePixel = 0
+colorButton.Text = "🎨  COLOR SELECTION     ›"
+colorButton.TextColor3 = TEXT
+colorButton.Font = Enum.Font.GothamBold
+colorButton.TextSize = 8
+colorButton.TextXAlignment = Enum.TextXAlignment.Left
 
-local colors = {
-	{"Blue",Color3.fromRGB(35,125,255)},
-	{"Purple",Color3.fromRGB(145,80,255)},
-	{"Cyan",Color3.fromRGB(30,210,220)},
-	{"Green",Color3.fromRGB(50,200,100)},
-	{"Red",Color3.fromRGB(235,65,75)},
-	{"Orange",Color3.fromRGB(255,145,40)}
+Instance.new("UICorner",colorButton).CornerRadius = UDim.new(0,8)
+
+local colorArrow = Instance.new("TextLabel",colorButton)
+colorArrow.BackgroundTransparency = 1
+colorArrow.Size = UDim2.fromOffset(25,30)
+colorArrow.Position = UDim2.new(1,-30,0,0)
+colorArrow.Text = "›"
+colorArrow.TextColor3 = SUB
+colorArrow.Font = Enum.Font.GothamBold
+colorArrow.TextSize = 14
+
+local colorList = Instance.new("Frame",settings)
+colorList.Size = UDim2.new(1,0,0,0)
+colorList.BackgroundTransparency = 1
+colorList.Visible = false
+colorList.ClipsDescendants = true
+
+local colorLayout = Instance.new("UIListLayout",colorList)
+colorLayout.Padding = UDim.new(0,4)
+
+local themes = {
+	{
+		Name = "Ocean Glass",
+		Main = Color3.fromRGB(35,125,255),
+		Soft = Color3.fromRGB(35,60,95)
+	},
+	{
+		Name = "Purple Night",
+		Main = Color3.fromRGB(155,95,255),
+		Soft = Color3.fromRGB(65,45,95)
+	},
+	{
+		Name = "Cyan Frost",
+		Main = Color3.fromRGB(40,210,220),
+		Soft = Color3.fromRGB(35,75,90)
+	},
+	{
+		Name = "Emerald Glass",
+		Main = Color3.fromRGB(55,205,125),
+		Soft = Color3.fromRGB(35,80,60)
+	},
+	{
+		Name = "Sunset",
+		Main = Color3.fromRGB(255,135,55),
+		Soft = Color3.fromRGB(90,55,40)
+	},
+	{
+		Name = "Rose Night",
+		Main = Color3.fromRGB(245,90,145),
+		Soft = Color3.fromRGB(85,45,65)
+	}
 }
 
-for _,data in ipairs(colors) do
-	local b = Instance.new("TextButton",settings)
-	b.Size = UDim2.new(1,0,0,24)
-	b.BackgroundColor3 = CARD
+local function applyTheme(theme)
+	THEME = theme.Main
+
+	outline.Color = theme.Main
+	miniStroke.Color = theme.Main
+
+	key.BackgroundColor3 = theme.Main
+
+	list.ScrollBarImageColor3 = theme.Main
+	info.ScrollBarImageColor3 = theme.Main
+	settings.ScrollBarImageColor3 = theme.Main
+
+	play.BackgroundColor3 = theme.Main
+
+	colorButton.Text = "🎨  "..theme.Name.."     ✓"
+	colorArrow.TextColor3 = theme.Main
+end
+
+for _,theme in ipairs(themes) do
+	local b = Instance.new("TextButton",colorList)
+
+	b.Size = UDim2.new(1,0,0,25)
+	b.BackgroundColor3 = theme.Soft
 	b.BorderSizePixel = 0
-	b.Text = data[1]
+	b.Text = "●  "..theme.Name
 	b.TextColor3 = TEXT
 	b.Font = Enum.Font.Gotham
 	b.TextSize = 8
+	b.TextXAlignment = Enum.TextXAlignment.Left
+
 	Instance.new("UICorner",b).CornerRadius = UDim.new(0,7)
 
 	b.Activated:Connect(function()
-		THEME = data[2]
+		applyTheme(theme)
 
-		outline.Color = THEME
-		miniStroke.Color = THEME
-
-		key.BackgroundColor3 = THEME
-		list.ScrollBarImageColor3 = THEME
-		info.ScrollBarImageColor3 = THEME
-		settings.ScrollBarImageColor3 = THEME
-
-		if songPlaying then
-			play.BackgroundColor3 = THEME
-		end
+		colorList.Visible = false
+		colorList.Size = UDim2.new(1,0,0,0)
+		colorArrow.Text = "›"
 	end)
 end
+
+colorButton.Activated:Connect(function()
+	colorList.Visible = not colorList.Visible
+
+	if colorList.Visible then
+		colorList.Size = UDim2.new(1,0,0,174)
+		colorArrow.Text = "⌄"
+	else
+		colorList.Size = UDim2.new(1,0,0,0)
+		colorArrow.Text = "›"
+	end
+end)
 
 local songTitle = Instance.new("TextLabel",settings)
 songTitle.Size = UDim2.new(1,0,0,18)
 songTitle.BackgroundTransparency = 1
-songTitle.Text = "SONG ID"
+songTitle.Text = "🎵 SONG"
 songTitle.TextColor3 = TEXT
 songTitle.Font = Enum.Font.GothamBold
 songTitle.TextSize = 9
 songTitle.TextXAlignment = Enum.TextXAlignment.Left
 
-local songBox = Instance.new("TextBox",settings)
-songBox.Size = UDim2.new(1,0,0,28)
+local songRow = Instance.new("Frame",settings)
+songRow.Size = UDim2.new(1,0,0,30)
+songRow.BackgroundTransparency = 1
+
+local songBox = Instance.new("TextBox",songRow)
+songBox.Size = UDim2.new(1,-64,1,0)
 songBox.BackgroundColor3 = CARD
 songBox.BorderSizePixel = 0
-songBox.PlaceholderText = "Enter Roblox Song ID"
+songBox.PlaceholderText = "Song ID"
 songBox.PlaceholderColor3 = SUB
 songBox.TextColor3 = TEXT
 songBox.Font = Enum.Font.Gotham
 songBox.TextSize = 8
 songBox.ClearTextOnFocus = false
-songBox.Text = ""
+
 Instance.new("UICorner",songBox).CornerRadius = UDim.new(0,7)
 
-local play = Instance.new("TextButton",settings)
-play.Size = UDim2.new(1,0,0,26)
+local play = Instance.new("TextButton",songRow)
+play.Size = UDim2.fromOffset(58,30)
+play.Position = UDim2.new(1,-58,0,0)
 play.BackgroundColor3 = THEME
 play.BorderSizePixel = 0
 play.Text = "▶ PLAY"
 play.TextColor3 = TEXT
 play.Font = Enum.Font.GothamBold
-play.TextSize = 8
+play.TextSize = 7
+
 Instance.new("UICorner",play).CornerRadius = UDim.new(0,7)
 
 local stop = Instance.new("TextButton",settings)
@@ -439,6 +528,7 @@ stop.Text = "■ STOP"
 stop.TextColor3 = TEXT
 stop.Font = Enum.Font.GothamBold
 stop.TextSize = 8
+
 Instance.new("UICorner",stop).CornerRadius = UDim.new(0,7)
 
 local song = Instance.new("Sound")
@@ -447,24 +537,18 @@ song.Volume = 0.5
 song.Looped = true
 song.Parent = SoundService
 
-local songPlaying = false
-
 play.Activated:Connect(function()
 	local id = songBox.Text:gsub("%D","")
 
 	if id ~= "" then
 		song.SoundId = "rbxassetid://"..id
 		song:Play()
-		songPlaying = true
-		play.BackgroundColor3 = THEME
 		print("Playing Song ID: "..id)
 	end
 end)
 
 stop.Activated:Connect(function()
 	song:Stop()
-	songPlaying = false
-	play.BackgroundColor3 = THEME
 end)
 
 -- PAGE SWITCH
@@ -475,20 +559,33 @@ local function page(name)
 	settings.Visible = name == "Settings"
 end
 
+local function selectNav(selected)
+	homeButton.BackgroundTransparency = 1
+	scriptButton.BackgroundTransparency = 1
+	settingsButton.BackgroundTransparency = 1
+
+	selected.BackgroundTransparency = 0
+	selected.BackgroundColor3 = Color3.fromRGB(25,40,65)
+end
+
 homeButton.Activated:Connect(function()
 	page("Home")
+	selectNav(homeButton)
 end)
 
 scriptButton.Activated:Connect(function()
 	page("Script")
+	selectNav(scriptButton)
 end)
 
 settingsButton.Activated:Connect(function()
 	page("Settings")
+	selectNav(settingsButton)
 end)
 
+selectNav(homeButton)
+
 -- MINIMIZED CIRCLE
--- Top-center and draggable
 
 local mini = Instance.new("ImageButton",gui)
 mini.Size = UDim2.fromOffset(50,50)
@@ -517,8 +614,9 @@ mini.InputBegan:Connect(function(input)
 		miniDragStart = input.Position
 		miniStartPos = mini.Position
 
-		local connection
-		connection = UIS.InputChanged:Connect(function(move)
+		local moveConnection
+
+		moveConnection = UIS.InputChanged:Connect(function(move)
 			if move.UserInputType == Enum.UserInputType.MouseMovement
 			or move.UserInputType == Enum.UserInputType.Touch then
 
@@ -539,13 +637,19 @@ mini.InputBegan:Connect(function(input)
 			end
 		end)
 
-		local ended
-		ended = UIS.InputEnded:Connect(function(endInput)
+		local endConnection
+
+		endConnection = UIS.InputEnded:Connect(function(endInput)
 			if endInput.UserInputType == Enum.UserInputType.MouseButton1
 			or endInput.UserInputType == Enum.UserInputType.Touch then
 
-				connection:Disconnect()
-				ended:Disconnect()
+				if moveConnection then
+					moveConnection:Disconnect()
+				end
+
+				if endConnection then
+					endConnection:Disconnect()
+				end
 			end
 		end)
 	end
