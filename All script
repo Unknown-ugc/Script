@@ -212,23 +212,21 @@ welcome.Parent = home
 
 Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
 
-local welcomeText = Instance.new("TextLabel")
-welcomeText.Position = UDim2.fromOffset(10,9)
-welcomeText.Size = UDim2.fromOffset(250,132)
-welcomeText.BackgroundTransparency = 1
-welcomeText.TextWrapped = true
-welcomeText.TextYAlignment = Enum.TextYAlignment.Top
-welcomeText.TextXAlignment = Enum.TextXAlignment.Left
-welcomeText.Font = Enum.Font.Gotham
-welcomeText.TextSize = 8
-welcomeText.TextColor3 = Color3.fromRGB(205,210,220)
+local welcome = Instance.new("Frame")
+welcome.Position = UDim2.fromOffset(0,70)
+welcome.Size = UDim2.fromOffset(270,150)
+welcome.BackgroundColor3 = Theme.Card
+welcome.BorderSizePixel = 0
+welcome.Parent = home
+
+Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
 
 local welcomeScroll = Instance.new("ScrollingFrame")
 welcomeScroll.Name = "WelcomeScroll"
 welcomeScroll.BackgroundTransparency = 1
-welcomeScroll.Position = UDim2.fromOffset(8, 8)
-welcomeScroll.Size = UDim2.new(1, -16, 1, -16)
-welcomeScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+welcomeScroll.Position = UDim2.fromOffset(8,8)
+welcomeScroll.Size = UDim2.new(1,-16,1,-16)
+welcomeScroll.CanvasSize = UDim2.new(0,0,0,0)
 welcomeScroll.ScrollBarThickness = 4
 welcomeScroll.ScrollBarImageTransparency = 0.2
 welcomeScroll.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -237,25 +235,15 @@ welcomeScroll.Parent = welcome
 local welcomeText = Instance.new("TextLabel")
 welcomeText.Name = "WelcomeText"
 welcomeText.BackgroundTransparency = 1
-welcomeText.Position = UDim2.fromOffset(0, 0)
-welcomeText.Size = UDim2.new(1, -8, 0, 0)
+welcomeText.Size = UDim2.new(1,-8,0,0)
 welcomeText.AutomaticSize = Enum.AutomaticSize.Y
 welcomeText.Font = Enum.Font.Gotham
 welcomeText.TextSize = 12
 welcomeText.TextWrapped = true
 welcomeText.TextXAlignment = Enum.TextXAlignment.Left
 welcomeText.TextYAlignment = Enum.TextYAlignment.Top
-welcomeText.TextColor3 = Color3.fromRGB(220, 230, 245)
+welcomeText.TextColor3 = Color3.fromRGB(220,230,245)
 welcomeText.Parent = welcomeScroll
-
-welcomeText:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-	welcomeScroll.CanvasSize = UDim2.new(
-		0,
-		0,
-		0,
-		welcomeText.AbsoluteSize.Y + 10
-	)
-end)
 
 welcomeText.Text =
 	"Welcome to Steal an Egg All Script!\n\n" ..
@@ -280,7 +268,15 @@ welcomeText.Text =
 	"💬 Tap the Discord icon to copy the link!\n\n" ..
 	"Credit: Chris"
 
-welcomeText.Parent = welcomescroll
+task.defer(function()
+	task.wait()
+	welcomeScroll.CanvasSize = UDim2.new(
+		0,
+		0,
+		0,
+		welcomeText.AbsoluteSize.Y + 10
+	)
+end)
 
 local keyTab = Instance.new("TextButton")
 keyTab.Position = UDim2.fromOffset(0,0)
