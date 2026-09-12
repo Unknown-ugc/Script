@@ -2,7 +2,7 @@ local HttpService = game:GetService("HttpService")
 local TextChatService = game:GetService("TextChatService")
 
 local WEBHOOKS = {
-	Secret = "https://discord.com/api/webhooks/1545390070754967562/OTf2R-J700kwjZGM-FJAl8kmkHxVAtyP-OC3AvbeD7XavzYMmcqReknxu292negAS7Ll",
+	Secret = "https://discord.com/api/webhooks/1548315401383976970/BbDlUVyeBabI-ucLY58IrGKtHnfbM6zxqTxdpOQeBclP9kRy01HD0kP9Akdc1RbA8_o1",
 	Enternal = "https://discord.com/api/webhooks/1545391742381985832/MSiBN_1GEAIRcauTiIlHbM653OIJnVu_opVxUonzHdRnWNlokkF7q0TMkDCDwn6Q9rIa",
 	Divine = "https://discord.com/api/webhooks/1545391908287807598/jKvhnZwwCLMRMyPoFuzmu9MPmrSAv6xoy6Afwoxkv6nTTBGkuNnV28ljVRdeT5cSbfVz"
 }
