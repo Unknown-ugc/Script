@@ -550,6 +550,10 @@ local function FindingOnePlayerServer()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
 end
 
+local function Bypasscheat/speed()
+	loadstring(game:HttpGet("https://rawscripts.net/raw/Steal-An-Egg-bypass-anti-cheat-224212"))()
+end
+
 local function Shader()
 	loadstring(game:HttpGet("https://pastebin.com/raw/Zpaf00Nu"))()
 end
@@ -652,6 +656,7 @@ local function showKeylessScripts()
 	makeScriptButton("Lennon hub",LennonHub)
 	makeScriptButton("Fyy community",FyyCommunity)
 	makeScriptButton("Foxname",Foxname)
+    makeScriptButton("Bypass cheat/speed",Bypasscheat/speed)
 	makeScriptButton("Axonic",Axonic)
 	makeScriptButton("bobloscript-v2",BobloscriptV2)
 	makeScriptButton("Mcrzhub",Mcrzhub)
