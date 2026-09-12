@@ -921,9 +921,8 @@ local dragStart
 local startPos
 
 title.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-
+	if input.UserInputType == Enum.UserInputType.Touch
+	or input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
 		dragStart = input.Position
 		startPos = main.Position
@@ -931,10 +930,10 @@ title.InputBegan:Connect(function(input)
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if dragging and
-		(input.UserInputType == Enum.UserInputType.MouseMovement
-		or input.UserInputType == Enum.UserInputType.Touch) then
-
+	if dragging and (
+		input.UserInputType == Enum.UserInputType.Touch
+		or input.UserInputType == Enum.UserInputType.MouseMovement
+	) then
 		local delta = input.Position - dragStart
 
 		main.Position = UDim2.new(
@@ -947,148 +946,8 @@ UIS.InputChanged:Connect(function(input)
 end)
 
 UIS.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = false
-	end
-end)
-
-local mini = Instance.new("ImageButton")
-mini.Size = UDim2.fromOffset(50,50)
-mini.Position = UDim2.new(.5,-25,.5,-25)
-mini.BackgroundColor3 = Theme.BG
-mini.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
-mini.Visible = false
-mini.Parent = gui
-
-Instance.new("UICorner",mini).CornerRadius = UDim.new(1,0)
-
-local miniStroke = Instance.new("UIStroke")
-miniStroke.Color = Theme.Main
-miniStroke.Thickness = 2
-miniStroke.Parent = mini
-
-minimize.Activated:Connect(function()
-	main.Visible = false
-	mini.Visible = true
-end)
-
-mini.Activated:Connect(function()
-	main.Visible = true
-	mini.Visible = false
-end)
-
-close.Activated:Connect(function()
-	gui:Destroy()
-end)
-
-local transparencyTitle = Instance.new("TextLabel")
-transparencyTitle.Position = UDim2.fromOffset(0,257)
-transparencyTitle.Size = UDim2.fromOffset(260,16)
-transparencyTitle.BackgroundTransparency = 1
-transparencyTitle.Text = "TRANSPARENCY 0%"
-transparencyTitle.TextSize = 8
-transparencyTitle.Font = Enum.Font.GothamBold
-transparencyTitle.TextColor3 = Theme.Main
-transparencyTitle.TextXAlignment = Enum.TextXAlignment.Left
-transparencyTitle.Parent = settingsPage
-
-local transparencyBar = Instance.new("Frame")
-transparencyBar.Position = UDim2.fromOffset(0,282)
-transparencyBar.Size = UDim2.fromOffset(260,5)
-transparencyBar.BackgroundColor3 = Theme.Card
-transparencyBar.BorderSizePixel = 0
-transparencyBar.Parent = settingsPage
-
-Instance.new("UICorner",transparencyBar).CornerRadius = UDim.new(1,0)
-
-local transparencyDot = Instance.new("TextButton")
-transparencyDot.Size = UDim2.fromOffset(14,14)
-transparencyDot.Position = UDim2.new(0,-7,.5,-7)
-transparencyDot.BackgroundColor3 = Theme.Main
-transparencyDot.Text = ""
-transparencyDot.BorderSizePixel = 0
-transparencyDot.Parent = transparencyBar
-
-Instance.new("UICorner",transparencyDot).CornerRadius = UDim.new(1,0)
-
-local transparencyDragging = false
-
-local function setTransparency(x)
-	local percent = math.clamp(
-		(x-transparencyBar.AbsolutePosition.X) /
-		transparencyBar.AbsoluteSize.X,
-		0,
-		1
-	)
-
-	transparencyDot.Position =
-		UDim2.new(percent,-7,.5,-7)
-
-	local value = math.floor(percent*100)
-
-	transparencyTitle.Text =
-		"TRANSPARENCY "..value.."%"
-
-	main.BackgroundTransparency = percent
-end
-
-transparencyDot.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-		transparencyDragging = true
-	end
-end)
-
-UIS.InputChanged:Connect(function(input)
-	if transparencyDragging and
-		(input.UserInputType == Enum.UserInputType.MouseMovement
-		or input.UserInputType == Enum.UserInputType.Touch) then
-
-		setTransparency(input.Position.X)
-	end
-end)
-
-UIS.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-		transparencyDragging = false
-	end
-end)
-
-local dragging = false
-local dragStart
-local startPos
-
-title.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-
-		dragging = true
-		dragStart = input.Position
-		startPos = main.Position
-	end
-end)
-
-UIS.InputChanged:Connect(function(input)
-	if dragging and
-		(input.UserInputType == Enum.UserInputType.MouseMovement
-		or input.UserInputType == Enum.UserInputType.Touch) then
-
-		local delta = input.Position - dragStart
-
-		main.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
-	end
-end)
-
-UIS.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
+	if input.UserInputType == Enum.UserInputType.Touch
+	or input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = false
 	end
 end)
@@ -1114,13 +973,16 @@ minimize.Activated:Connect(function()
 end)
 
 local miniDragging = false
+local miniMoved = false
 local miniDragStart
 local miniStartPos
 
 mini.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch
 	or input.UserInputType == Enum.UserInputType.MouseButton1 then
+
 		miniDragging = true
+		miniMoved = false
 		miniDragStart = input.Position
 		miniStartPos = mini.Position
 	end
@@ -1131,7 +993,12 @@ UIS.InputChanged:Connect(function(input)
 		input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseMovement
 	) then
+
 		local delta = input.Position - miniDragStart
+
+		if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then
+			miniMoved = true
+		end
 
 		mini.Position = UDim2.new(
 			miniStartPos.X.Scale,
@@ -1145,7 +1012,14 @@ end)
 UIS.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Touch
 	or input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+		if miniDragging and not miniMoved then
+			main.Visible = true
+			mini.Visible = false
+		end
+
 		miniDragging = false
+		miniMoved = false
 	end
 end)
 
