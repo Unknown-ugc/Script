@@ -501,7 +501,7 @@ local function MirandaHub()
 end
 
 local function CloverHub()
-	print("RUN: Clover hub")
+	loadstring(game:HttpGet("https://cloverhub.app/clover.lua"))()
 end
 
 local function AjjansHub()
@@ -514,6 +514,22 @@ end
 
 local function SpeedHub()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+end
+
+local function OmgHub()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))()   
+end
+
+local function NightHub()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/StealAnEggs.luau"))()   
+end
+
+local function ZeroinHub()
+	loadstring(game:HttpGet("https://zeroinhub.com/api/script"))()   
+end
+
+local function FindingOnePlayerServer()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()
 end
 
 local function FindingOnePlayerServer()
@@ -608,6 +624,10 @@ local function showKeyScripts()
 	makeScriptButton("Ajjans hub",AjjansHub)
 	makeScriptButton("Big Foot",BigFoot)
 	makeScriptButton("Speed Hub",SpeedHub)
+    makeScriptButton("Omg Hub",OmgHub)
+    makeScriptButton("Night Hub",NightHub)
+    makeScriptButton("Zeroin Hub",ZeroinHub)
+    makeScriptButton("QuantumqOnyx",QuantumqOnyx)
 
 	task.wait()
 	scriptList.CanvasSize =
