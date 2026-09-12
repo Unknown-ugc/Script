@@ -255,6 +255,7 @@ welcomeScroll.BackgroundTransparency = 1
 welcomeScroll.BorderSizePixel = 0
 welcomeScroll.ScrollBarThickness = 4
 welcomeScroll.ScrollingDirection = Enum.ScrollingDirection.Y
+welcomeScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 welcomeScroll.CanvasSize = UDim2.new(0,0,0,0)
 welcomeScroll.Parent = welcome
 
@@ -294,19 +295,6 @@ welcomeText.Text =
 	"Steal an Egg community together!\n\n" ..
 	"💬 Tap the Discord icon to copy the link!\n\n" ..
 	"Credit: Chris"
-
-task.defer(function()
-	task.wait(0.1)
-
-	local height = welcomeText.AbsoluteSize.Y
-
-	welcomeScroll.CanvasSize = UDim2.new(
-		0,
-		0,
-		0,
-		height + 10
-	)
-end)
 
 local keyTab = Instance.new("TextButton")
 keyTab.Position = UDim2.fromOffset(0,0)
