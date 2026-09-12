@@ -138,7 +138,7 @@ padding.Parent = list
 -- INDIVIDUAL FUNCTIONS
 
 local function FindingOnePlayerServer()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaegg"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
 end
 
 local function LennonHub()
