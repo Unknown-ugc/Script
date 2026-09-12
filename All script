@@ -221,31 +221,38 @@ welcome.Parent = home
 
 Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
 
+local welcome = Instance.new("Frame")
+welcome.Position = UDim2.fromOffset(0,70)
+welcome.Size = UDim2.fromOffset(270,150)
+welcome.BackgroundColor3 = Theme.Card
+welcome.BorderSizePixel = 0
+welcome.ClipsDescendants = true
+welcome.Parent = home
+
+Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
+
 local welcomeScroll = Instance.new("ScrollingFrame")
 welcomeScroll.Name = "WelcomeScroll"
-welcomeScroll.BackgroundTransparency = 1
 welcomeScroll.Position = UDim2.fromOffset(8,8)
 welcomeScroll.Size = UDim2.new(1,-16,1,-16)
-welcomeScroll.CanvasSize = UDim2.new(0,0,0,0)
+welcomeScroll.BackgroundTransparency = 1
+welcomeScroll.BorderSizePixel = 0
 welcomeScroll.ScrollBarThickness = 4
-welcomeScroll.ScrollBarImageTransparency = 0.2
 welcomeScroll.ScrollingDirection = Enum.ScrollingDirection.Y
+welcomeScroll.CanvasSize = UDim2.new(0,0,0,900)
 welcomeScroll.Parent = welcome
 
 local welcomeText = Instance.new("TextLabel")
-local welcomeText = Instance.new("TextLabel")
 welcomeText.Name = "WelcomeText"
-welcomeText.BackgroundTransparency = 1
 welcomeText.Position = UDim2.fromOffset(0,0)
-welcomeText.Size = UDim2.new(1,-8,0,0)
+welcomeText.Size = UDim2.new(1,-10,0,850)
+welcomeText.BackgroundTransparency = 1
 welcomeText.Font = Enum.Font.Gotham
 welcomeText.TextSize = 12
 welcomeText.TextWrapped = true
 welcomeText.TextXAlignment = Enum.TextXAlignment.Left
 welcomeText.TextYAlignment = Enum.TextYAlignment.Top
 welcomeText.TextColor3 = Color3.fromRGB(220,230,245)
-welcomeText.Parent = welcomeScroll
-
 welcomeText.Text =
 	"Welcome to Steal an Egg All Script!\n\n" ..
 	"All scripts are here in one place. Open the " ..
@@ -269,21 +276,7 @@ welcomeText.Text =
 	"💬 Tap the Discord icon to copy the link!\n\n" ..
 	"Credit: Chris"
 
-task.defer(function()
-	task.wait()
-
-	local height = welcomeText.TextBounds.Y + 15
-
-	welcomeText.Size = UDim2.new(
-		1,-8,
-		0,height
-	)
-
-	welcomeScroll.CanvasSize = UDim2.new(
-		0,0,
-		0,height + 10
-	)
-end)
+welcomeText.Parent = welcomeScroll
 
 local keyTab = Instance.new("TextButton")
 keyTab.Position = UDim2.fromOffset(0,0)
