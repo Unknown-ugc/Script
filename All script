@@ -249,6 +249,20 @@ welcome.BorderSizePixel = 0
 welcome.ClipsDescendants = true
 welcome.Parent = home
 
+welcome.Parent = home
+
+local scrollHint = Instance.new("TextLabel")
+scrollHint.BackgroundTransparency = 1
+scrollHint.Position = UDim2.new(1,-115,0,3)
+scrollHint.Size = UDim2.fromOffset(105,18)
+scrollHint.Font = Enum.Font.GothamBold
+scrollHint.Text = "↕ SWIPE TO SCROLL"
+scrollHint.TextSize = 7
+scrollHint.TextColor3 = Theme.Main
+scrollHint.TextXAlignment = Enum.TextXAlignment.Right
+scrollHint.ZIndex = 5
+scrollHint.Parent = welcome
+
 Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
 
 local welcome = Instance.new("Frame")
