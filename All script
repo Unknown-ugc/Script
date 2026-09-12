@@ -1,22 +1,21 @@
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 local SoundService = game:GetService("SoundService")
+local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
 
 local DISCORD_LINK = "https://discord.gg/FJK6QzNnf7"
 
 local Theme = {
-	Main = Color3.fromRGB(35,125,255),
-	BG = Color3.fromRGB(10,16,28),
-	Card = Color3.fromRGB(18,27,43)
+Main = Color3.fromRGB(35,125,255),
+BG = Color3.fromRGB(10,16,28),
+Card = Color3.fromRGB(18,27,43)
 }
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "StealAnEggAllScript"
 gui.ResetOnSpawn = false
-gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local main = Instance.new("Frame")
@@ -36,76 +35,63 @@ stroke.Thickness = 1.5
 stroke.Parent = main
 
 local title = Instance.new("TextLabel")
+title.Position = UDim2.fromOffset(72,6)
+title.Size = UDim2.fromOffset(210,20)
 title.BackgroundTransparency = 1
-title.Position = UDim2.fromOffset(12,8)
-title.Size = UDim2.fromOffset(230,25)
-title.Font = Enum.Font.GothamBold
 title.Text = "Steal an Egg All Script"
-title.TextSize = 16
-title.TextColor3 = Color3.fromRGB(235,240,250)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 13
+title.TextColor3 = Color3.new(1,1,1)
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = main
 
+title.Active = true
+title.Selectable = true
+title.ZIndex = 100
+
 local subtitle = Instance.new("TextLabel")
+subtitle.Position = UDim2.fromOffset(72,25)
+subtitle.Size = UDim2.fromOffset(210,15)
 subtitle.BackgroundTransparency = 1
-subtitle.Position = UDim2.fromOffset(12,32)
-subtitle.Size = UDim2.fromOffset(230,18)
+subtitle.Text = "All scripts in one place"
 subtitle.Font = Enum.Font.Gotham
-subtitle.Text = "All your scripts in one place"
-subtitle.TextSize = 10
-subtitle.TextColor3 = Color3.fromRGB(150,165,185)
+subtitle.TextSize = 8
+subtitle.TextColor3 = Color3.fromRGB(160,170,185)
 subtitle.TextXAlignment = Enum.TextXAlignment.Left
 subtitle.Parent = main
 
 local minimize = Instance.new("TextButton")
-minimize.Size = UDim2.fromOffset(30,28)
-minimize.Position = UDim2.new(1,-65,0,7)
+minimize.Position = UDim2.new(1,-62,0,5)
+minimize.Size = UDim2.fromOffset(28,24)
 minimize.BackgroundTransparency = 1
 minimize.Text = "−"
+minimize.TextSize = 20
+minimize.TextColor3 = Color3.new(1,1,1)
 minimize.Font = Enum.Font.GothamBold
-minimize.TextSize = 22
-minimize.TextColor3 = Color3.fromRGB(220,230,245)
 minimize.Parent = main
 
 local close = Instance.new("TextButton")
-close.Size = UDim2.fromOffset(30,28)
-close.Position = UDim2.new(1,-35,0,7)
+close.Position = UDim2.new(1,-32,0,5)
+close.Size = UDim2.fromOffset(28,24)
 close.BackgroundTransparency = 1
 close.Text = "×"
+close.TextSize = 18
+close.TextColor3 = Color3.new(1,1,1)
 close.Font = Enum.Font.GothamBold
-close.TextSize = 20
-close.TextColor3 = Color3.fromRGB(255,100,100)
 close.Parent = main
 
 local nav = Instance.new("Frame")
-nav.Position = UDim2.fromOffset(10,55)
-nav.Size = UDim2.fromOffset(330,32)
+nav.Position = UDim2.fromOffset(8,36)
+nav.Size = UDim2.fromOffset(57,226)
 nav.BackgroundColor3 = Theme.Card
 nav.BorderSizePixel = 0
 nav.Parent = main
 
-Instance.new("UICorner",nav).CornerRadius = UDim.new(0,8)
-
-local function makeNavButton(text,x)
-	local button = Instance.new("TextButton")
-	button.Size = UDim2.fromOffset(100,26)
-	button.Position = UDim2.fromOffset(x,3)
-	button.BackgroundTransparency = 1
-	button.Text = text
-	button.Font = Enum.Font.GothamBold
-	button.TextSize = 11
-	button.TextColor3 = Color3.fromRGB(190,205,225)
-	button.Parent = nav
-	return button
-end
-
-local homeButton = makeNavButton("HOME",5)
-local scriptButton = makeNavButton("SCRIPT",115)
-local settingsButton = makeNavButton("SETTINGS",225)
+Instance.new("UICorner",nav).CornerRadius = UDim.new(0,9)
 
 local content = Instance.new("Frame")
-content.Position = UDim2.fromOffset(10,92)
-content.Size = UDim2.fromOffset(330,168)
+content.Position = UDim2.fromOffset(72,36)
+content.Size = UDim2.fromOffset(270,226)
 content.BackgroundTransparency = 1
 content.Parent = main
 
@@ -120,77 +106,153 @@ scriptsPage.BackgroundTransparency = 1
 scriptsPage.Visible = false
 scriptsPage.Parent = content
 
-local settingsPage = Instance.new("Frame")
+local settingsPage = Instance.new("ScrollingFrame")
 settingsPage.Size = UDim2.fromScale(1,1)
 settingsPage.BackgroundTransparency = 1
+settingsPage.BorderSizePixel = 0
+settingsPage.ScrollBarThickness = 3
+settingsPage.CanvasSize = UDim2.fromOffset(0,400)
 settingsPage.Visible = false
 settingsPage.Parent = content
 
+local function makeNav(text,y)
+local b = Instance.new("TextButton")
+b.Position = UDim2.fromOffset(4,y)
+b.Size = UDim2.fromOffset(49,42)
+b.BackgroundTransparency = 1
+b.Text = text
+b.TextSize = 8
+b.Font = Enum.Font.GothamBold
+b.TextColor3 = Color3.fromRGB(210,215,225)
+b.Parent = nav
+
+Instance.new("UICorner",b).CornerRadius = UDim.new(0,8)  
+
+return b
+
+end
+
+local homeButton = makeNav("HOME",8)
+local scriptButton = makeNav("SCRIPT",56)
+local settingsButton = makeNav("SETTINGS",104)
+
+local function selectNav(selected)
+homeButton.BackgroundTransparency = 1
+scriptButton.BackgroundTransparency = 1
+settingsButton.BackgroundTransparency = 1
+
+selected.BackgroundTransparency = 0  
+selected.BackgroundColor3 = Color3.fromRGB(25,40,65)
+
+end
+
+local function showPage(page)
+home.Visible = false
+scriptsPage.Visible = false
+settingsPage.Visible = false
+page.Visible = true
+end
+
+selectNav(homeButton)
+
+homeButton.Activated:Connect(function()
+selectNav(homeButton)
+showPage(home)
+end)
+
+scriptButton.Activated:Connect(function()
+selectNav(scriptButton)
+showPage(scriptsPage)
+end)
+
+settingsButton.Activated:Connect(function()
+selectNav(settingsButton)
+showPage(settingsPage)
+end)
+
 local discord = Instance.new("ImageButton")
-discord.Name = "DiscordButton"
-discord.Size = UDim2.fromOffset(38,38)
 discord.Position = UDim2.fromOffset(0,0)
-discord.BackgroundColor3 = Theme.Card
-discord.BorderSizePixel = 0
+discord.Size = UDim2.fromOffset(34,34)
+discord.BackgroundTransparency = 1
 discord.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=10367063084&width=420&height=420&format=png"
 discord.Parent = home
 
 Instance.new("UICorner",discord).CornerRadius = UDim.new(1,0)
 
-local discordStroke = Instance.new("UIStroke")
-discordStroke.Color = Theme.Main
-discordStroke.Thickness = 1.5
-discordStroke.Parent = discord
-
 discord.Activated:Connect(function()
-	if setclipboard then
-		setclipboard(DISCORD_LINK)
-	end
+if setclipboard then
+setclipboard(DISCORD_LINK)
+end
 end)
 
 local avatar = Instance.new("ImageLabel")
-avatar.Name = "Profile"
-avatar.Size = UDim2.fromOffset(38,38)
-avatar.Position = UDim2.new(1,-38,0,0)
-avatar.BackgroundColor3 = Theme.Card
-avatar.BorderSizePixel = 0
+avatar.Position = UDim2.new(1,-36,0,0)
+avatar.Size = UDim2.fromOffset(34,34)
+avatar.BackgroundTransparency = 1
 avatar.Parent = home
 
 Instance.new("UICorner",avatar).CornerRadius = UDim.new(1,0)
 
-local avatarStroke = Instance.new("UIStroke")
-avatarStroke.Color = Theme.Main
-avatarStroke.Thickness = 1.5
-avatarStroke.Parent = avatar
+local avatarImage = Players:GetUserThumbnailAsync(
+player.UserId,
+Enum.ThumbnailType.HeadShot,
+Enum.ThumbnailSize.Size100x100
+)
 
-local success,contentImage = pcall(function()
-	return Players:GetUserThumbnailAsync(
-		player.UserId,
-		Enum.ThumbnailType.HeadShot,
-		Enum.ThumbnailSize.Size100x100
-	)
-end)
-
-if success then
-	avatar.Image = contentImage
-end
+avatar.Image = avatarImage
 
 local username = Instance.new("TextLabel")
-username.Name = "Username"
+username.Position = UDim2.new(1,-150,0,36)
+username.Size = UDim2.fromOffset(145,18)
 username.BackgroundTransparency = 1
-username.Position = UDim2.new(1,-150,0,40)
-username.Size = UDim2.fromOffset(150,18)
+username.Text = "@"..player.Name
 username.Font = Enum.Font.GothamBold
-username.Text = "@" .. player.Name
-username.TextSize = 10
-username.TextColor3 = Color3.fromRGB(190,205,225)
+username.TextSize = 8
+username.TextColor3 = Color3.new(1,1,1)
 username.TextXAlignment = Enum.TextXAlignment.Right
-username.TextTruncate = Enum.TextTruncate.AtEnd
 username.Parent = home
 
 local welcome = Instance.new("Frame")
-welcome.Position = UDim2.fromOffset(0,62)
-welcome.Size = UDim2.fromOffset(330,100)
+welcome.Position = UDim2.fromOffset(0,70)
+welcome.Size = UDim2.fromOffset(270,150)
+welcome.BackgroundColor3 = Theme.Card
+welcome.BorderSizePixel = 0
+welcome.Parent = home
+
+Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
+
+local welcome = Instance.new("Frame")
+welcome.Position = UDim2.fromOffset(0,70)
+welcome.Size = UDim2.fromOffset(270,150)
+welcome.BackgroundColor3 = Theme.Card
+welcome.BorderSizePixel = 0
+welcome.Parent = home
+
+Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
+
+local welcome = Instance.new("Frame")
+welcome.Position = UDim2.fromOffset(0,70)
+welcome.Size = UDim2.fromOffset(270,150)
+welcome.BackgroundColor3 = Theme.Card
+welcome.BorderSizePixel = 0
+welcome.ClipsDescendants = true
+welcome.Parent = home
+
+Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
+
+local welcome = Instance.new("Frame")
+welcome.Position = UDim2.fromOffset(0,70)
+welcome.Size = UDim2.fromOffset(270,150)
+welcome.BackgroundColor3 = Theme.Card
+welcome.BorderSizePixel = 0
+welcome.ClipsDescendants = true
+welcome.Parent = home
+
+Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
+
+local welcome = Instance.new("Frame")
+welcome.Position = UDim2.fromOffset(0,70)
+welcome.Size = UDim2.fromOffset(270,150)
 welcome.BackgroundColor3 = Theme.Card
 welcome.BorderSizePixel = 0
 welcome.ClipsDescendants = true
@@ -206,7 +268,6 @@ welcomeScroll.BackgroundTransparency = 1
 welcomeScroll.BorderSizePixel = 0
 welcomeScroll.ScrollBarThickness = 4
 welcomeScroll.ScrollingDirection = Enum.ScrollingDirection.Y
-welcomeScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 welcomeScroll.CanvasSize = UDim2.new(0,0,0,0)
 welcomeScroll.Parent = welcome
 
@@ -247,96 +308,88 @@ welcomeText.Text =
 	"💬 Tap the Discord icon to copy the link!\n\n" ..
 	"Credit: Chris"
 
-local function showPage(page)
-	home.Visible = false
-	scriptsPage.Visible = false
-	settingsPage.Visible = false
+task.defer(function()
+	task.wait()
 
-	page.Visible = true
+	local height = welcomeText.AbsoluteSize.Y
 
-	homeButton.TextColor3 = Color3.fromRGB(190,205,225)
-	scriptButton.TextColor3 = Color3.fromRGB(190,205,225)
-	settingsButton.TextColor3 = Color3.fromRGB(190,205,225)
-
-	if page == home then
-		homeButton.TextColor3 = Theme.Main
-	elseif page == scriptsPage then
-		scriptButton.TextColor3 = Theme.Main
-	elseif page == settingsPage then
-		settingsButton.TextColor3 = Theme.Main
-	end
-end
-
-homeButton.Activated:Connect(function()
-	showPage(home)
+	welcomeScroll.CanvasSize = UDim2.new(
+		0,
+		0,
+		0,
+		height
+	)
 end)
 
-scriptButton.Activated:Connect(function()
-	showPage(scriptsPage)
-end)
-
-settingsButton.Activated:Connect(function()
-	showPage(settingsPage)
-end)
-
-showPage(home)
-
--- LOADING SCREEN
 main.Visible = false
 
 local loading = Instance.new("Frame")
 loading.Name = "LoadingScreen"
-loading.Size = UDim2.fromScale(1,1)
-loading.BackgroundColor3 = Theme.BG
+loading.Size = UDim2.fromOffset(210,110)
+loading.Position = UDim2.new(0.5,-105,0.5,-55)
+loading.BackgroundColor3 = Theme.Card
 loading.BorderSizePixel = 0
-loading.ZIndex = 100
+loading.ZIndex = 200
 loading.Parent = gui
+
+Instance.new("UICorner",loading).CornerRadius = UDim.new(0,12)
+
+local loadingStroke = Instance.new("UIStroke")
+loadingStroke.Color = Theme.Main
+loadingStroke.Thickness = 1.5
+loadingStroke.Parent = loading
 
 local loadingTitle = Instance.new("TextLabel")
 loadingTitle.BackgroundTransparency = 1
-loadingTitle.Size = UDim2.new(1,0,0,40)
-loadingTitle.Position = UDim2.new(0,0,0.40,0)
+loadingTitle.Position = UDim2.fromOffset(10,18)
+loadingTitle.Size = UDim2.new(1,-20,0,25)
 loadingTitle.Font = Enum.Font.GothamBold
 loadingTitle.Text = "SERVER HUB"
-loadingTitle.TextSize = 25
+loadingTitle.TextSize = 18
 loadingTitle.TextColor3 = Theme.Main
-loadingTitle.ZIndex = 101
+loadingTitle.ZIndex = 201
 loadingTitle.Parent = loading
 
 local loadingText = Instance.new("TextLabel")
 loadingText.BackgroundTransparency = 1
-loadingText.Size = UDim2.new(1,0,0,25)
-loadingText.Position = UDim2.new(0,0,0.52,0)
+loadingText.Position = UDim2.fromOffset(10,52)
+loadingText.Size = UDim2.new(1,-20,0,20)
 loadingText.Font = Enum.Font.Gotham
 loadingText.Text = "Loading..."
-loadingText.TextSize = 13
+loadingText.TextSize = 11
 loadingText.TextColor3 = Color3.fromRGB(210,220,235)
-loadingText.ZIndex = 101
+loadingText.ZIndex = 201
 loadingText.Parent = loading
 
 task.wait(3)
 
 local fade = TweenService:Create(
 	loading,
-	TweenInfo.new(0.35,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),
-	{BackgroundTransparency = 1}
+	TweenInfo.new(0.4),
+	{
+		BackgroundTransparency = 1
+	}
 )
 
-local titleFade = TweenService:Create(
+local fadeTitle = TweenService:Create(
 	loadingTitle,
-	TweenInfo.new(0.35),
-	{TextTransparency = 1}
+	TweenInfo.new(0.4),
+	{
+		TextTransparency = 1
+	}
 )
 
-local textFade = TweenService:Create(
+local fadeText = TweenService:Create(
 	loadingText,
-	TweenInfo.new(0.35),
-	{TextTransparency = 1}
+	TweenInfo.new(0.4),
+	{
+		TextTransparency = 1
+	}
 )
 
 fade:Play()
-titleFade:Play()
-textFade:Play()
+fadeTitle:Play()
+fadeText:Play()
 
 fade.Completed:Wait()
 
