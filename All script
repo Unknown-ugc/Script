@@ -788,9 +788,55 @@ minimize.Activated:Connect(function()
 	mini.Visible = true
 end)
 
-mini.Activated:Connect(function()
-	main.Visible = true
-	mini.Visible = false
+local miniDragging = false
+local miniMoved = false
+local miniDragStart
+local miniStartPos
+
+mini.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch
+	or input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+		miniDragging = true
+		miniMoved = false
+		miniDragStart = input.Position
+		miniStartPos = mini.Position
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if miniDragging and (
+		input.UserInputType == Enum.UserInputType.Touch
+		or input.UserInputType == Enum.UserInputType.MouseMovement
+	) then
+
+		local delta = input.Position - miniDragStart
+
+		if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then
+			miniMoved = true
+		end
+
+		mini.Position = UDim2.new(
+			miniStartPos.X.Scale,
+			miniStartPos.X.Offset + delta.X,
+			miniStartPos.Y.Scale,
+			miniStartPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch
+	or input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+		if miniDragging and not miniMoved then
+			main.Visible = true
+			mini.Visible = false
+		end
+
+		miniDragging = false
+		miniMoved = false
+	end
 end)
 
 close.Activated:Connect(function()
