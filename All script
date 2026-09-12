@@ -233,10 +233,11 @@ welcomeScroll.ScrollingDirection = Enum.ScrollingDirection.Y
 welcomeScroll.Parent = welcome
 
 local welcomeText = Instance.new("TextLabel")
+local welcomeText = Instance.new("TextLabel")
 welcomeText.Name = "WelcomeText"
 welcomeText.BackgroundTransparency = 1
+welcomeText.Position = UDim2.fromOffset(0,0)
 welcomeText.Size = UDim2.new(1,-8,0,0)
-welcomeText.AutomaticSize = Enum.AutomaticSize.Y
 welcomeText.Font = Enum.Font.Gotham
 welcomeText.TextSize = 12
 welcomeText.TextWrapped = true
@@ -270,11 +271,17 @@ welcomeText.Text =
 
 task.defer(function()
 	task.wait()
+
+	local height = welcomeText.TextBounds.Y + 15
+
+	welcomeText.Size = UDim2.new(
+		1,-8,
+		0,height
+	)
+
 	welcomeScroll.CanvasSize = UDim2.new(
-		0,
-		0,
-		0,
-		welcomeText.AbsoluteSize.Y + 10
+		0,0,
+		0,height + 10
 	)
 end)
 
