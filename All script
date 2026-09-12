@@ -1095,7 +1095,7 @@ end)
 
 local mini = Instance.new("ImageButton")
 mini.Size = UDim2.fromOffset(50,50)
-mini.Position = UDim2.new(.5,-25,.5,-25)
+mini.Position = UDim2.new(0.5,-25,0,10)
 mini.BackgroundColor3 = Theme.BG
 mini.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
 mini.Visible = false
@@ -1113,9 +1113,40 @@ minimize.Activated:Connect(function()
 	mini.Visible = true
 end)
 
-mini.Activated:Connect(function()
-	main.Visible = true
-	mini.Visible = false
+local miniDragging = false
+local miniDragStart
+local miniStartPos
+
+mini.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch
+	or input.UserInputType == Enum.UserInputType.MouseButton1 then
+		miniDragging = true
+		miniDragStart = input.Position
+		miniStartPos = mini.Position
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if miniDragging and (
+		input.UserInputType == Enum.UserInputType.Touch
+		or input.UserInputType == Enum.UserInputType.MouseMovement
+	) then
+		local delta = input.Position - miniDragStart
+
+		mini.Position = UDim2.new(
+			miniStartPos.X.Scale,
+			miniStartPos.X.Offset + delta.X,
+			miniStartPos.Y.Scale,
+			miniStartPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch
+	or input.UserInputType == Enum.UserInputType.MouseButton1 then
+		miniDragging = false
+	end
 end)
 
 close.Activated:Connect(function()
