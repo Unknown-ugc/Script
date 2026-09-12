@@ -225,14 +225,25 @@ welcomeText.TextColor3 = Color3.fromRGB(205,210,220)
 
 welcomeText.Text =
 	"Welcome to Steal an Egg All Script!\n\n" ..
-	"All scripts are here in one place, so you don't " ..
-	"need to search around. Just open the SCRIPT tab " ..
-	"and pick the script you want.\n\n" ..
-	"You can switch between KEY and KEYLESS scripts " ..
-	"using the tabs at the top of the Script page. " ..
-	"Each script has its own RUN button for easy access.\n\n" ..
-	"You can also customize the UI in SETTINGS, " ..
-	"including the color, Song ID, and transparency.\n\n" ..
+	"All scripts are here in one place. Open the " ..
+	"SCRIPT tab and choose the script you want.\n\n" ..
+	"🇵🇭 JOIN OUR PHILIPPINES COMMUNITY!\n\n" ..
+	"Join our Discord to get Egg Notifier alerts, " ..
+	"trading, buying and selling channels, player " ..
+	"help, giveaways, and a place to meet other " ..
+	"Steal an Egg players from the Philippines.\n\n" ..
+	"🥚 Egg Notifier\n" ..
+	"Get updates about eggs and important finds.\n\n" ..
+	"🔄 Trading\n" ..
+	"Find players and arrange fair trades.\n\n" ..
+	"💰 Buy / Sell\n" ..
+	"Share your offers and look for items you want.\n\n" ..
+	"🤝 Community\n" ..
+	"Meet other Filipino players, share tips, " ..
+	"and help grow the Steal an Egg PH community.\n\n" ..
+	"Join us and let's build the Philippines " ..
+	"Steal an Egg community together!\n\n" ..
+	"💬 Tap the Discord icon to copy the link!\n\n" ..
 	"Credit: Chris"
 
 welcomeText.Parent = welcome
