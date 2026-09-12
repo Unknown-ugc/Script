@@ -141,6 +141,9 @@ local function FindingOnePlayerServer()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/showscript-hub/Script/refs/heads/main/Hop%20Server%20list"))()
 end
 
+local function Shader()
+	loadstring(game:HttpGet("https://pastebin.com/raw/Zpaf00Nu"))()
+
 local function LennonHub()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
 end
@@ -233,6 +236,7 @@ local keyScripts = {
 
 local keylessScripts = {
 	{"Finding one player server", FindingOnePlayerServer},
+    {"Shader", Shader},
 	{"Lennon hub", LennonHub},
 	{"Fyy community", FyyCommunity},
 	{"Foxname", Foxname},
