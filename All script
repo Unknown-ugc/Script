@@ -186,6 +186,61 @@ setclipboard(DISCORD_LINK)
 end
 end)
 
+local discordInfo = Instance.new("TextLabel")
+discordInfo.BackgroundTransparency = 1
+discordInfo.Position = UDim2.fromOffset(0,38)
+discordInfo.Size = UDim2.fromOffset(270,18)
+discordInfo.Font = Enum.Font.Gotham
+discordInfo.Text = "💬 Tap the Discord icon to copy the link"
+discordInfo.TextSize = 8
+discordInfo.TextColor3 = Color3.fromRGB(160,170,185)
+discordInfo.TextXAlignment = Enum.TextXAlignment.Left
+discordInfo.Parent = home
+
+local welcomeHeader = Instance.new("Frame")
+welcomeHeader.BackgroundTransparency = 1
+welcomeHeader.Position = UDim2.fromOffset(0,58)
+welcomeHeader.Size = UDim2.fromOffset(140,22)
+welcomeHeader.Parent = home
+
+local welcomeLabel = Instance.new("TextLabel")
+welcomeLabel.BackgroundTransparency = 1
+welcomeLabel.Position = UDim2.fromOffset(0,0)
+welcomeLabel.Size = UDim2.fromOffset(65,22)
+welcomeLabel.Font = Enum.Font.GothamBold
+welcomeLabel.Text = "AntiDetect"
+welcomeLabel.TextSize = 9
+welcomeLabel.TextColor3 = Color3.new(1,1,1)
+welcomeLabel.TextXAlignment = Enum.TextXAlignment.Left
+welcomeLabel.Parent = welcomeHeader
+
+local welcomeOn = Instance.new("TextButton")
+welcomeOn.Position = UDim2.fromOffset(70,3)
+welcomeOn.Size = UDim2.fromOffset(38,16)
+welcomeOn.BackgroundColor3 = Theme.Main
+welcomeOn.Text = "ON"
+welcomeOn.TextSize = 7
+welcomeOn.Font = Enum.Font.GothamBold
+welcomeOn.TextColor3 = Color3.new(1,1,1)
+welcomeOn.AutoButtonColor = false
+welcomeOn.Parent = welcomeHeader
+
+Instance.new("UICorner",welcomeOn).CornerRadius = UDim.new(0,6)
+
+local welcomeState = true
+
+welcomeOn.Activated:Connect(function()
+	welcomeState = not welcomeState
+
+	if welcomeState then
+		welcomeOn.Text = "ON"
+		welcomeOn.BackgroundColor3 = Theme.Main
+	else
+		welcomeOn.Text = "OFF"
+		welcomeOn.BackgroundColor3 = Color3.fromRGB(70,75,85)
+	end
+end)
+
 local avatar = Instance.new("ImageLabel")
 avatar.Position = UDim2.new(1,-36,0,0)
 avatar.Size = UDim2.fromOffset(34,34)
