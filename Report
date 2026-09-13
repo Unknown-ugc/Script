@@ -18,35 +18,35 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local main = Instance.new("Frame")
-main.Size = UDim2.fromOffset(255, 355)
-main.Position = UDim2.new(1, -265, 0.5, -177)
+main.Size = UDim2.fromOffset(245, 360)
+main.Position = UDim2.new(1, -255, 0.5, -180)
 main.BackgroundColor3 = Color3.fromRGB(22, 27, 38)
 main.BorderSizePixel = 0
 main.Parent = gui
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
-corner.Parent = main
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 10)
+mainCorner.Parent = main
 
 local stroke = Instance.new("UIStroke")
 stroke.Color = Color3.fromRGB(60, 120, 240)
 stroke.Thickness = 1.5
 stroke.Parent = main
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -16, 0, 32)
-title.Position = UDim2.fromOffset(8, 4)
-title.BackgroundTransparency = 1
-title.Text = "Report & Script Center"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 14
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Parent = main
+local header = Instance.new("TextLabel")
+header.Size = UDim2.new(1, -16, 0, 30)
+header.Position = UDim2.fromOffset(8, 3)
+header.BackgroundTransparency = 1
+header.Text = "Report & Script Center"
+header.TextColor3 = Color3.new(1, 1, 1)
+header.Font = Enum.Font.GothamBold
+header.TextSize = 13
+header.TextXAlignment = Enum.TextXAlignment.Left
+header.Parent = main
 
 local scroll = Instance.new("ScrollingFrame")
-scroll.Size = UDim2.new(1, -12, 1, -48)
-scroll.Position = UDim2.fromOffset(6, 38)
+scroll.Size = UDim2.new(1, -10, 1, -40)
+scroll.Position = UDim2.fromOffset(5, 36)
 scroll.BackgroundTransparency = 1
 scroll.BorderSizePixel = 0
 scroll.ScrollBarThickness = 3
@@ -55,13 +55,39 @@ scroll.CanvasSize = UDim2.new()
 scroll.Parent = main
 
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 5)
+layout.Padding = UDim.new(0, 7)
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.Parent = scroll
 
-local function label(text, height, size)
+local function section()
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(1, -4, 0, 0)
+	frame.AutomaticSize = Enum.AutomaticSize.Y
+	frame.BackgroundColor3 = Color3.fromRGB(29, 35, 48)
+	frame.BorderSizePixel = 0
+	frame.Parent = scroll
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = frame
+
+	local padding = Instance.new("UIPadding")
+	padding.PaddingTop = UDim.new(0, 7)
+	padding.PaddingBottom = UDim.new(0, 7)
+	padding.PaddingLeft = UDim.new(0, 7)
+	padding.PaddingRight = UDim.new(0, 7)
+	padding.Parent = frame
+
+	local list = Instance.new("UIListLayout")
+	list.Padding = UDim.new(0, 5)
+	list.Parent = frame
+
+	return frame
+end
+
+local function label(parent, text, height, size)
 	local l = Instance.new("TextLabel")
-	l.Size = UDim2.new(1, -8, 0, height)
+	l.Size = UDim2.new(1, 0, 0, height)
 	l.BackgroundTransparency = 1
 	l.Text = text
 	l.TextColor3 = Color3.fromRGB(215, 220, 230)
@@ -70,17 +96,17 @@ local function label(text, height, size)
 	l.TextWrapped = true
 	l.TextXAlignment = Enum.TextXAlignment.Left
 	l.TextYAlignment = Enum.TextYAlignment.Top
-	l.Parent = scroll
+	l.Parent = parent
 	return l
 end
 
-local function box(placeholder, height)
+local function box(parent, placeholder, height)
 	local b = Instance.new("TextBox")
-	b.Size = UDim2.new(1, -8, 0, height)
-	b.BackgroundColor3 = Color3.fromRGB(32, 38, 51)
+	b.Size = UDim2.new(1, 0, 0, height)
+	b.BackgroundColor3 = Color3.fromRGB(35, 41, 55)
 	b.BorderSizePixel = 0
 	b.PlaceholderText = placeholder
-	b.PlaceholderColor3 = Color3.fromRGB(130, 136, 148)
+	b.PlaceholderColor3 = Color3.fromRGB(135, 141, 153)
 	b.TextColor3 = Color3.new(1, 1, 1)
 	b.Font = Enum.Font.Gotham
 	b.TextSize = 9
@@ -89,7 +115,7 @@ local function box(placeholder, height)
 	b.TextYAlignment = Enum.TextYAlignment.Top
 	b.ClearTextOnFocus = false
 	b.MultiLine = true
-	b.Parent = scroll
+	b.Parent = parent
 
 	local c = Instance.new("UICorner")
 	c.CornerRadius = UDim.new(0, 6)
@@ -98,16 +124,16 @@ local function box(placeholder, height)
 	return b
 end
 
-local function button(text)
+local function button(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(1, -8, 0, 28)
+	b.Size = UDim2.new(1, 0, 0, 28)
 	b.BackgroundColor3 = Color3.fromRGB(52, 105, 220)
 	b.BorderSizePixel = 0
 	b.Text = text
 	b.TextColor3 = Color3.new(1, 1, 1)
 	b.Font = Enum.Font.GothamBold
 	b.TextSize = 9
-	b.Parent = scroll
+	b.Parent = parent
 
 	local c = Instance.new("UICorner")
 	c.CornerRadius = UDim.new(0, 6)
@@ -116,75 +142,106 @@ local function button(text)
 	return b
 end
 
-label("REPORT ISSUE", 16, 11)
+-- REPORT ISSUE
+
+local reportSection = section()
+
+label(reportSection, "REPORT ISSUE", 16, 11)
 
 label(
+	reportSection,
 	"Report if a script is not detected, not working, or has an error.",
 	25,
 	8
 )
 
 local reportBox = box(
-	'Example: "The script does not detect the server."',
-	48
+	reportSection,
+	'Example: "The script does not detect the server and nothing happens."',
+	55
 )
 
-local reportButton = button("SEND REPORT")
-
 label(
-	"How it works: Describe the problem above, then press SEND REPORT.",
-	22,
+	reportSection,
+	"How it works: Explain what went wrong in the box above, then press SEND REPORT.",
+	27,
 	8
 )
 
-label("ADD SCRIPT SUGGESTION", 17, 11)
+local reportButton = button(reportSection, "SEND REPORT")
+
+-- ADD SCRIPT SUGGESTION
+
+local suggestionSection = section()
+
+label(suggestionSection, "ADD SCRIPT SUGGESTION", 17, 11)
 
 label(
+	suggestionSection,
 	"Suggest a script you want us to add.",
 	18,
 	8
 )
 
 local suggestionBox = box(
+	suggestionSection,
 	'Example: "Server Finder"',
-	32
+	40
 )
 
-local suggestionButton = button("SEND SUGGESTION")
-
 label(
-	"How it works: Enter your script idea, then press SEND SUGGESTION.",
-	22,
+	suggestionSection,
+	"How it works: Write the script idea you want added, then press SEND SUGGESTION.",
+	27,
 	8
 )
 
-label("SCRIPT ADDED", 17, 11)
+local suggestionButton = button(
+	suggestionSection,
+	"SEND SUGGESTION"
+)
+
+-- SCRIPT ADDED
+
+local scriptSection = section()
+
+label(scriptSection, "SCRIPT ADDED", 17, 11)
 
 label(
+	scriptSection,
 	"Paste the script you want to add here.",
 	18,
 	8
 )
 
 local scriptBox = box(
+	scriptSection,
 	"Example: Paste your script here...",
-	55
+	70
 )
 
-local scriptButton = button("SEND SCRIPT")
-
 label(
-	"How it works: Paste an existing script, then press SEND SCRIPT.",
-	22,
+	scriptSection,
+	"How it works: Paste the script you already have, then press SEND SCRIPT.",
+	27,
 	8
 )
 
-local status = label("", 24, 8)
+local scriptButton = button(
+	scriptSection,
+	"SEND SCRIPT"
+)
+
+-- STATUS
+
+local status = label(scroll, "", 30, 8)
 status.TextXAlignment = Enum.TextXAlignment.Center
 status.TextYAlignment = Enum.TextYAlignment.Center
 
+-- CLOSE BUTTON AT BOTTOM
+
 local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(1, -8, 0, 27)
+closeButton.Size = UDim2.new(1, -4, 0, 28)
 closeButton.BackgroundColor3 = Color3.fromRGB(45, 51, 65)
 closeButton.BorderSizePixel = 0
 closeButton.Text = "✕  CLOSE"
@@ -201,17 +258,19 @@ closeButton.MouseButton1Click:Connect(function()
 	gui.Enabled = false
 end)
 
+-- DRAG
+
 local dragging = false
 local dragStart
-local startPos
+local startPosition
 
-title.InputBegan:Connect(function(input)
+header.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1
 		or input.UserInputType == Enum.UserInputType.Touch then
 
 		dragging = true
 		dragStart = input.Position
-		startPos = main.Position
+		startPosition = main.Position
 
 		input.Changed:Connect(function()
 			if input.UserInputState == Enum.UserInputState.End then
@@ -232,15 +291,21 @@ UserInputService.InputChanged:Connect(function(input)
 		local delta = input.Position - dragStart
 
 		main.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
+			startPosition.X.Scale,
+			startPosition.X.Offset + delta.X,
+			startPosition.Y.Scale,
+			startPosition.Y.Offset + delta.Y
 		)
 	end
 end)
 
-local function timeLeft(seconds)
+-- HELPERS
+
+local function clean(text)
+	return text:gsub("^%s+", ""):gsub("%s+$", "")
+end
+
+local function formatTime(seconds)
 	local h = math.floor(seconds / 3600)
 	local m = math.floor((seconds % 3600) / 60)
 	return h .. "h " .. m .. "m"
@@ -262,8 +327,8 @@ local function sendWebhook(titleText, description)
 		}}
 	}
 
-	local ok = pcall(function()
-		HttpService:RequestAsync({
+	local success = pcall(function()
+		local response = HttpService:RequestAsync({
 			Url = WEBHOOK_URL,
 			Method = "POST",
 			Headers = {
@@ -271,20 +336,28 @@ local function sendWebhook(titleText, description)
 			},
 			Body = HttpService:JSONEncode(data)
 		})
+
+		if not response.Success then
+			error("Webhook failed")
+		end
 	end)
 
-	return ok
+	return success
 end
+
+-- REPORT
 
 reportButton.MouseButton1Click:Connect(function()
 	local now = os.time()
 
 	if now - lastReport < COOLDOWN then
-		status.Text = "Report cooldown: " .. timeLeft(COOLDOWN - (now - lastReport))
+		status.Text =
+			"Report cooldown: " ..
+			formatTime(COOLDOWN - (now - lastReport))
 		return
 	end
 
-	local text = reportBox.Text:gsub("^%s+", ""):gsub("%s+$", "")
+	local text = clean(reportBox.Text)
 
 	if text == "" then
 		status.Text = "Please describe the issue."
@@ -294,26 +367,31 @@ reportButton.MouseButton1Click:Connect(function()
 	local message =
 		"**Player:** " .. player.Name ..
 		"\n**UserId:** " .. player.UserId ..
-		"\n\n**Issue:**\n" .. text:sub(1, 3500)
+		"\n\n**Issue:**\n" ..
+		text:sub(1, 3500)
 
 	if sendWebhook("New Issue Report", message) then
 		lastReport = now
 		reportBox.Text = ""
-		status.Text = "Report sent! Cooldown: 12 hours."
+		status.Text = "Report sent! 12-hour cooldown."
 	else
 		status.Text = "Failed to send report."
 	end
 end)
 
+-- SUGGESTION
+
 suggestionButton.MouseButton1Click:Connect(function()
 	local now = os.time()
 
 	if now - lastSuggestion < COOLDOWN then
-		status.Text = "Suggestion cooldown: " .. timeLeft(COOLDOWN - (now - lastSuggestion))
+		status.Text =
+			"Suggestion cooldown: " ..
+			formatTime(COOLDOWN - (now - lastSuggestion))
 		return
 	end
 
-	local text = suggestionBox.Text:gsub("^%s+", ""):gsub("%s+$", "")
+	local text = clean(suggestionBox.Text)
 
 	if text == "" then
 		status.Text = "Please enter a suggestion."
@@ -323,26 +401,31 @@ suggestionButton.MouseButton1Click:Connect(function()
 	local message =
 		"**Player:** " .. player.Name ..
 		"\n**UserId:** " .. player.UserId ..
-		"\n\n**Script Suggestion:**\n" .. text:sub(1, 3500)
+		"\n\n**Script Suggestion:**\n" ..
+		text:sub(1, 3500)
 
 	if sendWebhook("New Script Suggestion", message) then
 		lastSuggestion = now
 		suggestionBox.Text = ""
-		status.Text = "Suggestion sent! Cooldown: 12 hours."
+		status.Text = "Suggestion sent! 12-hour cooldown."
 	else
 		status.Text = "Failed to send suggestion."
 	end
 end)
 
+-- SCRIPT
+
 scriptButton.MouseButton1Click:Connect(function()
 	local now = os.time()
 
 	if now - lastScript < COOLDOWN then
-		status.Text = "Script cooldown: " .. timeLeft(COOLDOWN - (now - lastScript))
+		status.Text =
+			"Script cooldown: " ..
+			formatTime(COOLDOWN - (now - lastScript))
 		return
 	end
 
-	local text = scriptBox.Text:gsub("^%s+", ""):gsub("%s+$", "")
+	local text = clean(scriptBox.Text)
 
 	if text == "" then
 		status.Text = "Please paste a script."
@@ -359,7 +442,7 @@ scriptButton.MouseButton1Click:Connect(function()
 	if sendWebhook("New Script Submission", message) then
 		lastScript = now
 		scriptBox.Text = ""
-		status.Text = "Script sent! Cooldown: 12 hours."
+		status.Text = "Script sent! 12-hour cooldown."
 	else
 		status.Text = "Failed to send script."
 	end
