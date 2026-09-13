@@ -197,34 +197,6 @@ discordInfo.TextColor3 = Color3.fromRGB(160,170,185)
 discordInfo.TextXAlignment = Enum.TextXAlignment.Left
 discordInfo.Parent = home
 
-local TIKTOK_LINK = "https://www.tiktok.com/@lts.chris?_r=1&_t=ZS-99hYnzSQs6q"
-
-local tiktok = Instance.new("ImageButton")
-tiktok.Position = UDim2.fromOffset(150,0)
-tiktok.Size = UDim2.fromOffset(34,34)
-tiktok.BackgroundTransparency = 1
-tiktok.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
-tiktok.Parent = home
-
-Instance.new("UICorner",tiktok).CornerRadius = UDim.new(1,0)
-
-tiktok.Activated:Connect(function()
-	if setclipboard then
-		setclipboard(TIKTOK_LINK)
-	end
-end)
-
-local tiktokInfo = Instance.new("TextLabel")
-tiktokInfo.BackgroundTransparency = 1
-tiktokInfo.Position = UDim2.fromOffset(150,30)
-tiktokInfo.Size = UDim2.fromOffset(110,18)
-tiktokInfo.Font = Enum.Font.Gotham
-tiktokInfo.Text = "🎵 @lts.chris • Copy"
-tiktokInfo.TextSize = 8
-tiktokInfo.TextColor3 = Color3.fromRGB(160,170,185)
-tiktokInfo.TextXAlignment = Enum.TextXAlignment.Left
-tiktokInfo.Parent = home
-
 local welcomeHeader = Instance.new("Frame")
 welcomeHeader.BackgroundTransparency = 1
 welcomeHeader.Position = UDim2.fromOffset(0,47)
@@ -345,7 +317,7 @@ welcomeScroll.Parent = welcome
 
 local welcomeText = Instance.new("TextLabel")
 welcomeText.Name = "WelcomeText"
-welcomeText.Position = UDim2.fromOffset(0,148)
+welcomeText.Position = UDim2.fromOffset(0,58)
 welcomeText.Size = UDim2.new(1,-10,0,0)
 welcomeText.BackgroundTransparency = 1
 welcomeText.Font = Enum.Font.Gotham
@@ -359,31 +331,31 @@ welcomeText.Parent = welcomeScroll
 local TIKTOK_LINK = "https://www.tiktok.com/@randomperson5142?_r=1&_t=ZS-99hbB7Iv7HU"
 
 local tiktokIcon = Instance.new("ImageLabel")
-tiktokIcon.Position = UDim2.fromOffset(5,8)
-tiktokIcon.Size = UDim2.fromOffset(32,32)
+tiktokIcon.Position = UDim2.fromOffset(5,6)
+tiktokIcon.Size = UDim2.fromOffset(26,26)
 tiktokIcon.BackgroundTransparency = 1
 tiktokIcon.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=113058136114857&width=420&height=420&format=png"
 tiktokIcon.Parent = welcomeScroll
 
 local tiktokTitle = Instance.new("TextLabel")
 tiktokTitle.BackgroundTransparency = 1
-tiktokTitle.Position = UDim2.fromOffset(43,8)
-tiktokTitle.Size = UDim2.fromOffset(100,16)
+tiktokTitle.Position = UDim2.fromOffset(36,5)
+tiktokTitle.Size = UDim2.fromOffset(90,14)
 tiktokTitle.Font = Enum.Font.GothamBold
 tiktokTitle.Text = "Support TikTok"
-tiktokTitle.TextSize = 9
+tiktokTitle.TextSize = 8
 tiktokTitle.TextColor3 = Color3.fromRGB(255,255,255)
 tiktokTitle.TextXAlignment = Enum.TextXAlignment.Left
 tiktokTitle.Parent = welcomeScroll
 
 local tiktokBox = Instance.new("TextButton")
-tiktokBox.Position = UDim2.fromOffset(43,26)
-tiktokBox.Size = UDim2.fromOffset(100,20)
+tiktokBox.Position = UDim2.fromOffset(36,19)
+tiktokBox.Size = UDim2.fromOffset(85,18)
 tiktokBox.BackgroundColor3 = Theme.BG
 tiktokBox.BorderSizePixel = 0
 tiktokBox.Font = Enum.Font.GothamBold
 tiktokBox.Text = "@chris"
-tiktokBox.TextSize = 8
+tiktokBox.TextSize = 7
 tiktokBox.TextColor3 = Theme.Main
 tiktokBox.Parent = welcomeScroll
 
@@ -391,11 +363,11 @@ Instance.new("UICorner",tiktokBox).CornerRadius = UDim.new(0,6)
 
 local tiktokInfo = Instance.new("TextLabel")
 tiktokInfo.BackgroundTransparency = 1
-tiktokInfo.Position = UDim2.fromOffset(43,47)
-tiktokInfo.Size = UDim2.fromOffset(150,14)
+tiktokInfo.Position = UDim2.fromOffset(36,38)
+tiktokInfo.Size = UDim2.fromOffset(150,12)
 tiktokInfo.Font = Enum.Font.Gotham
 tiktokInfo.Text = "Click top to copy TikTok link"
-tiktokInfo.TextSize = 7
+tiktokInfo.TextSize = 6
 tiktokInfo.TextColor3 = Color3.fromRGB(160,170,185)
 tiktokInfo.TextXAlignment = Enum.TextXAlignment.Left
 tiktokInfo.Parent = welcomeScroll
@@ -453,7 +425,7 @@ task.defer(function()
 
 	welcomeScroll.CanvasSize = UDim2.fromOffset(
 		0,
-		148 + textSize.Y + 8
+		58 + textSize.Y + 8
 	)
 end)
 
