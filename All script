@@ -1,8 +1,16 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Unknown-ugc/Script/refs/heads/main/...", true))()
+
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local TextService = game:GetService("TextService")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local aboutRemotes = ReplicatedStorage:WaitForChild("AboutRemotes")
+local reportRemote = aboutRemotes:WaitForChild("ReportIssue")
+local addScriptRemote = aboutRemotes:WaitForChild("AddScript")
 
 local player = Players.LocalPlayer
 
@@ -116,6 +124,212 @@ settingsPage.CanvasSize = UDim2.fromOffset(0,400)
 settingsPage.Visible = false
 settingsPage.Parent = content
 
+local reportPage = Instance.new("ScrollingFrame")
+reportPage.Name = "ReportPage"
+reportPage.Size = UDim2.fromScale(1,1)
+reportPage.BackgroundTransparency = 1
+reportPage.BorderSizePixel = 0
+reportPage.ScrollBarThickness = 3
+reportPage.CanvasSize = UDim2.fromOffset(0,560)
+reportPage.Visible = false
+reportPage.Parent = content
+
+local reportTitle = Instance.new("TextLabel")
+reportTitle.BackgroundTransparency = 1
+reportTitle.Position = UDim2.fromOffset(10,8)
+reportTitle.Size = UDim2.fromOffset(250,24)
+reportTitle.Font = Enum.Font.GothamBold
+reportTitle.Text = "🐛 REPORT"
+reportTitle.TextSize = 16
+reportTitle.TextColor3 = Color3.new(1,1,1)
+reportTitle.TextXAlignment = Enum.TextXAlignment.Left
+reportTitle.Parent = reportPage
+
+local reportUser = Instance.new("TextLabel")
+reportUser.BackgroundTransparency = 1
+reportUser.Position = UDim2.fromOffset(10,32)
+reportUser.Size = UDim2.fromOffset(250,18)
+reportUser.Font = Enum.Font.Gotham
+reportUser.Text = "User: @" .. player.Name
+reportUser.TextSize = 9
+reportUser.TextColor3 = Color3.fromRGB(160,170,185)
+reportUser.TextXAlignment = Enum.TextXAlignment.Left
+reportUser.Parent = reportPage
+
+local reportName = Instance.new("TextBox")
+reportName.Position = UDim2.fromOffset(10,55)
+reportName.Size = UDim2.fromOffset(250,34)
+reportName.BackgroundColor3 = Theme.Card
+reportName.BorderSizePixel = 0
+reportName.TextColor3 = Color3.new(1,1,1)
+reportName.PlaceholderText = "Script Name *"
+reportName.PlaceholderColor3 = Color3.fromRGB(120,130,145)
+reportName.TextSize = 10
+reportName.Font = Enum.Font.Gotham
+reportName.ClearTextOnFocus = false
+reportName.Parent = reportPage
+
+Instance.new("UICorner",reportName).CornerRadius = UDim.new(0,7)
+
+local reportExplain = Instance.new("TextBox")
+reportExplain.Position = UDim2.fromOffset(10,95)
+reportExplain.Size = UDim2.fromOffset(250,65)
+reportExplain.BackgroundColor3 = Theme.Card
+reportExplain.BorderSizePixel = 0
+reportExplain.TextColor3 = Color3.new(1,1,1)
+reportExplain.PlaceholderText = "Explain what went wrong... *"
+reportExplain.PlaceholderColor3 = Color3.fromRGB(120,130,145)
+reportExplain.TextSize = 10
+reportExplain.Font = Enum.Font.Gotham
+reportExplain.TextWrapped = true
+reportExplain.TextXAlignment = Enum.TextXAlignment.Left
+reportExplain.TextYAlignment = Enum.TextYAlignment.Top
+reportExplain.MultiLine = true
+reportExplain.ClearTextOnFocus = false
+reportExplain.Parent = reportPage
+
+Instance.new("UICorner",reportExplain).CornerRadius = UDim.new(0,7) I'm
+
+local sendReport = Instance.new("TextButton")
+sendReport.Position = UDim2.fromOffset(10,168)
+sendReport.Size = UDim2.fromOffset(250,34)
+sendReport.BackgroundColor3 = Theme.Main
+sendReport.BorderSizePixel = 0
+sendReport.Text = "SEND REPORT"
+sendReport.TextColor3 = Color3.new(1,1,1)
+sendReport.TextSize = 10
+sendReport.Font = Enum.Font.GothamBold
+sendReport.Parent = reportPage
+
+Instance.new("UICorner",sendReport).CornerRadius = UDim.new(0,7)
+
+sendReport.Activated:Connect(function()
+	if reportName.Text == "" or reportExplain.Text == "" then
+		sendReport.Text = "FILL IN BOTH FIELDS"
+
+		task.delay(2,function()
+			sendReport.Text = "SEND REPORT"
+		end)
+
+		return
+	end
+
+	reportRemote:FireServer(
+		reportName.Text,
+		reportExplain.Text
+	)
+
+	sendReport.Text = "REPORT SENT"
+
+	task.delay(2,function()
+		sendReport.Text = "SEND REPORT"
+	end)
+end)
+
+local addTitle = Instance.new("TextLabel")
+addTitle.BackgroundTransparency = 1
+addTitle.Position = UDim2.fromOffset(10,215)
+addTitle.Size = UDim2.fromOffset(250,24)
+addTitle.Font = Enum.Font.GothamBold
+addTitle.Text = "➕ ADD SCRIPT"
+addTitle.TextSize = 16
+addTitle.TextColor3 = Color3.new(1,1,1)
+addTitle.TextXAlignment = Enum.TextXAlignment.Left
+addTitle.Parent = reportPage
+
+local addName = Instance.new("TextBox")
+addName.Position = UDim2.fromOffset(10,245)
+addName.Size = UDim2.fromOffset(250,34)
+addName.BackgroundColor3 = Theme.Card
+addName.BorderSizePixel = 0
+addName.TextColor3 = Color3.new(1,1,1)
+addName.PlaceholderText = "Script Name *"
+addName.PlaceholderColor3 = Color3.fromRGB(120,130,145)
+addName.TextSize = 10
+addName.Font = Enum.Font.Gotham
+addName.ClearTextOnFocus = false
+addName.Parent = reportPage
+Instance.new("UICorner",addName).CornerRadius = UDim.new(0,7)
+
+local addExplain = Instance.new("TextBox")
+addExplain.Position = UDim2.fromOffset(10,285)
+addExplain.Size = UDim2.fromOffset(250,65)
+addExplain.BackgroundColor3 = Theme.Card
+addExplain.BorderSizePixel = 0
+addExplain.TextColor3 = Color3.new(1,1,1)
+addExplain.PlaceholderText = "Why should this script be added? *"
+addExplain.PlaceholderColor3 = Color3.fromRGB(120,130,145)
+addExplain.TextSize = 10
+addExplain.Font = Enum.Font.Gotham
+addExplain.TextWrapped = true
+addExplain.TextXAlignment = Enum.TextXAlignment.Left
+addExplain.TextYAlignment = Enum.TextYAlignment.Top
+addExplain.MultiLine = true
+addExplain.ClearTextOnFocus = false
+addExplain.Parent = reportPage
+Instance.new("UICorner",addExplain).CornerRadius = UDim.new(0,7)
+
+local addCode = Instance.new("TextBox")
+addCode.Position = UDim2.fromOffset(10,355)
+addCode.Size = UDim2.fromOffset(250,75)
+addCode.BackgroundColor3 = Theme.Card
+addCode.BorderSizePixel = 0
+addCode.TextColor3 = Color3.new(1,1,1)
+addCode.PlaceholderText = "Script Code (Optional)"
+addCode.PlaceholderColor3 = Color3.fromRGB(120,130,145)
+addCode.TextSize = 9
+addCode.Font = Enum.Font.Code
+addCode.TextXAlignment = Enum.TextXAlignment.Left
+addCode.TextYAlignment = Enum.TextYAlignment.Top
+addCode.MultiLine = true
+addCode.ClearTextOnFocus = false
+addCode.Parent = reportPage
+Instance.new("UICorner",addCode).CornerRadius = UDim.new(0,7)
+
+local addScript = Instance.new("TextButton")
+addScript.Activated:Connect(function()
+	if addName.Text == "" or addExplain.Text == "" then
+		addScript.Text = "NAME + REASON REQUIRED"
+
+		task.delay(2,function()
+			addScript.Text = "SUBMIT SCRIPT REQUEST"
+		end)
+
+		return
+	end
+
+	addScriptRemote:FireServer(
+		addName.Text,
+		addExplain.Text,
+		addCode.Text
+	)
+
+	addScript.Text = "REQUEST SENT"
+
+	task.delay(2,function()
+		addScript.Text = "SUBMIT SCRIPT REQUEST"
+	end)
+end)
+addScript.Position = UDim2.fromOffset(10,440)
+addScript.Size = UDim2.fromOffset(250,34)
+addScript.BackgroundColor3 = Theme.Main
+addScript.BorderSizePixel = 0
+addScript.Text = "SUBMIT SCRIPT REQUEST"
+addScript.TextColor3 = Color3.new(1,1,1)
+addScript.TextSize = 10
+addScript.Font = Enum.Font.GothamBold
+addScript.Parent = reportPage
+Instance.new("UICorner",addScript).CornerRadius = UDim.new(0,7)
+
+local function showPage(page)
+	home.Visible = false
+	scriptsPage.Visible = false
+	settingsPage.Visible = false
+	reportPage.Visible = false
+
+	page.Visible = true
+end
+
 local function makeNav(text,y)
 local b = Instance.new("TextButton")
 b.Position = UDim2.fromOffset(4,y)
@@ -136,6 +350,7 @@ end
 local homeButton = makeNav("HOME",8)
 local scriptButton = makeNav("SCRIPT",56)
 local settingsButton = makeNav("SETTINGS",104)
+local reportButton = makeNav("REPORT",152)
 
 local function selectNav(selected)
 homeButton.BackgroundTransparency = 1
@@ -151,8 +366,9 @@ local function showPage(page)
 home.Visible = false
 scriptsPage.Visible = false
 settingsPage.Visible = false
+reportpage.Visible = false
+
 page.Visible = true
-end
 
 selectNav(homeButton)
 
@@ -169,6 +385,11 @@ end)
 settingsButton.Activated:Connect(function()
 selectNav(settingsButton)
 showPage(settingsPage)
+end)
+
+reportButton.Activated:Connect(function()
+	selectNav(reportButton)
+	showPage(reportPage)
 end)
 
 local discord = Instance.new("ImageButton")
