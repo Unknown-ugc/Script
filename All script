@@ -197,6 +197,34 @@ discordInfo.TextColor3 = Color3.fromRGB(160,170,185)
 discordInfo.TextXAlignment = Enum.TextXAlignment.Left
 discordInfo.Parent = home
 
+local TIKTOK_LINK = "https://www.tiktok.com/@lts.chris?_r=1&_t=ZS-99hYnzSQs6q"
+
+local tiktok = Instance.new("ImageButton")
+tiktok.Position = UDim2.fromOffset(150,0)
+tiktok.Size = UDim2.fromOffset(34,34)
+tiktok.BackgroundTransparency = 1
+tiktok.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=85422381974829&width=420&height=420&format=png"
+tiktok.Parent = home
+
+Instance.new("UICorner",tiktok).CornerRadius = UDim.new(1,0)
+
+tiktok.Activated:Connect(function()
+	if setclipboard then
+		setclipboard(TIKTOK_LINK)
+	end
+end)
+
+local tiktokInfo = Instance.new("TextLabel")
+tiktokInfo.BackgroundTransparency = 1
+tiktokInfo.Position = UDim2.fromOffset(150,30)
+tiktokInfo.Size = UDim2.fromOffset(110,18)
+tiktokInfo.Font = Enum.Font.Gotham
+tiktokInfo.Text = "🎵 @lts.chris • Copy"
+tiktokInfo.TextSize = 8
+tiktokInfo.TextColor3 = Color3.fromRGB(160,170,185)
+tiktokInfo.TextXAlignment = Enum.TextXAlignment.Left
+tiktokInfo.Parent = home
+
 local welcomeHeader = Instance.new("Frame")
 welcomeHeader.BackgroundTransparency = 1
 welcomeHeader.Position = UDim2.fromOffset(0,47)
@@ -665,6 +693,40 @@ local function Void()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))()
 end
 
+local function Horizon()
+	script_key = "Trial"
+                                loadstring(game:HttpGet("https://api.getpolsec.com/scripts/hosted/6582551b42d21c6b7eb55f1d76d8d50ce53cb35592093d6615b5e83437594dc0.lua"))()
+end
+
+local function Lkz()
+	loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/65bf3459d87ba3ac46350e154b640929.lua"))()
+end
+
+local function Zeroin()
+	loadstring(game:HttpGet("https://zeroinhub.com/api/script"))()
+end
+
+local function Decode()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzYumi/Decode/refs/heads/main/DE%3ACODE.lua"))()
+end
+
+local function BlxyoHub()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))()
+end
+
+local function HoshiHub()
+	loadstring(game:HttpGet("https://hoshihub.site/loader.lua"))()
+end
+
+local function SenaHub()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/senarblx/sena/refs/heads/main/loader"))()
+end
+
+local function Vincetore()
+script_key = "KEYLESS"
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/tutorkah104-rgb/Sae/refs/heads/main/Sae.luau"))()
+end
+
 local function makeScriptButton(name,runFunction)
 	local card = Instance.new("Frame")
 	card.Size = UDim2.new(1,-6,0,34)
@@ -745,8 +807,16 @@ local function showKeylessScripts()
 	makeScriptButton("Mcrzhub",Mcrzhub)
 	makeScriptButton("ub-hub",UbHub)
     makeScriptButton("VXEZES",VXEZES)
-    makeScriptButton("Void",Void)
-
+    makeScriptButton("Horizon",Horizon)
+    makeScriptButton("Lkz",Lkz)
+    makeScriptButton("Zeroin",Zeroin)
+    makeScriptButton("Decode",Decode)
+    makeScriptButton("Blxyo Hub",BlxyoHub)
+    makeScriptButton("Hoshi Hub",HoshiHub)
+    makeScriptButton("Sera Hub",SeraHub)
+    makeScriptButton("Vincetore",Vincetore)
+    
+    
 
 	task.wait()
 	scriptList.CanvasSize =
