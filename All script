@@ -511,7 +511,7 @@ layout.Padding = UDim.new(0,5)
 layout.Parent = scriptList
 
 local function MirandaHub()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaegg"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))()
 end
 
 local function CloverHub()
@@ -552,6 +552,18 @@ end
 
 local function Shader()
 	loadstring(game:HttpGet("https://pastebin.com/raw/Zpaf00Nu"))()
+end
+
+local function Shader1()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua"))()
+end
+
+local function Shader2()
+	loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()
+end
+
+local function UNIVERSHUBGRAPHICS()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Uranus197/-Univers-Hub-Graphics-Script-/refs/heads/main/UniversHub"))()
 end
 
 local function BypassSpeed()
@@ -600,6 +612,23 @@ end
 
 local function VINCI()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/tutorkah104-rgb/Sae/refs/heads/main/Sae.luau"))()
+end
+
+local function REZZY()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Roman666Cabj/Nether/refs/heads/main/RezzyStealAnEgg.lua"))()
+end
+
+local function CRZHUB()
+	loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))()
+end
+
+
+local function ZYPHORAHUB()
+     loadstring(game:HttpGet("https://raw.githubusercontent.com/jdififjhdudis-del/ZZy/refs/heads/main/ZZy.lua"))()
+end
+
+local function NRL()
+	loadstring(game:HttpGet("https://www.nrlscript.com/raw/y9BUU6LkVW"))()
 end
 
 
@@ -670,6 +699,9 @@ local function showKeylessScripts()
 
 	makeScriptButton("Finding one player server",FindingOnePlayerServer)
 	makeScriptButton("Shader",Shader)
+    makeScriptButton("Shader1",Shader1)
+    makeScriptButton("Shader2",Shader2)
+    makeScriptButton("UNIVERS HUB GRAPHICS",UNIVERSHUBGRAPHICS)
     makeScriptButton("Bypass Speed",BypassSpeed)
     makeScriptButton("Nasi Rendang",NasiRendang)
 	makeScriptButton("Lennon hub",LennonHub)
@@ -682,6 +714,11 @@ local function showKeylessScripts()
     makeScriptButton("VXEZES",VXEZES)
     makeScriptButton("Void",Void)
     makeScriptButton("VINCI",VINCI)
+    makeScriptButton("REZZY"REZZY,)
+    makeScriptButton("CRZHUB",CRZHUB)
+    makeScriptButton("ZYPHORAHUB",ZYPHORAHUB)
+    makeScriptButton("NRL",NRL)
+
 
 
 	task.wait()
