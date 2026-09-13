@@ -326,8 +326,7 @@ local function showPage(page)
 	scriptsPage.Visible = false
 	settingsPage.Visible = false
 	reportPage.Visible = false
-
-	page.Visible = true
+     page.Visible = true
 end
 
 local function makeNav(text,y)
