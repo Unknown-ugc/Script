@@ -215,7 +215,7 @@ welcomeLabel.TextXAlignment = Enum.TextXAlignment.Left
 welcomeLabel.Parent = welcomeHeader
 
 local welcomeOn = Instance.new("TextButton")
-welcomeOn.Position = UDim2.fromOffset(70,-2)
+welcomeOn.Position = UDim2.fromOffset(70,5)
 welcomeOn.Size = UDim2.fromOffset(38,16)
 welcomeOn.BackgroundColor3 = Theme.Main
 welcomeOn.Text = "ON"
