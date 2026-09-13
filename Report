@@ -1,0 +1,247 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1547588055450521650/sst9fMdf8Q3aGmiXBTNv5yt4z9OLRse1377npW3rlAsBanvFPb6M1VuWpLJQbZ3R6bR8"
+
+local remote = ReplicatedStorage:FindFirstChild("ReportWebhook")
+
+if not remote then
+	remote = Instance.new("RemoteEvent")
+	remote.Name = "ReportWebhook"
+	remote.Parent = ReplicatedStorage
+end
+
+local function sendDiscord(title, description)
+	if WEBHOOK_URL == "PASTE_YOUR_DISCORD_WEBHOOK_HERE" then
+		warn("Put your Discord webhook URL in WEBHOOK_URL")
+		return
+	end
+
+	local data = {
+		username = "Roblox Report System",
+		embeds = {{
+			title = title,
+			description = description,
+			color = 5793266,
+			timestamp = DateTime.now():ToIsoDate()
+		}}
+	}
+
+	local success, result = pcall(function()
+		return HttpService:RequestAsync({
+			Url = WEBHOOK_URL,
+			Method = "POST",
+			Headers = {
+				["Content-Type"] = "application/json"
+			},
+			Body = HttpService:JSONEncode(data)
+		})
+	end)
+
+	if not success then
+		warn("Discord webhook error:", result)
+	end
+end
+
+remote.OnServerEvent:Connect(function(player, reportType, data)
+	if typeof(data) ~= "table" then
+		return
+	end
+
+	if reportType == "report" then
+		local issue = tostring(data.issue or "")
+		local scriptName = tostring(data.scriptName or "None")
+
+		issue = issue:sub(1, 3500)
+		scriptName = scriptName:sub(1, 500)
+
+		sendDiscord(
+			"📤 New Issue Report",
+			"**Player:** " .. player.Name ..
+			"\n**UserId:** " .. player.UserId ..
+			"\n**Script Name:** " .. scriptName ..
+			"\n\n**Issue:**\n" .. issue
+		)
+
+	elseif reportType == "addscript" then
+		local suggestion = tostring(data.suggestion or "None")
+		local scriptText = tostring(data.script or "None")
+
+		suggestion = suggestion:sub(1, 500)
+		scriptText = scriptText:sub(1, 3500)
+
+		sendDiscord(
+			"📜 New Add Script Request",
+			"**Player:** " .. player.Name ..
+			"\n**UserId:** " .. player.UserId ..
+			"\n\n**Script Name Suggestion:**\n" .. suggestion ..
+			"\n\n**Script They Want Added:**\n" .. scriptText
+		)
+	end
+end)
+
+local function createGUI(player)
+	local playerGui = player:WaitForChild("PlayerGui")
+
+	if playerGui:FindFirstChild("ReportIssueGUI") then
+		return
+	end
+
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "ReportIssueGUI"
+	gui.ResetOnSpawn = false
+	gui.Parent = playerGui
+
+	local main = Instance.new("Frame")
+	main.Size = UDim2.fromOffset(350, 480)
+	main.Position = UDim2.new(0.5, -175, 0.5, -240)
+	main.BackgroundColor3 = Color3.fromRGB(24, 29, 40)
+	main.BorderSizePixel = 0
+	main.Parent = gui
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 14)
+	corner.Parent = main
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(65, 125, 255)
+	stroke.Thickness = 2
+	stroke.Parent = main
+
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1, -20, 0, 45)
+	title.Position = UDim2.fromOffset(10, 8)
+	title.BackgroundTransparency = 1
+	title.Text = "Report Issue / Add Script"
+	title.TextColor3 = Color3.new(1, 1, 1)
+	title.Font = Enum.Font.GothamBold
+	title.TextSize = 19
+	title.Parent = main
+
+	local scroll = Instance.new("ScrollingFrame")
+	scroll.Size = UDim2.new(1, -20, 1, -65)
+	scroll.Position = UDim2.fromOffset(10, 58)
+	scroll.BackgroundTransparency = 1
+	scroll.BorderSizePixel = 0
+	scroll.ScrollBarThickness = 5
+	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	scroll.CanvasSize = UDim2.fromOffset(0, 0)
+	scroll.Parent = main
+
+	local layout = Instance.new("UIListLayout")
+	layout.Padding = UDim.new(0, 9)
+	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	layout.Parent = scroll
+
+	local function label(text, height)
+		local l = Instance.new("TextLabel")
+		l.Size = UDim2.new(1, -10, 0, height)
+		l.BackgroundTransparency = 1
+		l.Text = text
+		l.TextColor3 = Color3.fromRGB(220, 225, 235)
+		l.Font = Enum.Font.Gotham
+		l.TextSize = 13
+		l.TextWrapped = true
+		l.TextXAlignment = Enum.TextXAlignment.Left
+		l.TextYAlignment = Enum.TextYAlignment.Top
+		l.Parent = scroll
+		return l
+	end
+
+	local function box(placeholder, height)
+		local b = Instance.new("TextBox")
+		b.Size = UDim2.new(1, -10, 0, height)
+		b.BackgroundColor3 = Color3.fromRGB(34, 40, 54)
+		b.BorderSizePixel = 0
+		b.PlaceholderText = placeholder
+		b.PlaceholderColor3 = Color3.fromRGB(140, 145, 155)
+		b.TextColor3 = Color3.new(1, 1, 1)
+		b.Font = Enum.Font.Gotham
+		b.TextSize = 13
+		b.TextWrapped = true
+		b.TextXAlignment = Enum.TextXAlignment.Left
+		b.TextYAlignment = Enum.TextYAlignment.Top
+		b.MultiLine = true
+		b.ClearTextOnFocus = false
+		b.Parent = scroll
+
+		local c = Instance.new("UICorner")
+		c.CornerRadius = UDim.new(0, 9)
+		c.Parent = b
+
+		return b
+	end
+
+	label(
+		"📤 SEND REPORT\nSend a report if the script is not detected, not working, or has an error. Explain what happened.",
+		65
+	)
+
+	local issueBox = box("Describe the issue...", 85)
+
+	label(
+		"📜 ADD SCRIPT\nSuggest a script you want added, or provide a script you already have. This is optional.",
+		65
+	)
+
+	label(
+		"💡 Script Name Suggestion\nWrite the name of the script you want added.",
+		42
+	)
+
+	local suggestionBox = box("Example: Server Finder", 55)
+
+	label(
+		"📜 Script You Want Added\nOptional. Add the script you already have and want added.",
+		45
+	)
+
+	local scriptBox = box("Paste or describe the script here...", 100)
+
+	local reportButton = Instance.new("TextButton")
+	reportButton.Size = UDim2.new(1, -10, 0, 45)
+	reportButton.BackgroundColor3 = Color3.fromRGB(55, 110, 235)
+	reportButton.BorderSizePixel = 0
+	reportButton.Text = "📤 SEND REPORT"
+	reportButton.TextColor3 = Color3.new(1, 1, 1)
+	reportButton.Font = Enum.Font.GothamBold
+	reportButton.TextSize = 14
+	reportButton.Parent = scroll
+
+	local reportCorner = Instance.new("UICorner")
+	reportCorner.CornerRadius = UDim.new(0, 9)
+	reportCorner.Parent = reportButton
+
+	local addButton = Instance.new("TextButton")
+	addButton.Size = UDim2.new(1, -10, 0, 45)
+	addButton.BackgroundColor3 = Color3.fromRGB(75, 80, 100)
+	addButton.BorderSizePixel = 0
+	addButton.Text = "📜 SEND ADD SCRIPT"
+	addButton.TextColor3 = Color3.new(1, 1, 1)
+	addButton.Font = Enum.Font.GothamBold
+	addButton.TextSize = 14
+	addButton.Parent = scroll
+
+	local addCorner = Instance.new("UICorner")
+	addCorner.CornerRadius = UDim.new(0, 9)
+	addCorner.Parent = addButton
+
+	local status = label("", 35)
+	status.TextXAlignment = Enum.TextXAlignment.Center
+
+	-- Client-side button connections are handled by a LocalScript.
+	-- This server script creates the RemoteEvent and webhook handler.
+end
+
+Players.PlayerAdded:Connect(function(player)
+	task.spawn(function()
+		createGUI(player)
+	end)
+end)
+
+for _, player in ipairs(Players:GetPlayers()) do
+	task.spawn(function()
+		createGUI(player)
+	end)
+end
