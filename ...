@@ -1,0 +1,133 @@
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local WEBHOOK_URL = "PASTE_YOUR_WEBHOOK_HERE"
+
+local remotes = ReplicatedStorage:WaitForChild("AboutRemotes")
+local reportRemote = remotes:WaitForChild("ReportIssue")
+local addScriptRemote = remotes:WaitForChild("AddScript")
+
+local MENTION = "<@1539499007397724181>"
+
+local COOLDOWN = 12 * 60 * 60
+
+local reportCooldowns = {}
+local addScriptCooldowns = {}
+
+local function clean(text, limit)
+	text = tostring(text or "")
+	text = text:gsub("@everyone", "@ everyone")
+	text = text:gsub("@here", "@ here")
+	return text:sub(1, limit)
+end
+
+local function sendDiscord(title, fields)
+	local data = {
+		content = MENTION,
+		username = "Steal An Egg Reports",
+		embeds = {{
+			title = title,
+			color = 35711,
+			fields = fields
+		}}
+	}
+
+	local success, result = pcall(function()
+		return HttpService:RequestAsync({
+			Url = WEBHOOK_URL,
+			Method = "POST",
+			Headers = {
+				["Content-Type"] = "application/json"
+			},
+			Body = HttpService:JSONEncode(data)
+		})
+	end)
+
+	return success and result and result.Success
+end
+
+reportRemote.OnServerEvent:Connect(function(player, scriptName, explanation)
+	local now = os.time()
+
+	if reportCooldowns[player.UserId] and reportCooldowns[player.UserId] > now then
+		return
+	end
+
+	scriptName = clean(scriptName, 100)
+	explanation = clean(explanation, 900)
+
+	if scriptName == "" or explanation == "" then
+		return
+	end
+
+	local sent = sendDiscord("🐛 ISSUE REPORT", {
+		{
+			name = "User",
+			value = player.Name,
+			inline = false
+		},
+		{
+			name = "Script",
+			value = scriptName,
+			inline = false
+		},
+		{
+			name = "Explanation",
+			value = explanation,
+			inline = false
+		}
+	})
+
+	if sent then
+		reportCooldowns[player.UserId] = now + COOLDOWN
+	end
+end)
+
+addScriptRemote.OnServerEvent:Connect(function(player, scriptName, explanation, scriptCode)
+	local now = os.time()
+
+	if addScriptCooldowns[player.UserId] and addScriptCooldowns[player.UserId] > now then
+		return
+	end
+
+	scriptName = clean(scriptName, 100)
+	explanation = clean(explanation, 900)
+	scriptCode = clean(scriptCode, 800)
+
+	if scriptName == "" or explanation == "" then
+		return
+	end
+
+	local codeStatus = "Not provided"
+
+	if scriptCode ~= "" then
+		codeStatus = "Provided:\n```lua\n" .. scriptCode .. "\n```"
+	end
+
+	local sent = sendDiscord("➕ ADD SCRIPT REQUEST", {
+		{
+			name = "User",
+			value = player.Name,
+			inline = false
+		},
+		{
+			name = "Script Name",
+			value = scriptName,
+			inline = false
+		},
+		{
+			name = "Explanation",
+			value = explanation,
+			inline = false
+		},
+		{
+			name = "Script Code",
+			value = codeStatus,
+			inline = false
+		}
+	})
+
+	if sent then
+		addScriptCooldowns[player.UserId] = now + COOLDOWN
+	end
+end)
