@@ -188,7 +188,7 @@ end)
 
 local discordInfo = Instance.new("TextLabel")
 discordInfo.BackgroundTransparency = 1
-discordInfo.Position = UDim2.fromOffset(0,38)
+discordInfo.Position = UDim2.fromOffset(0,34)
 discordInfo.Size = UDim2.fromOffset(270,18)
 discordInfo.Font = Enum.Font.Gotham
 discordInfo.Text = "💬 Tap the Discord icon to copy the link"
@@ -205,7 +205,7 @@ welcomeHeader.Parent = home
 
 local welcomeLabel = Instance.new("TextLabel")
 welcomeLabel.BackgroundTransparency = 1
-welcomeLabel.Position = UDim2.fromOffset(0,0)
+welcomeLabel.Position = UDim2.fromOffset(0,54)
 welcomeLabel.Size = UDim2.fromOffset(65,22)
 welcomeLabel.Font = Enum.Font.GothamBold
 welcomeLabel.Text = "AntiDetect"
@@ -215,7 +215,7 @@ welcomeLabel.TextXAlignment = Enum.TextXAlignment.Left
 welcomeLabel.Parent = welcomeHeader
 
 local welcomeOn = Instance.new("TextButton")
-welcomeOn.Position = UDim2.fromOffset(70,5)
+welcomeOn.Position = UDim2.fromOffset(70,-4)
 welcomeOn.Size = UDim2.fromOffset(38,16)
 welcomeOn.BackgroundColor3 = Theme.Main
 welcomeOn.Text = "ON"
