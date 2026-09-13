@@ -590,6 +590,19 @@ local function UbHub()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/TeamUBHub/UBLoader/refs/heads/main/index/Key.lua"))()
 end
 
+local function VXEZES()
+	loadstring(game:HttpGet("https://vxezestudio.online/api/scripts/script_G5CGjqj2X3rOS/stream/init"))()
+end
+
+local function Void()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))()
+end
+
+local function VINCI()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/tutorkah104-rgb/Sae/refs/heads/main/Sae.luau"))()
+end
+
+
 local function makeScriptButton(name,runFunction)
 	local card = Instance.new("Frame")
 	card.Size = UDim2.new(1,-6,0,34)
@@ -666,6 +679,10 @@ local function showKeylessScripts()
 	makeScriptButton("bobloscript-v2",BobloscriptV2)
 	makeScriptButton("Mcrzhub",Mcrzhub)
 	makeScriptButton("ub-hub",UbHub)
+    makeScriptButton("VXEZES",VXEZES)
+    makeScriptButton("Void",Void)
+    makeScriptButton("VINCI",VINCI)
+
 
 	task.wait()
 	scriptList.CanvasSize =
