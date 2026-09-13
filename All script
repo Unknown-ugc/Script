@@ -301,36 +301,10 @@ welcome.Position = UDim2.fromOffset(0,70)
 welcome.Size = UDim2.fromOffset(270,150)
 welcome.BackgroundColor3 = Theme.Card
 welcome.BorderSizePixel = 0
-welcome.Parent = home
-
-Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
-
-local welcome = Instance.new("Frame")
-welcome.Position = UDim2.fromOffset(0,70)
-welcome.Size = UDim2.fromOffset(270,150)
-welcome.BackgroundColor3 = Theme.Card
-welcome.BorderSizePixel = 0
-welcome.Parent = home
-
-Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
-
-local welcome = Instance.new("Frame")
-welcome.Position = UDim2.fromOffset(0,70)
-welcome.Size = UDim2.fromOffset(270,150)
-welcome.BackgroundColor3 = Theme.Card
-welcome.BorderSizePixel = 0
 welcome.ClipsDescendants = true
 welcome.Parent = home
 
 Instance.new("UICorner",welcome).CornerRadius = UDim.new(0,10)
-
-local welcome = Instance.new("Frame")
-welcome.Position = UDim2.fromOffset(0,70)
-welcome.Size = UDim2.fromOffset(270,150)
-welcome.BackgroundColor3 = Theme.Card
-welcome.BorderSizePixel = 0
-welcome.ClipsDescendants = true
-welcome.Parent = home
 
 welcome.Parent = home
 
@@ -371,7 +345,7 @@ welcomeScroll.Parent = welcome
 
 local welcomeText = Instance.new("TextLabel")
 welcomeText.Name = "WelcomeText"
-welcomeText.Position = UDim2.fromOffset(0,0)
+welcomeText.Position = UDim2.fromOffset(0,148)
 welcomeText.Size = UDim2.new(1,-10,0,0)
 welcomeText.BackgroundTransparency = 1
 welcomeText.Font = Enum.Font.Gotham
@@ -381,6 +355,61 @@ welcomeText.TextXAlignment = Enum.TextXAlignment.Left
 welcomeText.TextYAlignment = Enum.TextYAlignment.Top
 welcomeText.TextColor3 = Color3.fromRGB(220,230,245)
 welcomeText.Parent = welcomeScroll
+
+local TIKTOK_LINK = "https://www.tiktok.com/@randomperson5142?_r=1&_t=ZS-99hbB7Iv7HU"
+
+local tiktokIcon = Instance.new("ImageLabel")
+tiktokIcon.Position = UDim2.fromOffset(5,8)
+tiktokIcon.Size = UDim2.fromOffset(32,32)
+tiktokIcon.BackgroundTransparency = 1
+tiktokIcon.Image = "https://www.roblox.com/asset-thumbnail/image?assetId=113058136114857&width=420&height=420&format=png"
+tiktokIcon.Parent = welcomeScroll
+
+local tiktokTitle = Instance.new("TextLabel")
+tiktokTitle.BackgroundTransparency = 1
+tiktokTitle.Position = UDim2.fromOffset(43,8)
+tiktokTitle.Size = UDim2.fromOffset(100,16)
+tiktokTitle.Font = Enum.Font.GothamBold
+tiktokTitle.Text = "Support TikTok"
+tiktokTitle.TextSize = 9
+tiktokTitle.TextColor3 = Color3.fromRGB(255,255,255)
+tiktokTitle.TextXAlignment = Enum.TextXAlignment.Left
+tiktokTitle.Parent = welcomeScroll
+
+local tiktokBox = Instance.new("TextButton")
+tiktokBox.Position = UDim2.fromOffset(43,26)
+tiktokBox.Size = UDim2.fromOffset(100,20)
+tiktokBox.BackgroundColor3 = Theme.BG
+tiktokBox.BorderSizePixel = 0
+tiktokBox.Font = Enum.Font.GothamBold
+tiktokBox.Text = "@chris"
+tiktokBox.TextSize = 8
+tiktokBox.TextColor3 = Theme.Main
+tiktokBox.Parent = welcomeScroll
+
+Instance.new("UICorner",tiktokBox).CornerRadius = UDim.new(0,6)
+
+local tiktokInfo = Instance.new("TextLabel")
+tiktokInfo.BackgroundTransparency = 1
+tiktokInfo.Position = UDim2.fromOffset(43,47)
+tiktokInfo.Size = UDim2.fromOffset(150,14)
+tiktokInfo.Font = Enum.Font.Gotham
+tiktokInfo.Text = "Click top to copy TikTok link"
+tiktokInfo.TextSize = 7
+tiktokInfo.TextColor3 = Color3.fromRGB(160,170,185)
+tiktokInfo.TextXAlignment = Enum.TextXAlignment.Left
+tiktokInfo.Parent = welcomeScroll
+
+tiktokBox.Activated:Connect(function()
+	if setclipboard then
+		setclipboard(TIKTOK_LINK)
+		tiktokBox.Text = "Copied!"
+
+		task.delay(2,function()
+			tiktokBox.Text = "@chris"
+		end)
+	end
+end)
 
 welcomeText.Text =
 	"Welcome to Steal an Egg All Script!\n\n" ..
@@ -424,7 +453,7 @@ task.defer(function()
 
 	welcomeScroll.CanvasSize = UDim2.fromOffset(
 		0,
-		textSize.Y
+		148 + textSize.Y + 8
 	)
 end)
 
