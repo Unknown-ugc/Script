@@ -622,7 +622,6 @@ local function CRZHUB()
 	loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))()
 end
 
-
 local function ZYPHORAHUB()
      loadstring(game:HttpGet("https://raw.githubusercontent.com/jdififjhdudis-del/ZZy/refs/heads/main/ZZy.lua"))()
 end
@@ -714,7 +713,7 @@ local function showKeylessScripts()
     makeScriptButton("VXEZES",VXEZES)
     makeScriptButton("Void",Void)
     makeScriptButton("VINCI",VINCI)
-    makeScriptButton("REZZY"REZZY,)
+    makeScriptButton("REZZY"REZZY)
     makeScriptButton("CRZHUB",CRZHUB)
     makeScriptButton("ZYPHORAHUB",ZYPHORAHUB)
     makeScriptButton("NRL",NRL)
