@@ -610,27 +610,6 @@ local function Void()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))()
 end
 
-local function VINCI()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/tutorkah104-rgb/Sae/refs/heads/main/Sae.luau"))()
-end
-
-local function REZZY()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Roman666Cabj/Nether/refs/heads/main/RezzyStealAnEgg.lua"))()
-end
-
-local function CRZHUB()
-	loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))()
-end
-
-local function ZYPHORAHUB()
-     loadstring(game:HttpGet("https://raw.githubusercontent.com/jdififjhdudis-del/ZZy/refs/heads/main/ZZy.lua"))()
-end
-
-local function NRL()
-	loadstring(game:HttpGet("https://www.nrlscript.com/raw/y9BUU6LkVW"))()
-end
-
-
 local function makeScriptButton(name,runFunction)
 	local card = Instance.new("Frame")
 	card.Size = UDim2.new(1,-6,0,34)
@@ -712,12 +691,6 @@ local function showKeylessScripts()
 	makeScriptButton("ub-hub",UbHub)
     makeScriptButton("VXEZES",VXEZES)
     makeScriptButton("Void",Void)
-    makeScriptButton("VINCI",VINCI)
-    makeScriptButton("REZZY",REZZY)
-    makeScriptButton("CRZHUB",CRZHUB)
-    makeScriptButton("ZYPHORAHUB",ZYPHORAHUB)
-    makeScriptButton("NRL",NRL)
-
 
 
 	task.wait()
