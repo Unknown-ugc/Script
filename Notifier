@@ -35,218 +35,112 @@ local PET_IMAGES = {
 	["Phoenix"] = "https://static.wikia.nocookie.net/stealanegg/images/c/c1/Phoenix.png/revision/latest/scale-to-width-down/178?cb=20260904025201",
 	["Lava Dragon"] = "https://static.wikia.nocookie.net/stealanegg/images/7/77/Lava_Dragon.png/revision/latest/scale-to-width-down/178?cb=20260904025223",
 	["Ice Dragon"] = "https://static.wikia.nocookie.net/stealanegg/images/b/bb/Ice_Dragon.png/revision/latest/scale-to-width-down/284?cb=20260904110044",
-
 	["Cosmic Dragon"] = "https://static.wikia.nocookie.net/stealanegg/images/3/3e/Cosmic_Dragon.png/revision/latest/scale-to-width-down/284?cb=20260903140720",
 
 	["Unicorn"] = "https://static.wikia.nocookie.net/stealanegg/images/7/7e/Unicorn.png/revision/latest/scale-to-width-down/265?cb=20260901185215",
 	["Kitsune"] = "https://static.wikia.nocookie.net/stealanegg/images/0/04/Kitsune.png/revision/latest/scale-to-width-down/284?cb=20260903135644",
-	["Nightflame"] = "https://static.wikia.nocookie.net/stealanegg/images/a/aa/Nightflame.png/revision/latest/scale-to-width-down/284?cb=20260901190742"
+	["Nightflame"] = "https://static.wikia.nocookie.net/stealanegg/images/a/aa/Nightflame.png/revision/latest/scale-to-width-down/284?cb=20260901190742",
+
+	["Gargoyle"] = "https://static.wikia.nocookie.net/stealanegg/images/4/44/Gargoyle.png/revision/latest/scale-to-width-down/284?cb=20260912164712",
+	["RazorFang"] = "https://static.wikia.nocookie.net/stealanegg/images/c/c2/RazorFang.png/revision/latest/scale-to-width-down/284?cb=20260912164720",
+	["Skeleton Horse"] = "https://static.wikia.nocookie.net/stealanegg/images/d/de/Skeleton_Horse.png/revision/latest/scale-to-width-down/284?cb=20260912164727",
+	["World Burner"] = "https://static.wikia.nocookie.net/stealanegg/images/f/fe/World_Burner.png/revision/latest/scale-to-width-down/284?cb=20260912164738",
+
+	["Pure Jellyfish"] = "https://static.wikia.nocookie.net/stealanegg/images/7/7e/Pure_Jellyfish.png/revision/latest/scale-to-width-down/284?cb=20260912164614",
+	["Centaur"] = "https://static.wikia.nocookie.net/stealanegg/images/b/bc/Centaur.png/revision/latest/scale-to-width-down/284?cb=20260912164622",
+	["Pegasus"] = "https://static.wikia.nocookie.net/stealanegg/images/3/36/Eternal_Pegasus.png/revision/latest/scale-to-width-down/284?cb=20260913012404",
+	["ArchAngel"] = "https://static.wikia.nocookie.net/stealanegg/images/6/60/ArchAngel.png/revision/latest/scale-to-width-down/284?cb=20260912164639",
+
+	["Equinox"] = "https://static.wikia.nocookie.net/stealanegg/images/e/e7/Equinox.png/revision/latest/scale-to-width-down/284?cb=20260913045536",
+	["Aetheron"] = "https://static.wikia.nocookie.net/stealanegg/images/e/e7/Aetheron.png/revision/latest/scale-to-width-down/284?cb=20260913045520"
 }
 
 local CREATURES = {
 
 	-- SECRET
 
-	["mutant shark"] = {
-		"Mutant Shark",
-		"Secret",
-		0x000000,
-		"Titan Temple",
-		"7B"
-	},
+	["mutant shark"] = {"Mutant Shark", "Secret", 0x000000, "Titan Temple", "7B"},
+	["stag"] = {"Stag", "Secret", 0x000000, "Cherry Blossom", "2.5B"},
+	["cosmic skeleton boss"] = {"Cosmic Skeleton Boss", "Secret", 0x000000, "Cosmic", "700M"},
+	["tralaledon"] = {"Tralaledon", "Secret", 0x000000, "Prehistoric", "18M"},
+	["kraken"] = {"Kraken", "Secret", 0x000000, "Abyss Ocean", "2.5M"},
+	["cerberus"] = {"Cerberus", "Secret", 0x000000, "Volcano", "700K"},
+	["yeti"] = {"Yeti", "Secret", 0x000000, "Snow", "170K"},
+	["t-rex"] = {"T-Rex", "Secret", 0x000000, "Prehistoric", "18M"},
+	["cosmic dragon"] = {"Cosmic Dragon", "Secret", 0x000000, "Cosmic", "700M"},
 
-	["stag"] = {
-		"Stag",
-		"Secret",
-		0x000000,
-		"Cherry Blossom",
-		"2.5B"
-	},
-
-	["cosmic skeleton boss"] = {
-		"Cosmic Skeleton Boss",
-		"Secret",
-		0x000000,
-		"Cosmic",
-		"700M"
-	},
-
-	["tralaledon"] = {
-		"Tralaledon",
-		"Secret",
-		0x000000,
-		"Prehistoric",
-		"18M"
-	},
-
-	["kraken"] = {
-		"Kraken",
-		"Secret",
-		0x000000,
-		"Abyss Ocean",
-		"2.5M"
-	},
-
-	["cerberus"] = {
-		"Cerberus",
-		"Secret",
-		0x000000,
-		"Volcano",
-		"700K"
-	},
-
-	["yeti"] = {
-		"Yeti",
-		"Secret",
-		0x000000,
-		"Snow",
-		"170K"
-	},
-
-	["t-rex"] = {
-		"T-Rex",
-		"Secret",
-		0x000000,
-		"Prehistoric",
-		"18M"
-	},
-
-	["cosmic dragon"] = {
-		"Cosmic Dragon",
-		"Secret",
-		0x000000,
-		"Cosmic",
-		"700M"
-	},
+	["gargoyle"] = {"Gargoyle", "Secret", 0x000000, "Demon", "20B"},
+	["razorfang"] = {"RazorFang", "Secret", 0x000000, "Demon", "20B"},
+	["pure jellyfish"] = {"Pure Jellyfish", "Secret", 0x000000, "Angels", "20B"},
+	["centaur"] = {"Centaur", "Secret", 0x000000, "Angels", "20B"},
 
 	-- ENTERnal
 
-	["el maja"] = {
-		"El Maja",
-		"Enternal",
-		0xFF69B4,
-		"Abyss Ocean",
-		"2.5M"
-	},
+	["el maja"] = {"El Maja", "Enternal", 0xFF69B4, "Abyss Ocean", "2.5M"},
+	["gorilla king"] = {"Gorilla King", "Enternal", 0xFF69B4, "Titan Temple", "7B"},
+	["oni tiger"] = {"Oni Tiger", "Enternal", 0xFF69B4, "Cherry Blossom", "2.5B"},
+	["lunar dragon"] = {"Lunar Dragon", "Enternal", 0xFF69B4, "Cosmic", "700M"},
+	["mosasaurus"] = {"Mosasaurus", "Enternal", 0xFF69B4, "Prehistoric", "18M"},
+	["phoenix"] = {"Phoenix", "Enternal", 0xFF69B4, "Volcano", "700K"},
+	["lava dragon"] = {"Lava Dragon", "Enternal", 0xFF69B4, "Volcano", "700K"},
+	["ice dragon"] = {"Ice Dragon", "Enternal", 0xFF69B4, "Snow", "170K"},
 
-	["gorilla king"] = {
-		"Gorilla King",
-		"Enternal",
-		0xFF69B4,
-		"Titan Temple",
-		"7B"
-	},
-
-	["oni tiger"] = {
-		"Oni Tiger",
-		"Enternal",
-		0xFF69B4,
-		"Cherry Blossom",
-		"2.5B"
-	},
-
-	["lunar dragon"] = {
-		"Lunar Dragon",
-		"Enternal",
-		0xFF69B4,
-		"Cosmic",
-		"700M"
-	},
-
-	["mosasaurus"] = {
-		"Mosasaurus",
-		"Enternal",
-		0xFF69B4,
-		"Prehistoric",
-		"18M"
-	},
-
-	["phoenix"] = {
-		"Phoenix",
-		"Enternal",
-		0xFF69B4,
-		"Volcano",
-		"700K"
-	},
-
-	["lava dragon"] = {
-		"Lava Dragon",
-		"Enternal",
-		0xFF69B4,
-		"Volcano",
-		"700K"
-	},
-
-	["ice dragon"] = {
-		"Ice Dragon",
-		"Enternal",
-		0xFF69B4,
-		"Snow",
-		"170K"
-	},
+	["skeleton horse"] = {"Skeleton Horse", "Enternal", 0xFF69B4, "Demon", "20B"},
+	["pegasus"] = {"Pegasus", "Enternal", 0xFF69B4, "Angels", "20B"},
+	["equinox"] = {"Equinox", "Enternal", 0xFF69B4, "Angel and Demons", "20B"},
 
 	-- DIVINE
 
-	["unicorn"] = {
-		"Unicorn",
-		"Divine",
-		0xFFFF00,
-		"Cosmic",
-		"700M"
-	},
+	["unicorn"] = {"Unicorn", "Divine", 0xFFFF00, "Cosmic", "700M"},
+	["kitsune"] = {"Kitsune", "Divine", 0xFFFF00, "Cherry Blossom", "2.5B"},
+	["nightflame"] = {"Nightflame", "Divine", 0xFFFF00, "Titan Temple", "7B"},
 
-	["kitsune"] = {
-		"Kitsune",
-		"Divine",
-		0xFFFF00,
-		"Cherry Blossom",
-		"2.5B"
-	},
-
-	["nightflame"] = {
-		"Nightflame",
-		"Divine",
-		0xFFFF00,
-		"Titan Temple",
-		"7B"
-	}
+	["world burner"] = {"World Burner", "Divine", 0xFFFF00, "Demon", "20B"},
+	["archangel"] = {"ArchAngel", "Divine", 0xFFFF00, "Angels", "20B"},
+	["aetheron"] = {"Aetheron", "Divine", 0xFFFF00, "Angel and Demons", "20B"}
 }
 
 local MONEY = {
 
-	-- SNOW
 	["Yeti"] = "5M",
 	["Ice Dragon"] = "65M",
 
-	-- VOLCANO
 	["Cerberus"] = "8M",
 	["Phoenix"] = "85M",
 	["Lava Dragon"] = "100M",
 
-	-- ABYSS OCEAN
 	["Kraken"] = "15M",
 	["El Maja"] = "130M",
 
-	-- PREHISTORIC
 	["Tralaledon"] = "32M",
 	["T-Rex"] = "25M",
 	["Mosasaurus"] = "180M",
 
-	-- COSMIC
 	["Cosmic Dragon"] = "60M",
 	["Cosmic Skeleton Boss"] = "45M",
 	["Lunar Dragon"] = "250M",
 	["Unicorn"] = "1B",
 
-	-- CHERRY BLOSSOM
 	["Stag"] = "145M",
 	["Oni Tiger"] = "600M",
 	["Kitsune"] = "1.8B",
 
-	-- TITAN TEMPLE
 	["Mutant Shark"] = "215M",
 	["Gorilla King"] = "880M",
-	["Nightflame"] = "3B"
+	["Nightflame"] = "3B",
+
+	["Gargoyle"] = "225M",
+	["RazorFang"] = "350M",
+	["Skeleton Horse"] = "1.3B",
+	["World Burner"] = "5B",
+
+	["Pure Jellyfish"] = "225M",
+	["Centaur"] = "350M",
+	["Pegasus"] = "1.3B",
+	["ArchAngel"] = "5B",
+
+	["Equinox"] = "1.8B",
+	["Aetheron"] = "6.9B"
 }
 
 local function send(creature)
@@ -259,7 +153,6 @@ local function send(creature)
 
 	local role = ROLES[rarity]
 	local webhook = WEBHOOKS[rarity]
-
 	local image = PET_IMAGES[name]
 	local money = MONEY[name] or "Unknown"
 
@@ -291,7 +184,6 @@ local function send(creature)
 		}
 	}
 
-	-- Pet image on the RIGHT side of the Discord embed
 	if image then
 		embed.thumbnail = {
 			url = image
@@ -314,7 +206,6 @@ local function send(creature)
 
 		return HttpService:RequestAsync({
 			Url = webhook,
-
 			Method = "POST",
 
 			Headers = {
@@ -379,4 +270,5 @@ print("System Chat Only")
 print("Pet thumbnails enabled")
 print("Role pings enabled")
 print("5 second duplicate protection")
+print("All biome data loaded")
 print("================================")
