@@ -696,7 +696,7 @@ local function Void()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))()
 end
 
-local function Horizon()
+local function AntiHit()
 	script_key = "Trial"
                                 loadstring(game:HttpGet("https://api.getpolsec.com/scripts/hosted/6582551b42d21c6b7eb55f1d76d8d50ce53cb35592093d6615b5e83437594dc0.lua"))()
 end
@@ -810,7 +810,7 @@ local function showKeylessScripts()
 	makeScriptButton("Mcrzhub",Mcrzhub)
 	makeScriptButton("ub-hub",UbHub)
     makeScriptButton("VXEZES",VXEZES)
-    makeScriptButton("Horizon",Horizon)
+    makeScriptButton("Anti Hit",AntiHit)
     makeScriptButton("Lkz",Lkz)
     makeScriptButton("Zeroin",Zeroin)
     makeScriptButton("Decode",Decode)
