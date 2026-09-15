@@ -676,10 +676,6 @@ local function Axonic()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Kenniel123/Steal-A-Egg/refs/heads/main/Steal%20A%20Egg"))()
 end
 
-local function BobloscriptV2()
-	loadstring(game:HttpGet("https://github.com/bobloscript/scripts/raw/refs/heads/main/opensource_egg", true))()
-end
-
 local function Mcrzhub()
 	loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))()
 end
@@ -806,7 +802,6 @@ local function showKeylessScripts()
 	makeScriptButton("Fyy community",FyyCommunity)
 	makeScriptButton("Foxname",Foxname)
 	makeScriptButton("Axonic",Axonic)
-	makeScriptButton("bobloscript-v2",BobloscriptV2)
 	makeScriptButton("Mcrzhub",Mcrzhub)
 	makeScriptButton("ub-hub",UbHub)
     makeScriptButton("VXEZES",VXEZES)
